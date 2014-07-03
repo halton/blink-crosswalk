@@ -108,8 +108,6 @@ void ImageResource::didRemoveClient(ResourceClient* c)
     ASSERT(c->resourceClientType() == ImageResourceClient::expectedType());
 
     m_pendingContainerSizeRequests.remove(static_cast<ImageResourceClient*>(c));
-    if (m_svgImageCache)
-        m_svgImageCache->removeClientFromCache(static_cast<ImageResourceClient*>(c));
 
     Resource::didRemoveClient(c);
 }
@@ -205,12 +203,6 @@ blink::Image* ImageResource::imageForRenderer(const RenderObject* renderer)
     if (!m_image)
         return blink::Image::nullImage();
 
-    if (m_image->isSVGImage()) {
-        blink::Image* image = m_svgImageCache->imageForRenderer(renderer);
-        if (image != blink::Image::nullImage())
-            return image;
-    }
-
     return m_image.get();
 }
 
@@ -224,12 +216,7 @@ void ImageResource::setContainerSizeForRenderer(const ImageResourceClient* rende
         m_pendingContainerSizeRequests.set(renderer, SizeAndZoom(containerSize, containerZoom));
         return;
     }
-    if (!m_image->isSVGImage()) {
-        m_image->setContainerSize(containerSize);
-        return;
-    }
 
-    m_svgImageCache->setContainerSizeForRenderer(renderer, containerSize, containerZoom);
 }
 
 bool ImageResource::usesImageContainerSize() const
@@ -267,8 +254,6 @@ LayoutSize ImageResource::imageSizeForRenderer(const RenderObject* renderer, flo
 
     if (m_image->isBitmapImage() && (renderer && renderer->shouldRespectImageOrientation() == RespectImageOrientation))
         imageSize = toBitmapImage(m_image.get())->sizeRespectingOrientation();
-    else if (m_image->isSVGImage() && sizeType == NormalSize)
-        imageSize = m_svgImageCache->imageSizeForRenderer(renderer);
     else
         imageSize = m_image->size();
 
@@ -318,13 +303,7 @@ inline void ImageResource::createImage()
     if (m_image)
         return;
 
-    if (m_response.mimeType() == "image/svg+xml") {
-        RefPtr<SVGImage> svgImage = SVGImage::create(this);
-        m_svgImageCache = SVGImageCache::create(svgImage.get());
-        m_image = svgImage.release();
-    } else {
         m_image = BitmapImage::create(this);
-    }
 
     if (m_image) {
         // Send queued container size requests.

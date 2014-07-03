@@ -49,14 +49,6 @@
 #include "core/rendering/RenderView.h"
 #include "core/rendering/RenderWidget.h"
 #include "core/rendering/compositing/CompositedLayerMapping.h"
-#include "core/rendering/svg/RenderSVGContainer.h"
-#include "core/rendering/svg/RenderSVGGradientStop.h"
-#include "core/rendering/svg/RenderSVGImage.h"
-#include "core/rendering/svg/RenderSVGInlineText.h"
-#include "core/rendering/svg/RenderSVGPath.h"
-#include "core/rendering/svg/RenderSVGRoot.h"
-#include "core/rendering/svg/RenderSVGText.h"
-#include "core/rendering/svg/SVGRenderTreeAsText.h"
 #include "wtf/HexNumber.h"
 #include "wtf/Vector.h"
 #include "wtf/unicode/CharacterNames.h"
@@ -430,39 +422,6 @@ static void writeTextRun(TextStream& ts, const RenderText& o, const InlineTextBo
 
 void write(TextStream& ts, const RenderObject& o, int indent, RenderAsTextBehavior behavior)
 {
-    if (o.isSVGShape()) {
-        write(ts, toRenderSVGShape(o), indent);
-        return;
-    }
-    if (o.isSVGGradientStop()) {
-        writeSVGGradientStop(ts, toRenderSVGGradientStop(o), indent);
-        return;
-    }
-    if (o.isSVGResourceContainer()) {
-        writeSVGResourceContainer(ts, o, indent);
-        return;
-    }
-    if (o.isSVGContainer()) {
-        writeSVGContainer(ts, o, indent);
-        return;
-    }
-    if (o.isSVGRoot()) {
-        write(ts, toRenderSVGRoot(o), indent);
-        return;
-    }
-    if (o.isSVGText()) {
-        writeSVGText(ts, toRenderSVGText(o), indent);
-        return;
-    }
-    if (o.isSVGInlineText()) {
-        writeSVGInlineText(ts, toRenderSVGInlineText(o), indent);
-        return;
-    }
-    if (o.isSVGImage()) {
-        writeSVGImage(ts, toRenderSVGImage(o), indent);
-        return;
-    }
-
     writeIndent(ts, indent);
 
     RenderTreeAsText::writeRenderObject(ts, o, behavior);

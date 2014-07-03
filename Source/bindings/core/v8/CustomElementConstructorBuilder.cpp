@@ -40,9 +40,7 @@
 #include "bindings/core/v8/V8HTMLElement.h"
 #include "bindings/core/v8/V8HiddenValue.h"
 #include "bindings/core/v8/V8PerContextData.h"
-#include "bindings/core/v8/V8SVGElement.h"
 #include "core/HTMLNames.h"
-#include "core/SVGNames.h"
 #include "core/dom/Document.h"
 #include "core/dom/custom/CustomElementDefinition.h"
 #include "core/dom/custom/CustomElementDescriptor.h"
@@ -109,8 +107,6 @@ bool CustomElementConstructorBuilder::validateOptions(const AtomicString& type, 
     }
 
     AtomicString namespaceURI = HTMLNames::xhtmlNamespaceURI;
-    if (hasValidPrototypeChainFor(&V8SVGElement::wrapperTypeInfo))
-        namespaceURI = SVGNames::svgNamespaceURI;
 
     ASSERT(!tryCatch.HasCaught());
 
@@ -130,11 +126,6 @@ bool CustomElementConstructorBuilder::validateOptions(const AtomicString& type, 
             return false;
         }
     } else {
-        if (namespaceURI == SVGNames::svgNamespaceURI) {
-            CustomElementException::throwException(CustomElementException::ExtendsIsInvalidName, type, exceptionState);
-            tryCatch.ReThrow();
-            return false;
-        }
         localName = type;
     }
 

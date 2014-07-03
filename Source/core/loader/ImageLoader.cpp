@@ -416,9 +416,6 @@ RenderImageResource* ImageLoader::renderImageResource()
     if (renderer->isImage() && !static_cast<RenderImage*>(renderer)->isGeneratedContent())
         return toRenderImage(renderer)->imageResource();
 
-    if (renderer->isSVGImage())
-        return toRenderSVGImage(renderer)->imageResource();
-
     if (renderer->isVideo())
         return toRenderVideo(renderer)->imageResource();
 

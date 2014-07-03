@@ -779,12 +779,6 @@ inline bool BreakingContext::handleText(WordMeasurements& wordMeasurements, bool
             m_lineMidpointState.stopIgnoringSpaces(InlineIterator(0, m_current.object(), m_current.offset()));
         }
 
-        if (isSVGText && m_current.offset()) {
-            // Force creation of new InlineBoxes for each absolute positioned character (those that start new text chunks).
-            if (toRenderSVGInlineText(renderText)->characterStartsNewTextChunk(m_current.offset()))
-                m_lineMidpointState.ensureCharacterGetsLineBox(m_current);
-        }
-
         if (m_currentCharacterIsSpace && !previousCharacterIsSpace) {
             m_startOfIgnoredSpaces.setObject(m_current.object());
             m_startOfIgnoredSpaces.setOffset(m_current.offset());

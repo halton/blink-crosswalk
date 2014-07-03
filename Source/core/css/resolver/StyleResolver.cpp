@@ -495,9 +495,6 @@ void StyleResolver::matchAllRules(StyleResolverState& state, ElementRuleCollecto
             collector.addElementStyleProperties(state.element()->inlineStyle(), isInlineStyleCacheable);
         }
 
-        // Now check SMIL animation override style.
-        if (includeSMILProperties && state.element()->isSVGElement())
-            collector.addElementStyleProperties(toSVGElement(state.element())->animatedSMILStyleProperties(), false /* isCacheable */);
     }
 }
 

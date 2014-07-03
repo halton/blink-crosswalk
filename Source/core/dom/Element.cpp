@@ -33,7 +33,6 @@
 #include "bindings/core/v8/V8DOMWrapper.h"
 #include "bindings/core/v8/V8PerContextData.h"
 #include "core/CSSValueKeywords.h"
-#include "core/SVGNames.h"
 #include "core/XLinkNames.h"
 #include "core/XMLNames.h"
 #include "core/accessibility/AXObjectCache.h"
@@ -105,8 +104,6 @@
 #include "core/rendering/RenderLayer.h"
 #include "core/rendering/RenderView.h"
 #include "core/rendering/compositing/RenderLayerCompositor.h"
-#include "core/svg/SVGDocumentExtensions.h"
-#include "core/svg/SVGElement.h"
 #include "platform/EventDispatchForbiddenScope.h"
 #include "platform/RuntimeEnabledFeatures.h"
 #include "platform/UserGestureIndicator.h"
@@ -165,7 +162,6 @@ Element::~Element()
     // resources. If the document is also dead, there is no need to remove
     // the element from the pending resources.
     if (hasPendingResources()) {
-        document().accessSVGExtensions().removeElementFromPendingResources(this);
         ASSERT(!hasPendingResources());
     }
 #endif
@@ -380,10 +376,6 @@ void Element::synchronizeAllAttributes() const
         ASSERT(isStyledElement());
         synchronizeStyleAttributeInternal();
     }
-    if (elementData()->m_animatedSVGAttributesAreDirty) {
-        ASSERT(isSVGElement());
-        toSVGElement(this)->synchronizeAnimatedSVGAttribute(anyQName());
-    }
 }
 
 inline void Element::synchronizeAttribute(const QualifiedName& name) const
@@ -394,12 +386,6 @@ inline void Element::synchronizeAttribute(const QualifiedName& name) const
         ASSERT(isStyledElement());
         synchronizeStyleAttributeInternal();
         return;
-    }
-    if (UNLIKELY(elementData()->m_animatedSVGAttributesAreDirty)) {
-        ASSERT(isSVGElement());
-        // See comment in the AtomicString version of synchronizeAttribute()
-        // also.
-        toSVGElement(this)->synchronizeAnimatedSVGAttribute(name);
     }
 }
 
@@ -413,20 +399,6 @@ void Element::synchronizeAttribute(const AtomicString& localName) const
         ASSERT(isStyledElement());
         synchronizeStyleAttributeInternal();
         return;
-    }
-    if (elementData()->m_animatedSVGAttributesAreDirty) {
-        // We're not passing a namespace argument on purpose. SVGNames::*Attr are defined w/o namespaces as well.
-
-        // FIXME: this code is called regardless of whether name is an
-        // animated SVG Attribute. It would seem we should only call this method
-        // if SVGElement::isAnimatableAttribute is true, but the list of
-        // animatable attributes in isAnimatableAttribute does not suffice to
-        // pass all layout tests. Also, m_animatedSVGAttributesAreDirty stays
-        // dirty unless synchronizeAnimatedSVGAttribute is called with
-        // anyQName(). This means that even if Element::synchronizeAttribute()
-        // is called on all attributes, m_animatedSVGAttributesAreDirty remains
-        // true.
-        toSVGElement(this)->synchronizeAnimatedSVGAttribute(QualifiedName(nullAtom, localName, nullAtom));
     }
 }
 
@@ -775,17 +747,9 @@ IntRect Element::boundsInRootViewSpace()
         return IntRect();
 
     Vector<FloatQuad> quads;
-    if (isSVGElement() && renderer()) {
-        // Get the bounding rectangle from the SVG model.
-        SVGElement* svgElement = toSVGElement(this);
-        FloatRect localRect;
-        if (svgElement->getBoundingBox(localRect))
-            quads.append(renderer()->localToAbsoluteQuad(localRect));
-    } else {
         // Get the bounding rectangle from the box model.
         if (renderBoxModelObject())
             renderBoxModelObject()->absoluteQuads(quads);
-    }
 
     if (quads.isEmpty())
         return IntRect();
@@ -820,17 +784,9 @@ PassRefPtrWillBeRawPtr<ClientRect> Element::getBoundingClientRect()
     document().updateLayoutIgnorePendingStylesheets();
 
     Vector<FloatQuad> quads;
-    if (isSVGElement() && renderer() && !renderer()->isSVGRoot()) {
-        // Get the bounding rectangle from the SVG model.
-        SVGElement* svgElement = toSVGElement(this);
-        FloatRect localRect;
-        if (svgElement->getBoundingBox(localRect))
-            quads.append(renderer()->localToAbsoluteQuad(localRect));
-    } else {
         // Get the bounding rectangle from the box model.
         if (renderBoxModelObject())
             renderBoxModelObject()->absoluteQuads(quads);
-    }
 
     if (quads.isEmpty())
         return ClientRect::create();
@@ -1303,8 +1259,6 @@ void Element::removedFrom(ContainerNode* insertionPoint)
 
     ContainerNode::removedFrom(insertionPoint);
     if (wasInDocument) {
-        if (hasPendingResources())
-            document().accessSVGExtensions().removeElementFromPendingResources(this);
 
         if (isUpgradedCustomElement())
             CustomElement::didDetach(this, insertionPoint->document());
@@ -2702,9 +2656,6 @@ bool Element::fastAttributeLookupAllowed(const QualifiedName& name) const
     if (name == HTMLNames::styleAttr)
         return false;
 
-    if (isSVGElement())
-        return !toSVGElement(this)->isAnimatableAttribute(name);
-
     return true;
 }
 #endif
@@ -3191,8 +3142,6 @@ bool Element::supportsStyleSharing() const
         return false;
     // If the element has inline style it is probably unique.
     if (inlineStyle())
-        return false;
-    if (isSVGElement() && toSVGElement(this)->animatedSMILStyleProperties())
         return false;
     // Ids stop style sharing if they show up in the stylesheets.
     if (hasID() && document().ensureStyleResolver().hasRulesForId(idForStyleResolution()))

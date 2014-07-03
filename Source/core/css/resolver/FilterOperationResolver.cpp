@@ -111,8 +111,6 @@ bool FilterOperationResolver::createFilterOperations(CSSValue* inValue, const CS
             if (SVGURIReference::isExternalURIReference(svgDocumentValue->url(), state.document())) {
                 if (!svgDocumentValue->loadRequested())
                     state.elementStyleResources().addPendingSVGDocument(operation.get(), svgDocumentValue);
-                else if (svgDocumentValue->cachedSVGDocument())
-                    ReferenceFilterBuilder::setDocumentResourceReference(operation.get(), adoptPtr(new DocumentResourceReference(svgDocumentValue->cachedSVGDocument())));
             }
             operations.operations().append(operation);
             continue;

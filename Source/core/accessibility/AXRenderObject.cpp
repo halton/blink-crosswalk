@@ -34,7 +34,6 @@
 #include "core/accessibility/AXImageMapLink.h"
 #include "core/accessibility/AXInlineTextBox.h"
 #include "core/accessibility/AXObjectCache.h"
-#include "core/accessibility/AXSVGRoot.h"
 #include "core/accessibility/AXSpinButton.h"
 #include "core/accessibility/AXTable.h"
 #include "core/dom/ElementTraversal.h"
@@ -67,9 +66,6 @@
 #include "core/rendering/RenderTextFragment.h"
 #include "core/rendering/RenderView.h"
 #include "core/rendering/RenderWidget.h"
-#include "core/svg/SVGDocumentExtensions.h"
-#include "core/svg/SVGSVGElement.h"
-#include "core/svg/graphics/SVGImage.h"
 #include "platform/text/PlatformLocale.h"
 #include "wtf/StdLibExtras.h"
 
@@ -292,8 +288,6 @@ AccessibilityRole AXRenderObject::determineAccessibilityRole()
     if (cssBox && cssBox->isImage()) {
         if (isHTMLInputElement(node))
             return ariaHasPopup() ? PopUpButtonRole : ButtonRole;
-        if (isSVGImage())
-            return SVGRootRole;
         return ImageRole;
     }
 
@@ -331,11 +325,6 @@ AccessibilityRole AXRenderObject::determineAccessibilityRole()
 
     if (headingLevel())
         return HeadingRole;
-
-    if (m_renderer->isSVGImage())
-        return ImageRole;
-    if (m_renderer->isSVGRoot())
-        return SVGRootRole;
 
     if (node && node->hasTagName(ddTag))
         return DescriptionListDetailRole;
@@ -430,8 +419,6 @@ void AXRenderObject::init()
 void AXRenderObject::detach()
 {
     AXNodeObject::detach();
-
-    detachRemoteSVGRoot();
 
 #if ENABLE(ASSERT)
     if (m_renderer)
@@ -1327,9 +1314,6 @@ AXObject* AXRenderObject::accessibilityHitTest(const IntPoint& point) const
 
 AXObject* AXRenderObject::elementAccessibilityHitTest(const IntPoint& point) const
 {
-    if (isSVGImage())
-        return remoteSVGElementHitTest(point);
-
     return AXObject::elementAccessibilityHitTest(point);
 }
 
@@ -1453,7 +1437,6 @@ void AXRenderObject::addChildren()
     addImageMapChildren();
     addTextFieldChildren();
     addCanvasChildren();
-    addRemoteSVGChildren();
     addInlineTextBoxChildren();
 }
 
@@ -2023,69 +2006,6 @@ bool AXRenderObject::isDescendantOfElementType(const HTMLQualifiedName& tagName)
     return false;
 }
 
-bool AXRenderObject::isSVGImage() const
-{
-    return remoteSVGRootElement();
-}
-
-void AXRenderObject::detachRemoteSVGRoot()
-{
-    if (AXSVGRoot* root = remoteSVGRootElement())
-        root->setParent(0);
-}
-
-AXSVGRoot* AXRenderObject::remoteSVGRootElement() const
-{
-    if (!m_renderer || !m_renderer->isRenderImage())
-        return 0;
-
-    ImageResource* cachedImage = toRenderImage(m_renderer)->cachedImage();
-    if (!cachedImage)
-        return 0;
-
-    Image* image = cachedImage->image();
-    if (!image || !image->isSVGImage())
-        return 0;
-
-    FrameView* frameView = toSVGImage(image)->frameView();
-    if (!frameView)
-        return 0;
-    Document* doc = frameView->frame().document();
-    if (!doc || !doc->isSVGDocument())
-        return 0;
-
-    Settings* settings = doc->settings();
-    if (settings && !settings->accessibilityEnabled())
-        settings->setAccessibilityEnabled(true);
-
-    SVGSVGElement* rootElement = doc->accessSVGExtensions().rootElement();
-    if (!rootElement)
-        return 0;
-    RenderObject* rendererRoot = rootElement->renderer();
-    if (!rendererRoot)
-        return 0;
-
-    AXObject* rootSVGObject = doc->axObjectCache()->getOrCreate(rendererRoot);
-
-    // In order to connect the AX hierarchy from the SVG root element from the loaded resource
-    // the parent must be set, because there's no other way to get back to who created the image.
-    ASSERT(rootSVGObject && rootSVGObject->isAXSVGRoot());
-    if (!rootSVGObject->isAXSVGRoot())
-        return 0;
-
-    return toAXSVGRoot(rootSVGObject);
-}
-
-AXObject* AXRenderObject::remoteSVGElementHitTest(const IntPoint& point) const
-{
-    AXObject* remote = remoteSVGRootElement();
-    if (!remote)
-        return 0;
-
-    IntSize offset = point - roundedIntPoint(elementRect().location());
-    return remote->accessibilityHitTest(IntPoint(offset));
-}
-
 // The boundingBox for elements within the remote SVG element needs to be offset by its position
 // within the parent page, otherwise they are in relative coordinates only.
 void AXRenderObject::offsetBoundingBoxForRemoteSVGElement(LayoutRect& rect) const
@@ -2228,24 +2148,6 @@ void AXRenderObject::addPopupChildren()
         m_children.append(axPopup);
 }
 
-void AXRenderObject::addRemoteSVGChildren()
-{
-    AXSVGRoot* root = remoteSVGRootElement();
-    if (!root)
-        return;
-
-    root->setParent(this);
-
-    if (root->accessibilityIsIgnored()) {
-        AccessibilityChildrenVector children = root->children();
-        unsigned length = children.size();
-        for (unsigned i = 0; i < length; ++i)
-            m_children.append(children[i]);
-    } else {
-        m_children.append(root);
-    }
-}
-
 void AXRenderObject::ariaSelectedRows(AccessibilityChildrenVector& result)
 {
     // Get all the rows.
@@ -2328,16 +2230,13 @@ LayoutRect AXRenderObject::computeElementRect() const
 
     if (obj->isText())
         toRenderText(obj)->absoluteQuads(quads, 0, RenderText::ClipToEllipsis);
-    else if (isWebArea() || obj->isSVGRoot())
+    else if (isWebArea())
         obj->absoluteQuads(quads);
     else
         obj->absoluteFocusRingQuads(quads);
 
     LayoutRect result = boundingBoxForQuads(obj, quads);
 
-    Document* document = this->document();
-    if (document && document->isSVGDocument())
-        offsetBoundingBoxForRemoteSVGElement(result);
     if (document && document->frame() && document->frame()->pagePopupOwner()) {
         IntPoint popupOrigin = document->view()->contentsToScreen(IntRect()).location();
         IntPoint mainOrigin = axObjectCache()->rootObject()->documentFrameView()->contentsToScreen(IntRect()).location();

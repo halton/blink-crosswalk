@@ -40,7 +40,6 @@
 #include "core/rendering/RenderSelectionInfo.h"
 #include "core/rendering/compositing/CompositedLayerMapping.h"
 #include "core/rendering/compositing/RenderLayerCompositor.h"
-#include "core/svg/SVGDocumentExtensions.h"
 #include "platform/TraceEvent.h"
 #include "platform/geometry/FloatQuad.h"
 #include "platform/geometry/TransformState.h"
@@ -211,9 +210,6 @@ void RenderView::layout()
                     || child->style()->logicalMaxHeight().isPercent())
                 layoutScope.setChildNeedsLayout(child);
         }
-
-        if (document().svgExtensions())
-            document().accessSVGExtensions().invalidateSVGRootsWithRelativeLengthDescendents(&layoutScope);
     }
 
     ASSERT(!m_layoutState);

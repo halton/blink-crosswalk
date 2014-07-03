@@ -283,8 +283,6 @@ PassRefPtrWillBeRawPtr<AnimatableValue> CSSAnimatableValueFactory::create(CSSPro
     case CSSPropertyBackgroundSize:
     case CSSPropertyWebkitBackgroundSize:
         return createFromFillLayers<CSSPropertyBackgroundSize>(style.backgroundLayers(), style);
-    case CSSPropertyBaselineShift:
-        return AnimatableSVGLength::create(style.baselineShiftValue());
     case CSSPropertyBorderBottomColor:
         return createFromColor(property, style);
     case CSSPropertyBorderBottomLeftRadius:
@@ -329,12 +327,9 @@ PassRefPtrWillBeRawPtr<AnimatableValue> CSSAnimatableValueFactory::create(CSSPro
     case CSSPropertyColor:
         return createFromColor(property, style);
     case CSSPropertyFillOpacity:
-        return createFromDouble(style.fillOpacity());
+        return AnimatableUnknown::create(nullptr);
     case CSSPropertyFill:
-        return AnimatableSVGPaint::create(
-            style.svgStyle().fillPaintType(), style.svgStyle().visitedLinkFillPaintType(),
-            style.svgStyle().fillPaintColor(), style.svgStyle().visitedLinkFillPaintColor(),
-            style.svgStyle().fillPaintUri(), style.svgStyle().visitedLinkFillPaintUri());
+        return AnimatableUnknown::create(nullptr);
     case CSSPropertyFlexGrow:
         return createFromDouble(style.flexGrow(), AnimatableDouble::InterpolationIsNonContinuousWithZero);
     case CSSPropertyFlexShrink:
@@ -344,7 +339,7 @@ PassRefPtrWillBeRawPtr<AnimatableValue> CSSAnimatableValueFactory::create(CSSPro
     case CSSPropertyFloodColor:
         return createFromColor(property, style);
     case CSSPropertyFloodOpacity:
-        return createFromDouble(style.floodOpacity());
+        return AnimatableUnknown::create(nullptr);
     case CSSPropertyFontSize:
         // Must pass a specified size to setFontSize if Text Autosizing is enabled, but a computed size
         // if text zoom is enabled (if neither is enabled it's irrelevant as they're probably the same).
@@ -405,25 +400,16 @@ PassRefPtrWillBeRawPtr<AnimatableValue> CSSAnimatableValueFactory::create(CSSPro
         return createFromLength(style.paddingTop(), style);
     case CSSPropertyRight:
         return createFromLength(style.right(), style);
-    case CSSPropertyStrokeWidth:
-        return AnimatableSVGLength::create(style.strokeWidth());
     case CSSPropertyStopColor:
         return createFromColor(property, style);
     case CSSPropertyStopOpacity:
-        return createFromDouble(style.stopOpacity());
-    case CSSPropertyStrokeDasharray:
-        return AnimatableStrokeDasharrayList::create(style.strokeDashArray());
-    case CSSPropertyStrokeDashoffset:
-        return AnimatableSVGLength::create(style.strokeDashOffset());
+        return AnimatableUnknown::create(nullptr);
     case CSSPropertyStrokeMiterlimit:
-        return createFromDouble(style.strokeMiterLimit());
+        return AnimatableUnknown::create(nullptr);
     case CSSPropertyStrokeOpacity:
-        return createFromDouble(style.strokeOpacity());
+        return AnimatableUnknown::create(nullptr);
     case CSSPropertyStroke:
-        return AnimatableSVGPaint::create(
-            style.svgStyle().strokePaintType(), style.svgStyle().visitedLinkStrokePaintType(),
-            style.svgStyle().strokePaintColor(), style.svgStyle().visitedLinkStrokePaintColor(),
-            style.svgStyle().strokePaintUri(), style.svgStyle().visitedLinkStrokePaintUri());
+        return AnimatableUnknown::create(nullptr);
     case CSSPropertyTextDecorationColor:
         return AnimatableColor::create(style.textDecorationColor().resolve(style.color()), style.visitedLinkTextDecorationColor().resolve(style.visitedLinkColor()));
     case CSSPropertyTextIndent:

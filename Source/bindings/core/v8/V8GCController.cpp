@@ -48,7 +48,6 @@
 #include "core/html/HTMLTemplateElement.h"
 #include "core/html/imports/HTMLImportsController.h"
 #include "core/inspector/InspectorTraceEvents.h"
-#include "core/svg/SVGElement.h"
 #include "platform/Partitions.h"
 #include "platform/TraceEvent.h"
 #include "wtf/Vector.h"
@@ -145,11 +144,6 @@ public:
             // Maybe should image elements be active DOM nodes?
             // See https://code.google.com/p/chromium/issues/detail?id=164882
             if (isHTMLImageElement(*node) && toHTMLImageElement(*node).hasPendingActivity())
-                return;
-            // FIXME: Remove the special handling for SVG elements.
-            // We currently can't collect SVG Elements from minor gc, as we have
-            // strong references from SVG property tear-offs keeping context SVG element alive.
-            if (node->isSVGElement())
                 return;
 
             m_nodesInNewSpace.append(node);

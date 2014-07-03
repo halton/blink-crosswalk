@@ -70,9 +70,6 @@
 #include "core/rendering/compositing/CompositedSelectionBound.h"
 #include "core/rendering/compositing/RenderLayerCompositor.h"
 #include "core/rendering/style/RenderStyle.h"
-#include "core/rendering/svg/RenderSVGRoot.h"
-#include "core/svg/SVGDocumentExtensions.h"
-#include "core/svg/SVGSVGElement.h"
 #include "platform/RuntimeEnabledFeatures.h"
 #include "platform/ScriptForbiddenScope.h"
 #include "platform/TraceEvent.h"
@@ -472,19 +469,6 @@ void FrameView::applyOverflowToViewportAndSetRenderer(RenderObject* o, Scrollbar
     EOverflow overflowX = o->style()->overflowX();
     EOverflow overflowY = o->style()->overflowY();
 
-    if (o->isSVGRoot()) {
-        // Don't allow overflow to affect <img> and css backgrounds
-        if (toRenderSVGRoot(o)->isEmbeddedThroughSVGImage())
-            return;
-
-        // FIXME: evaluate if we can allow overflow for these cases too.
-        // Overflow is always hidden when stand-alone SVG documents are embedded.
-        if (toRenderSVGRoot(o)->isEmbeddedThroughFrameContainingSVGDocument()) {
-            overflowX = OHIDDEN;
-            overflowY = OHIDDEN;
-        }
-    }
-
     bool ignoreOverflowHidden = false;
     if (m_frame->settings()->ignoreMainFrameOverflowHiddenQuirk() && m_frame->isMainFrame())
         ignoreOverflowHidden = true;
@@ -663,10 +647,6 @@ inline void FrameView::forceLayoutParentViewIfNeeded()
 
     RenderBox* contentBox = embeddedContentBox();
     if (!contentBox)
-        return;
-
-    RenderSVGRoot* svgRoot = toRenderSVGRoot(contentBox);
-    if (svgRoot->everHadLayout() && !svgRoot->needsLayout())
         return;
 
     // If the embedded SVG document appears the first time, the ownerRenderer has already finished
@@ -1030,10 +1010,6 @@ RenderBox* FrameView::embeddedContentBox() const
     if (!firstChild || !firstChild->isBox())
         return 0;
 
-    // Curently only embedded SVG documents participate in the size-negotiation logic.
-    if (firstChild->isSVGRoot())
-        return toRenderBox(firstChild);
-
     return 0;
 }
 
@@ -1344,14 +1320,6 @@ bool FrameView::scrollToAnchor(const String& name)
 
     // Setting to null will clear the current target.
     m_frame->document()->setCSSTarget(anchorNode);
-
-    if (m_frame->document()->isSVGDocument()) {
-        if (SVGSVGElement* svg = SVGDocumentExtensions::rootElement(*m_frame->document())) {
-            svg->setupInitialView(name, anchorNode);
-            if (!anchorNode)
-                return true;
-        }
-    }
 
     // Implement the rule that "" and "top" both mean top of page as in other browsers.
     if (!anchorNode && !(name.isEmpty() || equalIgnoringCase(name, "top")))

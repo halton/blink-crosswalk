@@ -153,7 +153,7 @@ public:
 
     SVGAnimatedString* className() { return m_className.get(); }
 
-    bool inUseShadowTree() const;
+    bool inUseShadowTree() const { return false; };
 
     SVGElementSet* setOfIncomingReferences() const;
     void addReferenceTo(SVGElement*);

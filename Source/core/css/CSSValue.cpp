@@ -211,7 +211,6 @@ bool CSSValue::equals(const CSSValue& other) const
         case CSSFilterClass:
             return compareCSSValues<CSSFilterValue>(*this, other);
         case CSSSVGDocumentClass:
-            return compareCSSValues<CSSSVGDocumentValue>(*this, other);
         default:
             ASSERT_NOT_REACHED();
             return false;
@@ -289,7 +288,7 @@ String CSSValue::cssText() const
     case CSSFilterClass:
         return toCSSFilterValue(this)->customCSSText();
     case CSSSVGDocumentClass:
-        return toCSSSVGDocumentValue(this)->customCSSText();
+        return String();
     }
     ASSERT_NOT_REACHED();
     return String();
@@ -390,7 +389,6 @@ void CSSValue::destroy()
         delete toCSSFilterValue(this);
         return;
     case CSSSVGDocumentClass:
-        delete toCSSSVGDocumentValue(this);
         return;
     }
     ASSERT_NOT_REACHED();
@@ -491,7 +489,6 @@ void CSSValue::finalizeGarbageCollectedObject()
         toCSSFilterValue(this)->~CSSFilterValue();
         return;
     case CSSSVGDocumentClass:
-        toCSSSVGDocumentValue(this)->~CSSSVGDocumentValue();
         return;
     }
     ASSERT_NOT_REACHED();
@@ -592,7 +589,6 @@ void CSSValue::trace(Visitor* visitor)
         toCSSFilterValue(this)->traceAfterDispatch(visitor);
         return;
     case CSSSVGDocumentClass:
-        toCSSSVGDocumentValue(this)->traceAfterDispatch(visitor);
         return;
     }
     ASSERT_NOT_REACHED();

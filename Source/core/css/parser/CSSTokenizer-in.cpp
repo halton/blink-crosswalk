@@ -33,7 +33,6 @@
 #include "core/css/parser/BisonCSSParser.h"
 #include "core/css/parser/CSSParserValues.h"
 #include "core/html/parser/HTMLParserIdioms.h"
-#include "core/svg/SVGParserUtilities.h"
 
 namespace blink {
 

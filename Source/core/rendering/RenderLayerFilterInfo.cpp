@@ -34,11 +34,6 @@
 #include "core/fetch/DocumentResourceReference.h"
 #include "core/rendering/FilterEffectRenderer.h"
 #include "core/rendering/RenderLayer.h"
-#include "core/rendering/svg/ReferenceFilterBuilder.h"
-#include "core/rendering/svg/RenderSVGResourceContainer.h"
-#include "core/svg/SVGFilterElement.h"
-#include "core/svg/SVGFilterPrimitiveStandardAttributes.h"
-#include "core/svg/graphics/filters/SVGFilter.h"
 
 namespace blink {
 
@@ -114,47 +109,10 @@ void RenderLayerFilterInfo::notifyFinished(Resource*)
 
 void RenderLayerFilterInfo::updateReferenceFilterClients(const FilterOperations& operations)
 {
-    removeReferenceFilterClients();
-    for (size_t i = 0; i < operations.size(); ++i) {
-        RefPtr<FilterOperation> filterOperation = operations.operations().at(i);
-        if (filterOperation->type() != FilterOperation::REFERENCE)
-            continue;
-        ReferenceFilterOperation* referenceFilterOperation = toReferenceFilterOperation(filterOperation.get());
-        DocumentResourceReference* documentReference = ReferenceFilterBuilder::documentResourceReference(referenceFilterOperation);
-        DocumentResource* cachedSVGDocument = documentReference ? documentReference->document() : 0;
-
-        if (cachedSVGDocument) {
-            // Reference is external; wait for notifyFinished().
-            cachedSVGDocument->addClient(this);
-            m_externalSVGReferences.append(cachedSVGDocument);
-        } else {
-            // Reference is internal; add layer as a client so we can trigger
-            // filter paint invalidation on SVG attribute change.
-            Element* filter = m_layer->renderer()->node()->document().getElementById(referenceFilterOperation->fragment());
-            if (!isSVGFilterElement(filter))
-                continue;
-            if (filter->renderer())
-                toRenderSVGResourceContainer(filter->renderer())->addClientRenderLayer(m_layer);
-            else
-                toSVGFilterElement(filter)->addClient(m_layer->renderer()->node());
-            m_internalSVGReferences.append(filter);
-        }
-    }
 }
 
 void RenderLayerFilterInfo::removeReferenceFilterClients()
 {
-    for (size_t i = 0; i < m_externalSVGReferences.size(); ++i)
-        m_externalSVGReferences.at(i)->removeClient(this);
-    m_externalSVGReferences.clear();
-    for (size_t i = 0; i < m_internalSVGReferences.size(); ++i) {
-        Element* filter = m_internalSVGReferences.at(i).get();
-        if (filter->renderer())
-            toRenderSVGResourceContainer(filter->renderer())->removeClientRenderLayer(m_layer);
-        else
-            toSVGFilterElement(filter)->removeClient(m_layer->renderer()->node());
-    }
-    m_internalSVGReferences.clear();
 }
 
 } // namespace blink

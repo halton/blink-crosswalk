@@ -461,10 +461,6 @@ RenderBox* RenderImage::embeddedContentBox() const
     if (!m_imageResource)
         return 0;
 
-    ImageResource* cachedImage = m_imageResource->cachedImage();
-    if (cachedImage && cachedImage->image() && cachedImage->image()->isSVGImage())
-        return toSVGImage(cachedImage->image())->embeddedContentBox();
-
     return 0;
 }
 

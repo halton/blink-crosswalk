@@ -48,7 +48,6 @@ void PageAnimator::serviceScriptedAnimations(double monotonicAnimationStartTime)
 
     for (size_t i = 0; i < documents.size(); ++i) {
         DocumentAnimations::updateAnimationTimingForAnimationFrame(*documents[i], monotonicAnimationStartTime);
-        SVGDocumentExtensions::serviceOnAnimationFrame(*documents[i], monotonicAnimationStartTime);
     }
 
     for (size_t i = 0; i < documents.size(); ++i)

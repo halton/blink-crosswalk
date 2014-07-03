@@ -264,9 +264,6 @@
         '<(blink_core_output_dir)/InstrumentingAgentsInl.h',
         '<(blink_core_output_dir)/InspectorInstrumentationImpl.cpp',
 
-        # Additional .cpp files for SVG.
-        '<(blink_core_output_dir)/SVGElementFactory.cpp',
-
         # Generated from make_style_shorthands.py
         '<(blink_core_output_dir)/StylePropertyShorthand.cpp',
 
@@ -526,22 +523,6 @@
       ],
     },
     {
-      # GN version: //third_party/WebKit/Source/core:svg
-      'target_name': 'webcore_svg',
-      'type': 'static_library',
-      'dependencies': [
-        'webcore_prerequisites',
-      ],
-      'sources': [
-        '<@(webcore_svg_files)',
-      ],
-      'conditions': [
-        ['OS=="win" and buildtype=="Official"', {
-          'msvs_shard': 5,
-        }],
-      ],
-    },
-    {
       # GN version: //third_party/WebKit/Source/core:rendering
       'target_name': 'webcore_rendering',
       'type': 'static_library',
@@ -709,7 +690,6 @@
         'webcore_html',
         'webcore_remaining',
         'webcore_rendering',
-        'webcore_svg',
         # Exported.
         'webcore_generated',
         '../platform/blink_platform.gyp:blink_platform',

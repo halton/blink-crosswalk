@@ -196,9 +196,6 @@ void HTMLFrameOwnerElement::dispatchLoad()
 
 Document* HTMLFrameOwnerElement::getSVGDocument(ExceptionState& exceptionState) const
 {
-    Document* doc = contentDocument();
-    if (doc && doc->isSVGDocument())
-        return doc;
     return 0;
 }
 

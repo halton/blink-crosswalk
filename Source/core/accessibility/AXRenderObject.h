@@ -210,7 +210,7 @@ private:
     bool renderObjectIsObservable(RenderObject*) const;
     RenderObject* renderParentObject() const;
     bool isDescendantOfElementType(const HTMLQualifiedName& tagName) const;
-    bool isSVGImage() const;
+    bool isSVGImage() const { return false; };
     void detachRemoteSVGRoot();
     AXSVGRoot* remoteSVGRootElement() const;
     AXObject* remoteSVGElementHitTest(const IntPoint&) const;

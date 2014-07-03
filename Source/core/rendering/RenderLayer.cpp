@@ -72,8 +72,6 @@
 #include "core/rendering/RenderView.h"
 #include "core/rendering/compositing/CompositedLayerMapping.h"
 #include "core/rendering/compositing/RenderLayerCompositor.h"
-#include "core/rendering/svg/ReferenceFilterBuilder.h"
-#include "core/rendering/svg/RenderSVGResourceClipper.h"
 #include "platform/LengthFunctions.h"
 #include "platform/Partitions.h"
 #include "platform/RuntimeEnabledFeatures.h"
@@ -1725,8 +1723,6 @@ void RenderLayer::paintLayerContents(GraphicsContext* context, const LayerPainti
     // Apply clip-path to context.
     GraphicsContextStateSaver clipStateSaver(*context, false);
     RenderStyle* style = renderer()->style();
-    RenderSVGResourceClipper* resourceClipper = 0;
-    RenderSVGResourceClipper::ClipperState clipperState = RenderSVGResourceClipper::ClipperNotApplied;
 
     // Clip-path, like border radius, must not be applied to the contents of a composited-scrolling container.
     // It must, however, still be applied to the mask layer, so that the compositor can properly mask the
@@ -1742,29 +1738,7 @@ void RenderLayer::paintLayerContents(GraphicsContext* context, const LayerPainti
                     rootRelativeBounds = physicalBoundingBoxIncludingReflectionAndStackingChildren(paintingInfo.rootLayer, offsetFromRoot);
                     rootRelativeBoundsComputed = true;
                 }
-
                 context->clipPath(clipPath->path(rootRelativeBounds), clipPath->windRule());
-            }
-        } else if (style->clipPath()->type() == ClipPathOperation::REFERENCE) {
-            ReferenceClipPathOperation* referenceClipPathOperation = toReferenceClipPathOperation(style->clipPath());
-            Document& document = renderer()->document();
-            // FIXME: It doesn't work with forward or external SVG references (https://bugs.webkit.org/show_bug.cgi?id=90405)
-            Element* element = document.getElementById(referenceClipPathOperation->fragment());
-            if (isSVGClipPathElement(element) && element->renderer()) {
-                // FIXME: Saving at this point is not required in the 'mask'-
-                // case, or if the clip ends up empty.
-                clipStateSaver.save();
-                if (!rootRelativeBoundsComputed) {
-                    rootRelativeBounds = physicalBoundingBoxIncludingReflectionAndStackingChildren(paintingInfo.rootLayer, offsetFromRoot);
-                    rootRelativeBoundsComputed = true;
-                }
-
-                resourceClipper = toRenderSVGResourceClipper(toRenderSVGResourceContainer(element->renderer()));
-                if (!resourceClipper->applyClippingToContext(renderer(), rootRelativeBounds,
-                    paintingInfo.paintDirtyRect, context, clipperState)) {
-                    // No need to post-apply the clipper if this failed.
-                    resourceClipper = 0;
-                }
             }
         }
     }
@@ -1912,9 +1886,6 @@ void RenderLayer::paintLayerContents(GraphicsContext* context, const LayerPainti
         context->restore();
         m_usedTransparency = false;
     }
-
-    if (resourceClipper)
-        resourceClipper->postApplyStatefulResource(renderer(), context, clipperState);
 }
 
 void RenderLayer::paintLayerByApplyingTransform(GraphicsContext* context, const LayerPaintingInfo& paintingInfo, PaintLayerFlags paintFlags, const LayoutPoint& translationOffset)
@@ -3566,8 +3537,6 @@ FilterOperations RenderLayer::computeFilterOperations(const RenderStyle* style)
             RefPtr<ReferenceFilter> referenceFilter = ReferenceFilter::create();
             float zoom = style->effectiveZoom();
             referenceFilter->setAbsoluteTransform(AffineTransform().scale(zoom, zoom));
-            referenceFilter->setLastEffect(ReferenceFilterBuilder::build(referenceFilter.get(), renderer(), referenceFilter->sourceGraphic(),
-                referenceOperation));
             referenceOperation->setFilter(referenceFilter.release());
         }
     }

@@ -35,8 +35,6 @@
 #include "core/events/ScopedEventQueue.h"
 #include "core/rendering/RenderCombineText.h"
 #include "core/rendering/RenderText.h"
-#include "core/rendering/svg/RenderSVGInlineText.h"
-#include "core/svg/SVGForeignObjectElement.h"
 #include "wtf/text/CString.h"
 #include "wtf/text/StringBuilder.h"
 
@@ -284,18 +282,8 @@ bool Text::textRendererIsNeeded(const RenderStyle& style, const RenderObject& pa
     return true;
 }
 
-static bool isSVGText(Text* text)
-{
-    Node* parentOrShadowHostNode = text->parentOrShadowHostNode();
-    ASSERT(parentOrShadowHostNode);
-    return parentOrShadowHostNode->isSVGElement() && !isSVGForeignObjectElement(*parentOrShadowHostNode);
-}
-
 RenderText* Text::createTextRenderer(RenderStyle* style)
 {
-    if (isSVGText(this))
-        return new RenderSVGInlineText(this, dataImpl());
-
     if (style->hasTextCombine())
         return new RenderCombineText(this, dataImpl());
 

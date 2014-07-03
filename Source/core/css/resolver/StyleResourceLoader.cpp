@@ -63,8 +63,6 @@ void StyleResourceLoader::loadPendingSVGDocuments(RenderStyle* renderStyle, Elem
             if (!resource)
                 continue;
 
-            // Stash the DocumentResource on the reference filter.
-            ReferenceFilterBuilder::setDocumentResourceReference(referenceFilter, adoptPtr(new DocumentResourceReference(resource)));
         }
     }
 

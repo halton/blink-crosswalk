@@ -35,8 +35,6 @@
 #include "core/rendering/RenderLayer.h"
 #include "core/rendering/RenderView.h"
 #include "core/rendering/svg/ReferenceFilterBuilder.h"
-#include "core/svg/SVGElement.h"
-#include "core/svg/SVGFilterPrimitiveStandardAttributes.h"
 #include "platform/FloatConversion.h"
 #include "platform/LengthFunctions.h"
 #include "platform/graphics/ColorSpace.h"
@@ -97,7 +95,6 @@ bool FilterEffectRenderer::build(RenderObject* renderer, const FilterOperations&
         FilterOperation* filterOperation = operations.operations().at(i).get();
         switch (filterOperation->type()) {
         case FilterOperation::REFERENCE: {
-            effect = ReferenceFilterBuilder::build(this, renderer, previousEffect.get(), toReferenceFilterOperation(filterOperation));
             break;
         }
         case FilterOperation::GRAYSCALE: {

@@ -41,7 +41,6 @@
 #include "core/dom/custom/CustomElementScheduler.h"
 #include "core/html/HTMLElement.h"
 #include "core/html/HTMLUnknownElement.h"
-#include "core/svg/SVGUnknownElement.h"
 #include "wtf/RefPtr.h"
 
 namespace blink {
@@ -76,8 +75,6 @@ PassRefPtrWillBeRawPtr<Element> CustomElementRegistrationContext::createCustomTa
 
     if (HTMLNames::xhtmlNamespaceURI == tagName.namespaceURI()) {
         element = HTMLElement::create(tagName, document);
-    } else if (SVGNames::svgNamespaceURI == tagName.namespaceURI()) {
-        element = SVGUnknownElement::create(tagName, document);
     } else {
         // XML elements are not custom elements, so return early.
         return Element::create(tagName, &document);

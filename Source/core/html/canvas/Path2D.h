@@ -30,8 +30,6 @@
 
 #include "bindings/core/v8/ScriptWrappable.h"
 #include "core/html/canvas/CanvasPathMethods.h"
-#include "core/svg/SVGMatrixTearOff.h"
-#include "core/svg/SVGPathUtilities.h"
 #include "platform/heap/Handle.h"
 #include "platform/transforms/AffineTransform.h"
 #include "wtf/PassRefPtr.h"
@@ -54,13 +52,8 @@ public:
 
     void addPath(Path2D* path)
     {
-        addPath(path, 0);
-    }
-
-    void addPath(Path2D* path, SVGMatrixTearOff* transform)
-    {
         Path src = path->path();
-        m_path.addPath(src, transform ? transform->value() : AffineTransform(1, 0, 0, 1, 0, 0));
+        m_path.addPath(src, AffineTransform(1, 0, 0, 1, 0, 0));
     }
 
     virtual ~Path2D() { }
@@ -78,7 +71,6 @@ private:
     Path2D(const String& pathData)
         : CanvasPathMethods()
     {
-        buildPathFromString(pathData, m_path);
     }
 };
 

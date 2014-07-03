@@ -35,7 +35,6 @@ DocumentResource::DocumentResource(const ResourceRequest& request, Type type)
     , m_decoder(TextResourceDecoder::create("application/xml"))
 {
     // FIXME: We'll support more types to support HTMLImports.
-    ASSERT(type == SVGDocument);
 }
 
 DocumentResource::~DocumentResource()
@@ -74,8 +73,6 @@ void DocumentResource::checkNotify()
 PassRefPtrWillBeRawPtr<Document> DocumentResource::createDocument(const KURL& url)
 {
     switch (type()) {
-    case SVGDocument:
-        return XMLDocument::createSVG(DocumentInit(url));
     default:
         // FIXME: We'll add more types to support HTMLImports.
         ASSERT_NOT_REACHED();

@@ -39,12 +39,6 @@
 
 namespace blink {
 
-static inline SVGCursorElement* resourceReferencedByCursorElement(const String& url, TreeScope& treeScope)
-{
-    Element* element = SVGURIReference::targetElementFromIRIString(url, treeScope);
-    return isSVGCursorElement(element) ? toSVGCursorElement(element) : 0;
-}
-
 CSSCursorImageValue::CSSCursorImageValue(PassRefPtrWillBeRawPtr<CSSValue> imageValue, bool hasHotSpot, const IntPoint& hotSpot)
     : CSSValue(CursorImageClass)
     , m_imageValue(imageValue)
@@ -60,17 +54,6 @@ CSSCursorImageValue::~CSSCursorImageValue()
 #if !ENABLE(OILPAN)
     if (!isSVGCursor())
         return;
-
-    HashSet<SVGElement*>::const_iterator it = m_referencedElements.begin();
-    HashSet<SVGElement*>::const_iterator end = m_referencedElements.end();
-    String url = toCSSImageValue(m_imageValue.get())->url();
-
-    for (; it != end; ++it) {
-        SVGElement* referencedElement = *it;
-        referencedElement->cursorImageValueRemoved();
-        if (SVGCursorElement* cursorElement = resourceReferencedByCursorElement(url, referencedElement->treeScope()))
-            cursorElement->removeClient(referencedElement);
-    }
 #endif
 }
 
@@ -95,29 +78,6 @@ bool CSSCursorImageValue::updateIfSVGCursorIsUsed(Element* element)
     if (!isSVGCursor())
         return false;
 
-    String url = toCSSImageValue(m_imageValue.get())->url();
-    if (SVGCursorElement* cursorElement = resourceReferencedByCursorElement(url, element->treeScope())) {
-        // FIXME: This will override hot spot specified in CSS, which is probably incorrect.
-        SVGLengthContext lengthContext(0);
-        m_hasHotSpot = true;
-        float x = roundf(cursorElement->x()->currentValue()->value(lengthContext));
-        m_hotSpot.setX(static_cast<int>(x));
-
-        float y = roundf(cursorElement->y()->currentValue()->value(lengthContext));
-        m_hotSpot.setY(static_cast<int>(y));
-
-        if (cachedImageURL() != element->document().completeURL(cursorElement->href()->currentValue()->value()))
-            clearImageResource();
-
-        SVGElement* svgElement = toSVGElement(element);
-#if !ENABLE(OILPAN)
-        m_referencedElements.add(svgElement);
-#endif
-        svgElement->setCursorImageValue(this);
-        cursorElement->addClient(svgElement);
-        return true;
-    }
-
     return false;
 }
 
@@ -128,21 +88,6 @@ StyleImage* CSSCursorImageValue::cachedImage(ResourceFetcher* loader, float devi
 
     if (!m_accessedImage) {
         m_accessedImage = true;
-
-        // For SVG images we need to lazily substitute in the correct URL. Rather than attempt
-        // to change the URL of the CSSImageValue (which would then change behavior like cssText),
-        // we create an alternate CSSImageValue to use.
-        if (isSVGCursor() && loader && loader->document()) {
-            RefPtrWillBeRawPtr<CSSImageValue> imageValue = toCSSImageValue(m_imageValue.get());
-            // FIXME: This will fail if the <cursor> element is in a shadow DOM (bug 59827)
-            if (SVGCursorElement* cursorElement = resourceReferencedByCursorElement(imageValue->url(), *loader->document())) {
-                RefPtrWillBeRawPtr<CSSImageValue> svgImageValue = CSSImageValue::create(loader->document()->completeURL(cursorElement->href()->currentValue()->value()));
-                svgImageValue->setReferrer(imageValue->referrer());
-                StyleFetchedImage* cachedImage = svgImageValue->cachedImage(loader);
-                m_image = cachedImage;
-                return cachedImage;
-            }
-        }
 
         if (m_imageValue->isImageValue())
             m_image = toCSSImageValue(m_imageValue.get())->cachedImage(loader);
@@ -167,11 +112,6 @@ StyleImage* CSSCursorImageValue::cachedOrPendingImage(float deviceScaleFactor)
 
 bool CSSCursorImageValue::isSVGCursor() const
 {
-    if (m_imageValue->isImageValue()) {
-        RefPtrWillBeRawPtr<CSSImageValue> imageValue = toCSSImageValue(m_imageValue.get());
-        KURL kurl(ParsedURLString, imageValue->url());
-        return kurl.hasFragmentIdentifier();
-    }
     return false;
 }
 

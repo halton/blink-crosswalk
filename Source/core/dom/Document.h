@@ -128,8 +128,6 @@ class Range;
 class RenderView;
 class RequestAnimationFrameCallback;
 class ResourceFetcher;
-class SVGDocumentExtensions;
-class SVGUseElement;
 class ScriptRunner;
 class ScriptableDocumentParser;
 class ScriptedAnimationController;
@@ -183,7 +181,6 @@ enum DocumentClass {
     ImageDocumentClass = 1 << 2,
     PluginDocumentClass = 1 << 3,
     MediaDocumentClass = 1 << 4,
-    SVGDocumentClass = 1 << 5,
     XMLDocumentClass = 1 << 6,
 };
 
@@ -369,11 +366,11 @@ public:
     bool isXHTMLDocument() const { return m_documentClasses & XHTMLDocumentClass; }
     bool isXMLDocument() const { return m_documentClasses & XMLDocumentClass; }
     bool isImageDocument() const { return m_documentClasses & ImageDocumentClass; }
-    bool isSVGDocument() const { return m_documentClasses & SVGDocumentClass; }
+    bool isSVGDocument() const { return false; }
     bool isPluginDocument() const { return m_documentClasses & PluginDocumentClass; }
     bool isMediaDocument() const { return m_documentClasses & MediaDocumentClass; }
 
-    bool hasSVGRootNode() const;
+    bool hasSVGRootNode() const { return false; };
 
     bool isFrameSet() const;
 
@@ -420,9 +417,6 @@ public:
     void addedStyleSheet(StyleSheet*) { styleResolverChanged(); }
     void modifiedStyleSheet(StyleSheet*, StyleResolverUpdateMode = FullStyleUpdate);
     void changedSelectorWatch() { styleResolverChanged(); }
-
-    void scheduleUseShadowTreeUpdate(SVGUseElement&);
-    void unscheduleUseShadowTreeUpdate(SVGUseElement&);
 
     // FIXME: SVG filters should change to store the filter on the RenderStyle
     // instead of the RenderObject so we can get rid of this hack.
@@ -874,9 +868,6 @@ public:
 
     virtual void removeAllEventListeners() OVERRIDE FINAL;
 
-    const SVGDocumentExtensions* svgExtensions();
-    SVGDocumentExtensions& accessSVGExtensions();
-
     void initSecurityContext();
     void initSecurityContext(const DocumentInit&);
     void initContentSecurityPolicy(PassRefPtr<ContentSecurityPolicy> = nullptr);
@@ -1286,8 +1277,6 @@ private:
     unsigned m_nodeListCounts[numNodeListInvalidationTypes];
 #endif
 
-    OwnPtrWillBeMember<SVGDocumentExtensions> m_svgExtensions;
-
     Vector<AnnotatedRegionValue> m_annotatedRegions;
     bool m_hasAnnotatedRegions;
     bool m_annotatedRegionsDirty;
@@ -1363,7 +1352,6 @@ private:
     Timer<Document> m_didAssociateFormControlsTimer;
     WillBeHeapHashSet<RefPtrWillBeMember<Element> > m_associatedFormControls;
 
-    WillBeHeapHashSet<RawPtrWillBeMember<SVGUseElement> > m_useElementsNeedingUpdate;
     WillBeHeapHashSet<RawPtrWillBeMember<Element> > m_layerUpdateSVGFilterElements;
 
     bool m_hasViewportUnits;

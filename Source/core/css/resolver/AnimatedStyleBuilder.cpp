@@ -134,14 +134,6 @@ void setFillSize(FillLayer* fillLayer, const AnimatableValue* value, const Style
         state.styleMap().mapFillSize(fillLayer, toAnimatableUnknown(value)->toCSSValue().get());
 }
 
-PassRefPtr<SVGLength> animatableValueToNonNegativeSVGLength(const AnimatableValue* value)
-{
-    RefPtr<SVGLength> length = toAnimatableSVGLength(value)->toSVGLength();
-    if (length->valueInSpecifiedUnits() < 0)
-        length->setValueInSpecifiedUnits(0);
-    return length.release();
-}
-
 template <CSSPropertyID property>
 void setOnFillLayers(FillLayer& fillLayers, const AnimatableValue* value, StyleResolverState& state)
 {
@@ -278,7 +270,6 @@ void AnimatedStyleBuilder::applyProperty(CSSPropertyID property, StyleResolverSt
         setOnFillLayers<CSSPropertyBackgroundSize>(style->accessBackgroundLayers(), value, state);
         return;
     case CSSPropertyBaselineShift:
-        style->setBaselineShiftValue(toAnimatableSVGLength(value)->toSVGLength());
         return;
     case CSSPropertyBorderBottomColor:
         style->setBorderBottomColor(toAnimatableColor(value)->color());
@@ -347,14 +338,8 @@ void AnimatedStyleBuilder::applyProperty(CSSPropertyID property, StyleResolverSt
         style->setVisitedLinkColor(toAnimatableColor(value)->visitedLinkColor());
         return;
     case CSSPropertyFillOpacity:
-        style->setFillOpacity(clampTo<float>(toAnimatableDouble(value)->toDouble(), 0, 1));
         return;
     case CSSPropertyFill:
-        {
-            const AnimatableSVGPaint* svgPaint = toAnimatableSVGPaint(value);
-            style->accessSVGStyle().setFillPaint(svgPaint->paintType(), svgPaint->color(), svgPaint->uri(), true, false);
-            style->accessSVGStyle().setFillPaint(svgPaint->visitedLinkPaintType(), svgPaint->visitedLinkColor(), svgPaint->visitedLinkURI(), false, true);
-        }
         return;
     case CSSPropertyFlexGrow:
         style->setFlexGrow(clampTo<float>(toAnimatableDouble(value)->toDouble(), 0));
@@ -366,10 +351,8 @@ void AnimatedStyleBuilder::applyProperty(CSSPropertyID property, StyleResolverSt
         style->setFlexBasis(animatableValueToLength(value, state, ValueRangeNonNegative));
         return;
     case CSSPropertyFloodColor:
-        style->setFloodColor(toAnimatableColor(value)->color());
         return;
     case CSSPropertyFloodOpacity:
-        style->setFloodOpacity(clampTo<float>(toAnimatableDouble(value)->toDouble(), 0, 1));
         return;
     case CSSPropertyFontSize:
         style->setFontSize(clampTo<float>(toAnimatableDouble(value)->toDouble(), 0));
@@ -387,7 +370,6 @@ void AnimatedStyleBuilder::applyProperty(CSSPropertyID property, StyleResolverSt
         style->setLeft(animatableValueToLength(value, state));
         return;
     case CSSPropertyLightingColor:
-        style->setLightingColor(toAnimatableColor(value)->color());
         return;
     case CSSPropertyLineHeight:
         if (value->isLength())
@@ -461,32 +443,20 @@ void AnimatedStyleBuilder::applyProperty(CSSPropertyID property, StyleResolverSt
         style->setRight(animatableValueToLength(value, state));
         return;
     case CSSPropertyStrokeWidth:
-        style->setStrokeWidth(animatableValueToNonNegativeSVGLength(value));
         return;
     case CSSPropertyStopColor:
-        style->setStopColor(toAnimatableColor(value)->color());
         return;
     case CSSPropertyStopOpacity:
-        style->setStopOpacity(clampTo<float>(toAnimatableDouble(value)->toDouble(), 0, 1));
         return;
     case CSSPropertyStrokeDasharray:
-        style->setStrokeDashArray(toAnimatableStrokeDasharrayList(value)->toSVGLengthList());
         return;
     case CSSPropertyStrokeDashoffset:
-        style->setStrokeDashOffset(toAnimatableSVGLength(value)->toSVGLength());
         return;
     case CSSPropertyStrokeMiterlimit:
-        style->setStrokeMiterLimit(clampTo<float>(toAnimatableDouble(value)->toDouble(), 1));
         return;
     case CSSPropertyStrokeOpacity:
-        style->setStrokeOpacity(clampTo<float>(toAnimatableDouble(value)->toDouble(), 0, 1));
         return;
     case CSSPropertyStroke:
-        {
-            const AnimatableSVGPaint* svgPaint = toAnimatableSVGPaint(value);
-            style->accessSVGStyle().setStrokePaint(svgPaint->paintType(), svgPaint->color(), svgPaint->uri(), true, false);
-            style->accessSVGStyle().setStrokePaint(svgPaint->visitedLinkPaintType(), svgPaint->visitedLinkColor(), svgPaint->visitedLinkURI(), false, true);
-        }
         return;
     case CSSPropertyTextDecorationColor:
         style->setTextDecorationColor(toAnimatableColor(value)->color());

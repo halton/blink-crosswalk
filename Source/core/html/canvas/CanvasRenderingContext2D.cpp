@@ -712,13 +712,6 @@ void CanvasRenderingContext2D::setGlobalCompositeOperation(const String& operati
     c->setCompositeOperation(op, blendMode);
 }
 
-void CanvasRenderingContext2D::setCurrentTransform(PassRefPtr<SVGMatrixTearOff> passMatrixTearOff)
-{
-    RefPtr<SVGMatrixTearOff> matrixTearOff = passMatrixTearOff;
-    const AffineTransform& transform = matrixTearOff->value();
-    setTransform(transform.a(), transform.b(), transform.c(), transform.d(), transform.e(), transform.f());
-}
-
 void CanvasRenderingContext2D::scale(float sx, float sy)
 {
     GraphicsContext* c = drawingContext();

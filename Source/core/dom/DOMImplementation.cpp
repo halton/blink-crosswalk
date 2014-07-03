@@ -27,7 +27,6 @@
 
 #include "bindings/core/v8/ExceptionState.h"
 #include "core/HTMLNames.h"
-#include "core/SVGNames.h"
 #include "core/css/CSSStyleSheet.h"
 #include "core/css/MediaList.h"
 #include "core/css/StyleSheetContents.h"
@@ -64,106 +63,6 @@ namespace blink {
 
 typedef HashSet<String, CaseFoldingHash> FeatureSet;
 
-static void addString(FeatureSet& set, const char* string)
-{
-    set.add(string);
-}
-
-static bool isSupportedSVG10Feature(const String& feature, const String& version)
-{
-    if (!version.isEmpty() && version != "1.0")
-        return false;
-
-    static bool initialized = false;
-    DEFINE_STATIC_LOCAL(FeatureSet, svgFeatures, ());
-    if (!initialized) {
-#if ENABLE(SVG_FONTS)
-        addString(svgFeatures, "svg");
-        addString(svgFeatures, "svg.static");
-#endif
-//      addString(svgFeatures, "svg.animation");
-//      addString(svgFeatures, "svg.dynamic");
-//      addString(svgFeatures, "svg.dom.animation");
-//      addString(svgFeatures, "svg.dom.dynamic");
-#if ENABLE(SVG_FONTS)
-        addString(svgFeatures, "dom");
-        addString(svgFeatures, "dom.svg");
-        addString(svgFeatures, "dom.svg.static");
-#endif
-//      addString(svgFeatures, "svg.all");
-//      addString(svgFeatures, "dom.svg.all");
-        initialized = true;
-    }
-    return feature.startsWith("org.w3c.", false)
-        && svgFeatures.contains(feature.right(feature.length() - 8));
-}
-
-static bool isSupportedSVG11Feature(const String& feature, const String& version)
-{
-    if (!version.isEmpty() && version != "1.1")
-        return false;
-
-    static bool initialized = false;
-    DEFINE_STATIC_LOCAL(FeatureSet, svgFeatures, ());
-    if (!initialized) {
-        // Sadly, we cannot claim to implement any of the SVG 1.1 generic feature sets
-        // lack of Font and Filter support.
-        // http://bugs.webkit.org/show_bug.cgi?id=15480
-#if ENABLE(SVG_FONTS)
-        addString(svgFeatures, "SVG");
-        addString(svgFeatures, "SVGDOM");
-        addString(svgFeatures, "SVG-static");
-        addString(svgFeatures, "SVGDOM-static");
-#endif
-        addString(svgFeatures, "SVG-animation");
-        addString(svgFeatures, "SVGDOM-animation");
-//      addString(svgFeatures, "SVG-dynamic);
-//      addString(svgFeatures, "SVGDOM-dynamic);
-        addString(svgFeatures, "CoreAttribute");
-        addString(svgFeatures, "Structure");
-        addString(svgFeatures, "BasicStructure");
-        addString(svgFeatures, "ContainerAttribute");
-        addString(svgFeatures, "ConditionalProcessing");
-        addString(svgFeatures, "Image");
-        addString(svgFeatures, "Style");
-        addString(svgFeatures, "ViewportAttribute");
-        addString(svgFeatures, "Shape");
-        addString(svgFeatures, "Text");
-        addString(svgFeatures, "BasicText");
-        addString(svgFeatures, "PaintAttribute");
-        addString(svgFeatures, "BasicPaintAttribute");
-        addString(svgFeatures, "OpacityAttribute");
-        addString(svgFeatures, "GraphicsAttribute");
-        addString(svgFeatures, "BaseGraphicsAttribute");
-        addString(svgFeatures, "Marker");
-//      addString(svgFeatures, "ColorProfile");
-        addString(svgFeatures, "Gradient");
-        addString(svgFeatures, "Pattern");
-        addString(svgFeatures, "Clip");
-        addString(svgFeatures, "BasicClip");
-        addString(svgFeatures, "Mask");
-        addString(svgFeatures, "Filter");
-        addString(svgFeatures, "BasicFilter");
-        addString(svgFeatures, "DocumentEventsAttribute");
-        addString(svgFeatures, "GraphicalEventsAttribute");
-//      addString(svgFeatures, "AnimationEventsAttribute");
-        addString(svgFeatures, "Cursor");
-        addString(svgFeatures, "Hyperlinking");
-        addString(svgFeatures, "XlinkAttribute");
-        addString(svgFeatures, "View");
-        addString(svgFeatures, "Script");
-        addString(svgFeatures, "Animation");
-#if ENABLE(SVG_FONTS)
-        addString(svgFeatures, "Font");
-        addString(svgFeatures, "BasicFont");
-#endif
-        addString(svgFeatures, "Extensibility");
-        initialized = true;
-    }
-    return feature.startsWith("http://www.w3.org/tr/svg11/feature#", false)
-        && svgFeatures.contains(feature.right(feature.length() - 35));
-}
-
 DOMImplementation::DOMImplementation(Document& document)
     : m_document(document)
 {
@@ -171,12 +70,6 @@ DOMImplementation::DOMImplementation(Document& document)
 
 bool DOMImplementation::hasFeature(const String& feature, const String& version)
 {
-    if (feature.startsWith("http://www.w3.org/TR/SVG", false)
-    || feature.startsWith("org.w3c.dom.svg", false)
-    || feature.startsWith("org.w3c.svg", false)) {
-        // FIXME: SVG 2.0 support?
-        return isSupportedSVG10Feature(feature, version) || isSupportedSVG11Feature(feature, version);
-    }
     return true;
 }
 
@@ -204,9 +97,7 @@ PassRefPtrWillBeRawPtr<XMLDocument> DOMImplementation::createDocument(const Atom
 {
     RefPtrWillBeRawPtr<XMLDocument> doc = nullptr;
     DocumentInit init = DocumentInit::fromContext(document().contextDocument());
-    if (namespaceURI == SVGNames::svgNamespaceURI) {
-        doc = XMLDocument::createSVG(init);
-    } else if (namespaceURI == HTMLNames::xhtmlNamespaceURI) {
+    if (namespaceURI == HTMLNames::xhtmlNamespaceURI) {
         doc = XMLDocument::createXHTML(init.withRegistrationContext(document().registrationContext()));
     } else {
         doc = XMLDocument::create(init);
@@ -377,8 +268,6 @@ PassRefPtrWillBeRawPtr<Document> DOMImplementation::createDocument(const String&
         return PluginDocument::create(init);
     if (isTextMIMEType(type))
         return TextDocument::create(init);
-    if (type == "image/svg+xml")
-        return XMLDocument::createSVG(init);
     if (isXMLMIMEType(type))
         return XMLDocument::create(init);
 

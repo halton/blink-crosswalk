@@ -49,7 +49,6 @@ enum CanvasFillRule { "nonzero", "evenodd" };
     void restore(); // pop state stack and restore state
 
     // transformations (default transform is the identity matrix)
-    [RuntimeEnabled=ExperimentalCanvasFeatures] attribute SVGMatrix currentTransform;
     void scale(unrestricted float x, unrestricted float y);
     void rotate(unrestricted float angle);
     void translate(unrestricted float x, unrestricted float y);

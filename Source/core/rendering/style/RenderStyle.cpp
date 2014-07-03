@@ -65,8 +65,6 @@ struct SameSizeAsRenderStyle : public RefCounted<SameSizeAsRenderStyle> {
     } noninherited_flags;
 };
 
-COMPILE_ASSERT(sizeof(RenderStyle) == sizeof(SameSizeAsRenderStyle), RenderStyle_should_stay_small);
-
 inline RenderStyle* defaultStyle()
 {
     DEFINE_STATIC_REF(RenderStyle, s_defaultStyle, (RenderStyle::createDefaultStyle()));
@@ -105,7 +103,6 @@ ALWAYS_INLINE RenderStyle::RenderStyle()
     , rareNonInheritedData(defaultStyle()->rareNonInheritedData)
     , rareInheritedData(defaultStyle()->rareInheritedData)
     , inherited(defaultStyle()->inherited)
-    , m_svgStyle(defaultStyle()->m_svgStyle)
 {
     setBitDefaults(); // Would it be faster to copy this from the default style?
     COMPILE_ASSERT((sizeof(InheritedFlags) <= 8), InheritedFlags_does_not_grow);
@@ -132,7 +129,6 @@ ALWAYS_INLINE RenderStyle::RenderStyle(DefaultStyleTag)
     rareNonInheritedData.access()->m_gridItem.init();
     rareInheritedData.init();
     inherited.init();
-    m_svgStyle.init();
 }
 
 ALWAYS_INLINE RenderStyle::RenderStyle(const RenderStyle& o)
@@ -144,7 +140,6 @@ ALWAYS_INLINE RenderStyle::RenderStyle(const RenderStyle& o)
     , rareNonInheritedData(o.rareNonInheritedData)
     , rareInheritedData(o.rareInheritedData)
     , inherited(o.inherited)
-    , m_svgStyle(o.m_svgStyle)
     , inherited_flags(o.inherited_flags)
     , noninherited_flags(o.noninherited_flags)
 {
@@ -208,8 +203,6 @@ void RenderStyle::inheritFrom(const RenderStyle* inheritParent, IsAtShadowBounda
         rareInheritedData = inheritParent->rareInheritedData;
     inherited = inheritParent->inherited;
     inherited_flags = inheritParent->inherited_flags;
-    if (m_svgStyle != inheritParent->m_svgStyle)
-        m_svgStyle.access()->inheritFrom(inheritParent->m_svgStyle.get());
 }
 
 void RenderStyle::copyNonInheritedFrom(const RenderStyle* other)
@@ -235,8 +228,6 @@ void RenderStyle::copyNonInheritedFrom(const RenderStyle* other)
     noninherited_flags.pageBreakInside = other->noninherited_flags.pageBreakInside;
     noninherited_flags.explicitInheritance = other->noninherited_flags.explicitInheritance;
     noninherited_flags.hasViewportUnits = other->noninherited_flags.hasViewportUnits;
-    if (m_svgStyle != other->m_svgStyle)
-        m_svgStyle.access()->copyNonInheritedFrom(other->m_svgStyle.get());
     ASSERT(zoom() == initialZoom());
 }
 
@@ -251,8 +242,7 @@ bool RenderStyle::operator==(const RenderStyle& o) const
         && surround == o.surround
         && rareNonInheritedData == o.rareNonInheritedData
         && rareInheritedData == o.rareInheritedData
-        && inherited == o.inherited
-        && m_svgStyle == o.m_svgStyle;
+        && inherited == o.inherited;
 }
 
 bool RenderStyle::isStyleAvailable() const
@@ -325,7 +315,6 @@ bool RenderStyle::inheritedNotEqual(const RenderStyle* other) const
 {
     return inherited_flags != other->inherited_flags
            || inherited != other->inherited
-           || m_svgStyle->inheritedNotEqual(other->m_svgStyle.get())
            || rareInheritedData != other->rareInheritedData;
 }
 
@@ -334,7 +323,6 @@ bool RenderStyle::inheritedDataShared(const RenderStyle* other) const
     // This is a fast check that only looks if the data structures are shared.
     return inherited_flags == other->inherited_flags
         && inherited.get() == other->inherited.get()
-        && m_svgStyle.get() == other->m_svgStyle.get()
         && rareInheritedData.get() == other->rareInheritedData.get();
 }
 
@@ -374,8 +362,6 @@ StyleDifference RenderStyle::visualInvalidationDiff(const RenderStyle& other) co
     // this function anyway.
 
     StyleDifference diff;
-    if (m_svgStyle.get() != other.m_svgStyle.get())
-        diff = m_svgStyle->diff(other.m_svgStyle.get());
 
     if ((!diff.needsFullLayout() || !diff.needsPaintInvalidation()) && diffNeedsFullLayoutAndPaintInvalidation(other)) {
         diff.setNeedsFullLayout();
@@ -1443,13 +1429,10 @@ Color RenderStyle::colorIncludingFallback(int colorProperty, bool visitedLink) c
         result = visitedLink ? visitedLinkTextStrokeColor() : textStrokeColor();
         break;
     case CSSPropertyFloodColor:
-        result = floodColor();
         break;
     case CSSPropertyLightingColor:
-        result = lightingColor();
         break;
     case CSSPropertyStopColor:
-        result = stopColor();
         break;
     case CSSPropertyWebkitTapHighlightColor:
         result = tapHighlightColor();

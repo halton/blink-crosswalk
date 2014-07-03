@@ -39,8 +39,6 @@
 #include "bindings/core/v8/WindowProxy.h"
 #include "core/HTMLElementFactory.h"
 #include "core/HTMLNames.h"
-#include "core/SVGElementFactory.h"
-#include "core/SVGNames.h"
 #include "core/XMLNSNames.h"
 #include "core/XMLNames.h"
 #include "core/accessibility/AXObjectCache.h"
@@ -177,10 +175,6 @@
 #include "core/rendering/RenderWidget.h"
 #include "core/rendering/TextAutosizer.h"
 #include "core/rendering/compositing/RenderLayerCompositor.h"
-#include "core/svg/SVGDocumentExtensions.h"
-#include "core/svg/SVGFontFaceElement.h"
-#include "core/svg/SVGTitleElement.h"
-#include "core/svg/SVGUseElement.h"
 #include "core/workers/SharedWorkerRepositoryClient.h"
 #if !defined(DISABLE_XSLT)
 #include "core/xml/XSLTProcessor.h"
@@ -673,9 +667,6 @@ void Document::dispose()
         m_scriptedAnimationController->clearDocumentPointer();
     m_scriptedAnimationController.clear();
 
-    if (svgExtensions())
-        accessSVGExtensions().pauseAnimations();
-
     m_lifecycle.advanceTo(DocumentLifecycle::Disposed);
     lifecycleNotifier().notifyDocumentWasDisposed();
 }
@@ -1096,8 +1087,6 @@ PassRefPtrWillBeRawPtr<Element> Document::createElement(const QualifiedName& qNa
     // FIXME: Use registered namespaces and look up in a hash to find the right factory.
     if (qName.namespaceURI() == xhtmlNamespaceURI)
         e = HTMLElementFactory::createHTMLElement(qName.localName(), *this, 0, createdByParser);
-    else if (qName.namespaceURI() == SVGNames::svgNamespaceURI)
-        e = SVGElementFactory::createSVGElement(qName.localName(), *this, createdByParser);
 
     if (e)
         m_sawElementsInKnownNamespaces = true;
@@ -1242,8 +1231,6 @@ String Document::suggestedMIMEType() const
     if (isXMLDocument()) {
         if (isXHTMLDocument())
             return "application/xhtml+xml";
-        if (isSVGDocument())
-            return "image/svg+xml";
         return "application/xml";
     }
     if (xmlStandalone())
@@ -1570,8 +1557,6 @@ bool Document::needsFullRenderTreeUpdate() const
 {
     if (!isActive() || !view())
         return false;
-    if (!m_useElementsNeedingUpdate.isEmpty())
-        return true;
     if (!m_layerUpdateSVGFilterElements.isEmpty())
         return true;
     if (needsStyleRecalc())
@@ -1822,11 +1807,6 @@ void Document::updateRenderTree(StyleRecalcChange change)
 
     if (m_focusedElement && !m_focusedElement->isFocusable())
         clearFocusedElementSoon();
-
-#if ENABLE(SVG_FONTS)
-    if (svgExtensions())
-        accessSVGExtensions().removePendingSVGFontFaceElementsForRemoval();
-#endif
 
     ASSERT(!m_timeline->hasOutdatedAnimationPlayer());
 
@@ -2085,30 +2065,8 @@ void Document::unscheduleSVGFilterLayerUpdateHack(Element& element)
     m_layerUpdateSVGFilterElements.remove(&element);
 }
 
-void Document::scheduleUseShadowTreeUpdate(SVGUseElement& element)
-{
-    m_useElementsNeedingUpdate.add(&element);
-    scheduleRenderTreeUpdateIfNeeded();
-}
-
-void Document::unscheduleUseShadowTreeUpdate(SVGUseElement& element)
-{
-    m_useElementsNeedingUpdate.remove(&element);
-}
-
 void Document::updateUseShadowTreesIfNeeded()
 {
-    ScriptForbiddenScope forbidScript;
-
-    if (m_useElementsNeedingUpdate.isEmpty())
-        return;
-
-    WillBeHeapVector<RawPtrWillBeMember<SVGUseElement> > elements;
-    copyToVector(m_useElementsNeedingUpdate, elements);
-    m_useElementsNeedingUpdate.clear();
-
-    for (WillBeHeapVector<RawPtrWillBeMember<SVGUseElement> >::iterator it = elements.begin(), end = elements.end(); it != end; ++it)
-        (*it)->buildPendingResource();
 }
 
 StyleResolver* Document::styleResolver() const
@@ -2169,10 +2127,6 @@ void Document::detach(const AttachContext& context)
         m_scriptedAnimationController->clearDocumentPointer();
     m_scriptedAnimationController.clear();
 
-    if (svgExtensions())
-        accessSVGExtensions().pauseAnimations();
-
-    // FIXME: This shouldn't be needed once LocalDOMWindow becomes ExecutionContext.
     if (m_domWindow)
         m_domWindow->clearEventQueue();
 
@@ -2523,11 +2477,6 @@ void Document::implicitClose()
     // JS running below could remove the frame or destroy the RenderView so we call
     // those two functions repeatedly and don't save them on the stack.
 
-    // To align the HTML load event and the SVGLoad event for the outermost <svg> element, fire it from
-    // here, instead of doing it from SVGElement::finishedParsingChildren.
-    if (svgExtensions())
-        accessSVGExtensions().dispatchSVGLoadEventToOutermostSVGElements();
-
     if (protectedWindow)
         protectedWindow->documentWasClosed();
 
@@ -2581,9 +2530,6 @@ void Document::implicitClose()
             }
         }
     }
-
-    if (svgExtensions())
-        accessSVGExtensions().startAnimations();
 }
 
 bool Document::dispatchBeforeUnloadEvent(Chrome& chrome, bool& didAllowNavigation)
@@ -4564,23 +4510,6 @@ PassRefPtrWillBeRawPtr<Attr> Document::createAttributeNS(const AtomicString& nam
     }
 
     return Attr::create(*this, qName, emptyAtom);
-}
-
-const SVGDocumentExtensions* Document::svgExtensions()
-{
-    return m_svgExtensions.get();
-}
-
-SVGDocumentExtensions& Document::accessSVGExtensions()
-{
-    if (!m_svgExtensions)
-        m_svgExtensions = adoptPtrWillBeNoop(new SVGDocumentExtensions(this));
-    return *m_svgExtensions;
-}
-
-bool Document::hasSVGRootNode() const
-{
-    return isSVGSVGElement(documentElement());
 }
 
 PassRefPtrWillBeRawPtr<HTMLCollection> Document::images()

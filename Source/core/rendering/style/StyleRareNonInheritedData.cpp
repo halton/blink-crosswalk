@@ -184,9 +184,6 @@ StyleRareNonInheritedData::StyleRareNonInheritedData(const StyleRareNonInherited
 
 StyleRareNonInheritedData::~StyleRareNonInheritedData()
 {
-    const FilterOperations& filterOperations = m_filter->m_operations;
-    for (unsigned i = 0; i < filterOperations.size(); ++i)
-        ReferenceFilterBuilder::clearDocumentResourceReference(filterOperations.at(i));
 }
 
 bool StyleRareNonInheritedData::operator==(const StyleRareNonInheritedData& o) const

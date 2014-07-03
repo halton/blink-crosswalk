@@ -83,7 +83,6 @@
 #include "core/rendering/RenderView.h"
 #include "core/rendering/RenderWidget.h"
 #include "core/rendering/style/RenderStyle.h"
-#include "core/svg/SVGDocumentExtensions.h"
 #include "platform/PlatformGestureEvent.h"
 #include "platform/PlatformKeyboardEvent.h"
 #include "platform/PlatformTouchEvent.h"
@@ -600,14 +599,6 @@ bool EventHandler::handleMousePressEvent(const MouseEventWithHitTestResults& eve
     if (event.isOverWidget() && passWidgetMouseDownEventToWidget(event))
         return true;
 
-    if (m_frame->document()->isSVGDocument() && m_frame->document()->accessSVGExtensions().zoomAndPanEnabled()) {
-        if (event.event().shiftKey() && singleClick) {
-            m_svgPan = true;
-            m_frame->document()->accessSVGExtensions().startPan(m_frame->view()->windowToContents(event.event().position()));
-            return true;
-        }
-    }
-
     // We don't do this at the start of mouse down handling,
     // because we don't want to do it until we know we didn't hit a widget.
     if (singleClick)
@@ -711,14 +702,6 @@ void EventHandler::updateSelectionForMouseDrag(const HitTestResult& hitTestResul
     // Restart the selection if this is the first mouse move. This work is usually
     // done in handleMousePressEvent, but not if the mouse press was on an existing selection.
     VisibleSelection newSelection = m_frame->selection().selection();
-
-    // Special case to limit selection to the containing block for SVG text.
-    // FIXME: Isn't there a better non-SVG-specific way to do this?
-    if (Node* selectionBaseNode = newSelection.base().deprecatedNode())
-        if (RenderObject* selectionBaseRenderer = selectionBaseNode->renderer())
-            if (selectionBaseRenderer->isSVGText())
-                if (target->renderer()->containingBlock() != selectionBaseRenderer->containingBlock())
-                    return;
 
     if (m_selectionInitiationState == HaveNotStartedSelection && !dispatchSelectStart(target))
         return;
@@ -1394,11 +1377,6 @@ bool EventHandler::handleMouseMoveOrLeaveEvent(const PlatformMouseEvent& mouseEv
 
     cancelFakeMouseMoveEvent();
 
-    if (m_svgPan) {
-        m_frame->document()->accessSVGExtensions().updatePan(m_frame->view()->windowToContents(m_lastKnownMousePosition));
-        return true;
-    }
-
     if (m_frameSetBeingResized)
         return !dispatchMouseEvent(EventTypeNames::mousemove, m_frameSetBeingResized.get(), 0, mouseEvent, false);
 
@@ -1519,12 +1497,6 @@ bool EventHandler::handleMouseReleaseEvent(const PlatformMouseEvent& mouseEvent)
 
     m_mousePressed = false;
     setLastKnownMousePosition(mouseEvent);
-
-    if (m_svgPan) {
-        m_svgPan = false;
-        m_frame->document()->accessSVGExtensions().updatePan(m_frame->view()->windowToContents(m_lastKnownMousePosition));
-        return true;
-    }
 
     if (m_frameSetBeingResized)
         return !dispatchMouseEvent(EventTypeNames::mouseup, m_frameSetBeingResized.get(), m_clickCount, mouseEvent, false);

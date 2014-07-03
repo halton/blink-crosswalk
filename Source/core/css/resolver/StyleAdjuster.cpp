@@ -30,7 +30,6 @@
 #include "core/css/resolver/StyleAdjuster.h"
 
 #include "core/HTMLNames.h"
-#include "core/SVGNames.h"
 #include "core/dom/ContainerNode.h"
 #include "core/dom/Document.h"
 #include "core/dom/Element.h"
@@ -47,7 +46,6 @@
 #include "core/rendering/style/GridPosition.h"
 #include "core/rendering/style/RenderStyle.h"
 #include "core/rendering/style/RenderStyleConstants.h"
-#include "core/svg/SVGSVGElement.h"
 #include "platform/Length.h"
 #include "platform/transforms/TransformOperations.h"
 #include "wtf/Assertions.h"
@@ -224,16 +222,6 @@ void StyleAdjuster::adjustRenderStyle(RenderStyle* style, RenderStyle* parentSty
         || style->overflowY() != OVISIBLE
         || style->hasFilter()))
         style->setTransformStyle3D(TransformStyle3DFlat);
-
-    if (e && e->isSVGElement()) {
-        // Only the root <svg> element in an SVG document fragment tree honors css position
-        if (!(isSVGSVGElement(*e) && e->parentNode() && !e->parentNode()->isSVGElement()))
-            style->setPosition(RenderStyle::initialPosition());
-
-        // SVG text layout code expects us to be a block-level style element.
-        if ((isSVGForeignObjectElement(*e) || isSVGTextElement(*e)) && style->isDisplayInlineType())
-            style->setDisplay(BLOCK);
-    }
 
     if (e && e->renderStyle() && e->renderStyle()->textAutosizingMultiplier() != 1) {
         // Preserve the text autosizing multiplier on style recalc.

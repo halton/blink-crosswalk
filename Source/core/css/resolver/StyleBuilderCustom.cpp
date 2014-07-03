@@ -212,8 +212,6 @@ void StyleBuilderFunctions::applyValueCSSPropertyCursor(StyleResolverState& stat
             CSSValue* item = list->item(i);
             if (item->isCursorImageValue()) {
                 CSSCursorImageValue* image = toCSSCursorImageValue(item);
-                if (image->updateIfSVGCursorIsUsed(state.element())) // Elements with SVG cursors are not allowed to share style.
-                    state.style()->setUnique();
                 state.style()->addCursor(state.styleImage(CSSPropertyCursor, image), image->hotSpot());
             } else {
                 state.style()->setCursor(*toCSSPrimitiveValue(item));
@@ -245,14 +243,6 @@ void StyleBuilderFunctions::applyInheritCSSPropertyFontFamily(StyleResolverState
 void StyleBuilderFunctions::applyValueCSSPropertyFontFamily(StyleResolverState& state, CSSValue* value)
 {
     state.fontBuilder().setFontFamilyValue(value);
-}
-
-void StyleBuilderFunctions::applyValueCSSPropertyGlyphOrientationVertical(StyleResolverState& state, CSSValue* value)
-{
-    if (value->isPrimitiveValue() && toCSSPrimitiveValue(value)->getValueID() == CSSValueAuto)
-        state.style()->accessSVGStyle().setGlyphOrientationVertical(GO_AUTO);
-    else
-        state.style()->accessSVGStyle().setGlyphOrientationVertical(StyleBuilderConverter::convertGlyphOrientation(state, value));
 }
 
 void StyleBuilderFunctions::applyInitialCSSPropertyGridTemplateAreas(StyleResolverState& state)

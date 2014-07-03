@@ -104,7 +104,6 @@ line-height animatable, inherited, getter=specifiedLineHeight, custom_value
 
 align-content
 align-items custom_all
-alignment-baseline svg
 align-self custom_all
 backface-visibility
 background-attachment custom_all
@@ -118,7 +117,6 @@ background-position-y animatable, custom_all
 background-repeat-x custom_all
 background-repeat-y custom_all
 background-size animatable, custom_all
-baseline-shift animatable, svg, custom_inherit, custom_value
 border-bottom-color animatable, custom_all
 border-bottom-left-radius animatable, initial=initialBorderRadius, converter=convertRadius
 border-bottom-right-radius animatable, initial=initialBorderRadius, converter=convertRadius
@@ -144,37 +142,22 @@ border-top-width animatable, initial=initialBorderWidth, converter=convertLineWi
 bottom animatable, initial=initialOffset, converter=convertLengthOrAuto
 box-shadow animatable, converter=convertShadow
 box-sizing
-buffered-rendering svg
 caption-side inherited
 clear
 clip animatable, converter=convertClip, custom_all
-clip-path svg, name_for_methods=ClipperResource, converter=convertFragmentIdentifier
-clip-rule inherited, svg, type_name=WindRule
-color-interpolation inherited, svg
-color-interpolation-filters inherited, svg, type_name=EColorInterpolation
-color-rendering inherited, svg
 column-fill runtime_flag=RegionBasedColumns, type_name=ColumnFill
 content custom_all
 counter-increment custom_all
 counter-reset custom_all
 cursor inherited, custom_all
 display
-dominant-baseline svg
 empty-cells inherited, type_name=EEmptyCell
-fill animatable, inherited, svg, setter=setFillPaint, custom_all
-fill-opacity animatable, inherited, svg, converter=convertNumberOrPercentage
-fill-rule inherited, svg, type_name=WindRule
-filter svg, name_for_methods=FilterResource, converter=convertFragmentIdentifier
 flex-basis animatable, converter=convertLengthOrAuto
 flex-direction
 flex-grow animatable, type_name=float
 flex-shrink animatable, type_name=float
 flex-wrap
 float type_name=EFloat, name_for_methods=Floating
-flood-color animatable, svg, converter=convertSVGColor
-flood-opacity animatable, svg, converter=convertNumberOrPercentage
-glyph-orientation-horizontal inherited, svg, converter=convertGlyphOrientation
-glyph-orientation-vertical inherited, svg, custom_value
 grid-auto-columns runtime_flag=CSSGridLayout, converter=convertGridTrackSize
 grid-auto-flow runtime_flag=CSSGridLayout, custom_value
 grid-auto-rows runtime_flag=CSSGridLayout, converter=convertGridTrackSize
@@ -193,7 +176,6 @@ justify-items runtime_flag=CSSGridLayout, custom_all
 justify-self runtime_flag=CSSGridLayout, custom_all
 left animatable, initial=initialOffset, converter=convertLengthOrAuto
 letter-spacing animatable, inherited, initial=initialLetterWordSpacing, converter=convertSpacing
-lighting-color animatable, svg, converter=convertSVGColor
 list-style-image animatable, inherited, custom_value
 list-style-position inherited
 list-style-type inherited
@@ -201,12 +183,7 @@ margin-bottom animatable, initial=initialMargin, converter=convertLengthOrAuto
 margin-left animatable, initial=initialMargin, converter=convertLengthOrAuto
 margin-right animatable, initial=initialMargin, converter=convertLengthOrAuto
 margin-top animatable, initial=initialMargin, converter=convertLengthOrAuto
-marker-end inherited, svg, name_for_methods=MarkerEndResource, converter=convertFragmentIdentifier
-marker-mid inherited, svg, name_for_methods=MarkerMidResource, converter=convertFragmentIdentifier
-marker-start inherited, svg, name_for_methods=MarkerStartResource, converter=convertFragmentIdentifier
-mask svg, name_for_methods=MaskerResource, converter=convertFragmentIdentifier
 mask-source-type runtime_flag=CSSMaskSourceType, custom_all
-mask-type svg
 max-height animatable, initial=initialMaxSize, converter=convertLengthMaxSizing
 max-width animatable, initial=initialMaxSize, converter=convertLengthMaxSizing
 min-height animatable, initial=initialMinSize, converter=convertLengthSizing
@@ -231,7 +208,6 @@ padding-top animatable, initial=initialPadding, converter=convertLength
 page-break-after type_name=EPageBreak, initial=initialPageBreak
 page-break-before type_name=EPageBreak, initial=initialPageBreak
 page-break-inside type_name=EPageBreak, initial=initialPageBreak
-paint-order inherited, svg, converter=convertPaintOrder
 perspective animatable, custom_value
 perspective-origin animatable, custom_all
 pointer-events inherited
@@ -244,24 +220,12 @@ scroll-behavior runtime_flag=CSSOMSmoothScroll, type_name=ScrollBehavior
 shape-image-threshold animatable, type_name=float
 shape-margin animatable, converter=convertLength
 shape-outside animatable, custom_value
-shape-rendering inherited, svg
 size custom_all
 speak inherited
-stop-color animatable, svg, converter=convertSVGColor
-stop-opacity animatable, svg, converter=convertNumberOrPercentage
-stroke animatable, inherited, svg, setter=setStrokePaint, custom_all
-stroke-dasharray animatable, inherited, svg, name_for_methods=StrokeDashArray, converter=convertStrokeDasharray
-stroke-dashoffset animatable, inherited, svg, name_for_methods=StrokeDashOffset, converter=convertSVGLength
-stroke-linecap svg, inherited, type_name=LineCap, name_for_methods=CapStyle
-stroke-linejoin svg, inherited, type_name=LineJoin, name_for_methods=JoinStyle
-stroke-miterlimit animatable, inherited, svg, type_name=float, name_for_methods=StrokeMiterLimit
-stroke-opacity animatable, inherited, svg, converter=convertNumberOrPercentage
-stroke-width animatable, inherited, svg, converter=convertSVGLength
 table-layout
 tab-size inherited, type_name=unsigned
 text-align inherited, custom_value
 text-align-last runtime_flag=CSS3Text, inherited, type_name=TextAlignLast
-text-anchor inherited, svg
 // FIXME: We shouldn't switch between shorthand/not shorthand based on a runtime flag
 text-decoration use_handlers_for=CSSPropertyTextDecorationLine, longhands=text-decoration-line;text-decoration-style;text-decoration-color
 text-decoration-color runtime_flag=CSS3TextDecorations, animatable, custom_all
@@ -280,7 +244,6 @@ transform animatable, custom_value
 transform-origin animatable, custom_all
 transform-style name_for_methods=TransformStyle3D
 unicode-bidi
-vector-effect svg
 vertical-align animatable, custom_inherit, custom_value
 visibility animatable, inherited
 -webkit-animation-delay custom_all
@@ -385,7 +348,6 @@ word-break inherited
 word-spacing animatable, inherited, initial=initialLetterWordSpacing, converter=convertSpacing
 // UAs must treat 'word-wrap' as an alternate name for the 'overflow-wrap' property. So using the same handlers.
 word-wrap inherited, name_for_methods=OverflowWrap
-writing-mode inherited, svg, type_name=SVGWritingMode
 z-index animatable, type_name=int, custom_all
 
 // Internal properties

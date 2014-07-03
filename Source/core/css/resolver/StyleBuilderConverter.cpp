@@ -86,9 +86,6 @@ Color StyleBuilderConverter::convertColor(StyleResolverState& state, CSSValue* v
 
 AtomicString StyleBuilderConverter::convertFragmentIdentifier(StyleResolverState& state, CSSValue* value)
 {
-    CSSPrimitiveValue* primitiveValue = toCSSPrimitiveValue(value);
-    if (primitiveValue->isURI())
-        return SVGURIReference::fragmentIdentifierFromIRIString(primitiveValue->getStringValue(), state.element()->treeScope());
     return nullAtom;
 }
 
@@ -567,48 +564,12 @@ float StyleBuilderConverter::convertSpacing(StyleResolverState& state, CSSValue*
     return primitiveValue->computeLength<float>(state.cssToLengthConversionData());
 }
 
-PassRefPtr<SVGLengthList> StyleBuilderConverter::convertStrokeDasharray(StyleResolverState&, CSSValue* value)
-{
-    if (!value->isValueList()) {
-        return SVGRenderStyle::initialStrokeDashArray();
-    }
-
-    CSSValueList* dashes = toCSSValueList(value);
-
-    RefPtr<SVGLengthList> array = SVGLengthList::create();
-    size_t length = dashes->length();
-    for (size_t i = 0; i < length; ++i) {
-        CSSValue* currValue = dashes->item(i);
-        if (!currValue->isPrimitiveValue())
-            continue;
-
-        CSSPrimitiveValue* dash = toCSSPrimitiveValue(dashes->item(i));
-        array->append(SVGLength::fromCSSPrimitiveValue(dash));
-    }
-
-    return array.release();
-}
-
 StyleColor StyleBuilderConverter::convertStyleColor(StyleResolverState& state, CSSValue* value, bool forVisitedLink)
 {
     CSSPrimitiveValue* primitiveValue = toCSSPrimitiveValue(value);
     if (primitiveValue->getValueID() == CSSValueCurrentcolor)
         return StyleColor::currentColor();
     return state.document().textLinkColors().colorFromPrimitiveValue(primitiveValue, Color(), forVisitedLink);
-}
-
-Color StyleBuilderConverter::convertSVGColor(StyleResolverState& state, CSSValue* value)
-{
-    CSSPrimitiveValue* primitiveValue = toCSSPrimitiveValue(value);
-    if (primitiveValue->isRGBColor())
-        return primitiveValue->getRGBA32Value();
-    ASSERT(primitiveValue->getValueID() == CSSValueCurrentcolor);
-    return state.style()->color();
-}
-
-PassRefPtr<SVGLength> StyleBuilderConverter::convertSVGLength(StyleResolverState&, CSSValue* value)
-{
-    return SVGLength::fromCSSPrimitiveValue(toCSSPrimitiveValue(value));
 }
 
 float StyleBuilderConverter::convertTextStrokeWidth(StyleResolverState& state, CSSValue* value)

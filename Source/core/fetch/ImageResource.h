@@ -131,7 +131,6 @@ private:
     float m_devicePixelRatioHeaderValue;
 
     RefPtr<blink::Image> m_image;
-    OwnPtr<SVGImageCache> m_svgImageCache;
     bool m_loadingMultipartContent;
     bool m_hasDevicePixelRatioHeaderValue;
 };

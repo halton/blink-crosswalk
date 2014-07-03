@@ -60,7 +60,6 @@
 #include "core/rendering/RenderLayer.h"
 #include "core/rendering/RenderView.h"
 #include "core/rendering/compositing/RenderLayerCompositor.h"
-#include "core/svg/SVGDocumentExtensions.h"
 #include "platform/DragImage.h"
 #include "platform/RuntimeEnabledFeatures.h"
 #include "platform/graphics/GraphicsContext.h"
@@ -537,13 +536,6 @@ void LocalFrame::setPageAndTextZoomFactors(float pageZoomFactor, float textZoomF
     Document* document = this->document();
     if (!document)
         return;
-
-    // Respect SVGs zoomAndPan="disabled" property in standalone SVG documents.
-    // FIXME: How to handle compound documents + zoomAndPan="disabled"? Needs SVG WG clarification.
-    if (document->isSVGDocument()) {
-        if (!document->accessSVGExtensions().zoomAndPanEnabled())
-            return;
-    }
 
     if (m_pageZoomFactor != pageZoomFactor) {
         if (FrameView* view = this->view()) {
