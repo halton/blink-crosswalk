@@ -331,45 +331,7 @@ static const CSSPropertyID staticComputableProperties[] = {
     CSSPropertyWebkitUserSelect,
     CSSPropertyWebkitWritingMode,
     CSSPropertyWebkitAppRegion,
-    CSSPropertyBufferedRendering,
-    CSSPropertyClipPath,
-    CSSPropertyClipRule,
-    CSSPropertyMask,
-    CSSPropertyFilter,
-    CSSPropertyFloodColor,
-    CSSPropertyFloodOpacity,
-    CSSPropertyLightingColor,
-    CSSPropertyStopColor,
-    CSSPropertyStopOpacity,
-    CSSPropertyColorInterpolation,
-    CSSPropertyColorInterpolationFilters,
-    CSSPropertyColorRendering,
-    CSSPropertyFill,
-    CSSPropertyFillOpacity,
-    CSSPropertyFillRule,
-    CSSPropertyMarkerEnd,
-    CSSPropertyMarkerMid,
-    CSSPropertyMarkerStart,
-    CSSPropertyMaskType,
     CSSPropertyMaskSourceType,
-    CSSPropertyShapeRendering,
-    CSSPropertyStroke,
-    CSSPropertyStrokeDasharray,
-    CSSPropertyStrokeDashoffset,
-    CSSPropertyStrokeLinecap,
-    CSSPropertyStrokeLinejoin,
-    CSSPropertyStrokeMiterlimit,
-    CSSPropertyStrokeOpacity,
-    CSSPropertyStrokeWidth,
-    CSSPropertyAlignmentBaseline,
-    CSSPropertyBaselineShift,
-    CSSPropertyDominantBaseline,
-    CSSPropertyTextAnchor,
-    CSSPropertyWritingMode,
-    CSSPropertyGlyphOrientationHorizontal,
-    CSSPropertyGlyphOrientationVertical,
-    CSSPropertyVectorEffect,
-    CSSPropertyPaintOrder
 };
 
 static const Vector<CSSPropertyID>& computableProperties()
@@ -2769,46 +2731,7 @@ PassRefPtrWillBeRawPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValu
             ASSERT_NOT_REACHED();
             return nullptr;
 
-        case CSSPropertyBufferedRendering:
-        case CSSPropertyClipPath:
-        case CSSPropertyClipRule:
-        case CSSPropertyMask:
         case CSSPropertyEnableBackground:
-        case CSSPropertyFilter:
-        case CSSPropertyFloodColor:
-        case CSSPropertyFloodOpacity:
-        case CSSPropertyLightingColor:
-        case CSSPropertyStopColor:
-        case CSSPropertyStopOpacity:
-        case CSSPropertyColorInterpolation:
-        case CSSPropertyColorInterpolationFilters:
-        case CSSPropertyColorRendering:
-        case CSSPropertyFill:
-        case CSSPropertyFillOpacity:
-        case CSSPropertyFillRule:
-        case CSSPropertyMarker:
-        case CSSPropertyMarkerEnd:
-        case CSSPropertyMarkerMid:
-        case CSSPropertyMarkerStart:
-        case CSSPropertyMaskType:
-        case CSSPropertyShapeRendering:
-        case CSSPropertyStroke:
-        case CSSPropertyStrokeDasharray:
-        case CSSPropertyStrokeDashoffset:
-        case CSSPropertyStrokeLinecap:
-        case CSSPropertyStrokeLinejoin:
-        case CSSPropertyStrokeMiterlimit:
-        case CSSPropertyStrokeOpacity:
-        case CSSPropertyStrokeWidth:
-        case CSSPropertyAlignmentBaseline:
-        case CSSPropertyBaselineShift:
-        case CSSPropertyDominantBaseline:
-        case CSSPropertyGlyphOrientationHorizontal:
-        case CSSPropertyGlyphOrientationVertical:
-        case CSSPropertyTextAnchor:
-        case CSSPropertyVectorEffect:
-        case CSSPropertyPaintOrder:
-        case CSSPropertyWritingMode:
             return getSVGPropertyCSSValue(propertyID, DoNotUpdateLayout);
 
         case CSSPropertyAll:

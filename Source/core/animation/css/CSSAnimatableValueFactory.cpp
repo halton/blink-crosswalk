@@ -326,20 +326,12 @@ PassRefPtrWillBeRawPtr<AnimatableValue> CSSAnimatableValueFactory::create(CSSPro
         return createFromLengthBox(style.clip(), style);
     case CSSPropertyColor:
         return createFromColor(property, style);
-    case CSSPropertyFillOpacity:
-        return AnimatableUnknown::create(nullptr);
-    case CSSPropertyFill:
-        return AnimatableUnknown::create(nullptr);
     case CSSPropertyFlexGrow:
         return createFromDouble(style.flexGrow(), AnimatableDouble::InterpolationIsNonContinuousWithZero);
     case CSSPropertyFlexShrink:
         return createFromDouble(style.flexShrink(), AnimatableDouble::InterpolationIsNonContinuousWithZero);
     case CSSPropertyFlexBasis:
         return createFromLength(style.flexBasis(), style);
-    case CSSPropertyFloodColor:
-        return createFromColor(property, style);
-    case CSSPropertyFloodOpacity:
-        return AnimatableUnknown::create(nullptr);
     case CSSPropertyFontSize:
         // Must pass a specified size to setFontSize if Text Autosizing is enabled, but a computed size
         // if text zoom is enabled (if neither is enabled it's irrelevant as they're probably the same).
@@ -352,8 +344,6 @@ PassRefPtrWillBeRawPtr<AnimatableValue> CSSAnimatableValueFactory::create(CSSPro
         return createFromFontWeight(style.fontWeight());
     case CSSPropertyHeight:
         return createFromLength(style.height(), style);
-    case CSSPropertyLightingColor:
-        return createFromColor(property, style);
     case CSSPropertyListStyleImage:
         return createFromStyleImage(style.listStyleImage());
     case CSSPropertyLeft:
@@ -400,16 +390,6 @@ PassRefPtrWillBeRawPtr<AnimatableValue> CSSAnimatableValueFactory::create(CSSPro
         return createFromLength(style.paddingTop(), style);
     case CSSPropertyRight:
         return createFromLength(style.right(), style);
-    case CSSPropertyStopColor:
-        return createFromColor(property, style);
-    case CSSPropertyStopOpacity:
-        return AnimatableUnknown::create(nullptr);
-    case CSSPropertyStrokeMiterlimit:
-        return AnimatableUnknown::create(nullptr);
-    case CSSPropertyStrokeOpacity:
-        return AnimatableUnknown::create(nullptr);
-    case CSSPropertyStroke:
-        return AnimatableUnknown::create(nullptr);
     case CSSPropertyTextDecorationColor:
         return AnimatableColor::create(style.textDecorationColor().resolve(style.color()), style.visitedLinkTextDecorationColor().resolve(style.visitedLinkColor()));
     case CSSPropertyTextIndent:

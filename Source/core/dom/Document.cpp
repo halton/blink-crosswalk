@@ -1376,8 +1376,6 @@ void Document::setTitleElement(Element* titleElement)
     if (m_titleElement && m_titleElement != titleElement) {
         if (isHTMLDocument() || isXHTMLDocument()) {
             m_titleElement = Traversal<HTMLTitleElement>::firstWithin(*this);
-        } else if (isSVGDocument()) {
-            m_titleElement = Traversal<SVGTitleElement>::firstWithin(*this);
         }
     } else {
         m_titleElement = titleElement;
@@ -1385,8 +1383,6 @@ void Document::setTitleElement(Element* titleElement)
 
     if (isHTMLTitleElement(m_titleElement))
         updateTitle(toHTMLTitleElement(m_titleElement)->text());
-    else if (isSVGTitleElement(m_titleElement))
-        updateTitle(toSVGTitleElement(m_titleElement)->textContent());
 }
 
 void Document::removeTitle(Element* titleElement)
@@ -1399,9 +1395,6 @@ void Document::removeTitle(Element* titleElement)
     // Update title based on first title element in the document, if one exists.
     if (isHTMLDocument() || isXHTMLDocument()) {
         if (HTMLTitleElement* title = Traversal<HTMLTitleElement>::firstWithin(*this))
-            setTitleElement(title);
-    } else if (isSVGDocument()) {
-        if (SVGTitleElement* title = Traversal<SVGTitleElement>::firstWithin(*this))
             setTitleElement(title);
     }
 
@@ -2041,9 +2034,6 @@ void Document::setIsViewSource(bool isViewSource)
 
 bool Document::dirtyElementsForLayerUpdate()
 {
-    if (m_layerUpdateSVGFilterElements.isEmpty())
-        return false;
-
     for (WillBeHeapHashSet<RawPtrWillBeMember<Element> >::iterator it = m_layerUpdateSVGFilterElements.begin(), end = m_layerUpdateSVGFilterElements.end(); it != end; ++it)
         (*it)->setNeedsStyleRecalc(LocalStyleChange);
     m_layerUpdateSVGFilterElements.clear();

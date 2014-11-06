@@ -325,12 +325,6 @@ String StylePropertySerializer::getPropertyValue(CSSPropertyID propertyID) const
         return getLayeredShorthandValue(webkitTransitionShorthand());
     case CSSPropertyWebkitAnimation:
         return getLayeredShorthandValue(webkitAnimationShorthand());
-    case CSSPropertyMarker: {
-        RefPtrWillBeRawPtr<CSSValue> value = m_propertySet.getPropertyCSSValue(CSSPropertyMarkerStart);
-        if (value)
-            return value->cssText();
-        return String();
-    }
     case CSSPropertyBorderRadius:
         return get4Values(borderRadiusShorthand());
     default:

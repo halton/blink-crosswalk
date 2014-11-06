@@ -88,9 +88,7 @@ static inline bool isValidVisitedLinkProperty(CSSPropertyID id)
     case CSSPropertyBorderTopColor:
     case CSSPropertyBorderBottomColor:
     case CSSPropertyColor:
-    case CSSPropertyFill:
     case CSSPropertyOutlineColor:
-    case CSSPropertyStroke:
     case CSSPropertyTextDecorationColor:
     case CSSPropertyWebkitColumnRuleColor:
     case CSSPropertyWebkitTextEmphasisColor:
@@ -1103,40 +1101,6 @@ void StyleBuilderFunctions::applyValueCSSPropertyWebkitTextOrientation(StyleReso
 {
     if (value->isPrimitiveValue())
         state.setTextOrientation(*toCSSPrimitiveValue(value));
-}
-
-void StyleBuilderFunctions::applyInheritCSSPropertyBaselineShift(StyleResolverState& state)
-{
-    const SVGRenderStyle& parentSvgStyle = state.parentStyle()->svgStyle();
-    EBaselineShift baselineShift = parentSvgStyle.baselineShift();
-    SVGRenderStyle& svgStyle = state.style()->accessSVGStyle();
-    svgStyle.setBaselineShift(baselineShift);
-    if (baselineShift == BS_LENGTH)
-        svgStyle.setBaselineShiftValue(parentSvgStyle.baselineShiftValue());
-}
-
-void StyleBuilderFunctions::applyValueCSSPropertyBaselineShift(StyleResolverState& state, CSSValue* value)
-{
-    SVGRenderStyle& svgStyle = state.style()->accessSVGStyle();
-    CSSPrimitiveValue* primitiveValue = toCSSPrimitiveValue(value);
-    if (!primitiveValue->isValueID()) {
-        svgStyle.setBaselineShift(BS_LENGTH);
-        svgStyle.setBaselineShiftValue(SVGLength::fromCSSPrimitiveValue(primitiveValue));
-        return;
-    }
-    switch (primitiveValue->getValueID()) {
-    case CSSValueBaseline:
-        svgStyle.setBaselineShift(BS_BASELINE);
-        return;
-    case CSSValueSub:
-        svgStyle.setBaselineShift(BS_SUB);
-        return;
-    case CSSValueSuper:
-        svgStyle.setBaselineShift(BS_SUPER);
-        return;
-    default:
-        ASSERT_NOT_REACHED();
-    }
 }
 
 void StyleBuilderFunctions::applyValueCSSPropertyGridAutoFlow(StyleResolverState& state, CSSValue* value)

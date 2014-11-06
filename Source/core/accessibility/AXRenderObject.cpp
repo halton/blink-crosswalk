@@ -2237,6 +2237,7 @@ LayoutRect AXRenderObject::computeElementRect() const
 
     LayoutRect result = boundingBoxForQuads(obj, quads);
 
+    Document* document = this->document();
     if (document && document->frame() && document->frame()->pagePopupOwner()) {
         IntPoint popupOrigin = document->view()->contentsToScreen(IntRect()).location();
         IntPoint mainOrigin = axObjectCache()->rootObject()->documentFrameView()->contentsToScreen(IntRect()).location();

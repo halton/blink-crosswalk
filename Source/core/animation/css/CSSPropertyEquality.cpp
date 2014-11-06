@@ -70,8 +70,6 @@ bool CSSPropertyEquality::propertiesEqual(CSSPropertyID prop, const RenderStyle&
         return fillLayersEqual<CSSPropertyBackgroundPositionY>(a.backgroundLayers(), b.backgroundLayers());
     case CSSPropertyBackgroundSize:
         return fillLayersEqual<CSSPropertyBackgroundSize>(a.backgroundLayers(), b.backgroundLayers());
-    case CSSPropertyBaselineShift:
-        return true;
     case CSSPropertyBorderBottomColor:
         return a.borderBottomColor() == b.borderBottomColor()
             && a.visitedLinkBorderBottomColor() == b.visitedLinkBorderBottomColor();
@@ -116,20 +114,12 @@ bool CSSPropertyEquality::propertiesEqual(CSSPropertyID prop, const RenderStyle&
         return a.clip() == b.clip();
     case CSSPropertyColor:
         return a.color() == b.color() && a.visitedLinkColor() == b.visitedLinkColor();
-    case CSSPropertyFill:
-        return true;
-    case CSSPropertyFillOpacity:
-        return true;
     case CSSPropertyFlexBasis:
         return a.flexBasis() == b.flexBasis();
     case CSSPropertyFlexGrow:
         return a.flexGrow() == b.flexGrow();
     case CSSPropertyFlexShrink:
         return a.flexShrink() == b.flexShrink();
-    case CSSPropertyFloodColor:
-        return true;
-    case CSSPropertyFloodOpacity:
-        return true;
     case CSSPropertyFontSize:
         // CSSPropertyFontSize: Must pass a specified size to setFontSize if Text Autosizing is enabled, but a computed size
         // if text zoom is enabled (if neither is enabled it's irrelevant as they're probably the same).
@@ -146,8 +136,6 @@ bool CSSPropertyEquality::propertiesEqual(CSSPropertyID prop, const RenderStyle&
         return a.left() == b.left();
     case CSSPropertyLetterSpacing:
         return a.letterSpacing() == b.letterSpacing();
-    case CSSPropertyLightingColor:
-        return true;
     case CSSPropertyLineHeight:
         return a.specifiedLineHeight() == b.specifiedLineHeight();
     case CSSPropertyListStyleImage:
@@ -197,22 +185,6 @@ bool CSSPropertyEquality::propertiesEqual(CSSPropertyID prop, const RenderStyle&
         return a.shapeMargin() == b.shapeMargin();
     case CSSPropertyShapeOutside:
         return dataEquivalent(a.shapeOutside(), b.shapeOutside());
-    case CSSPropertyStopColor:
-        return true;
-    case CSSPropertyStopOpacity:
-        return true;
-    case CSSPropertyStroke:
-        return true;
-    case CSSPropertyStrokeDasharray:
-        return true;
-    case CSSPropertyStrokeDashoffset:
-        return true;
-    case CSSPropertyStrokeMiterlimit:
-        return true;
-    case CSSPropertyStrokeOpacity:
-        return true;
-    case CSSPropertyStrokeWidth:
-        return true;
     case CSSPropertyTextDecorationColor:
         return a.textDecorationColor() == b.textDecorationColor()
             && a.visitedLinkTextDecorationColor() == b.visitedLinkTextDecorationColor();

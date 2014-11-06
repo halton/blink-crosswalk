@@ -247,11 +247,6 @@ EventTarget* Event::currentTarget() const
 {
     if (!m_currentTarget)
         return 0;
-    Node* node = m_currentTarget->toNode();
-    if (node && node->isSVGElement()) {
-        if (SVGElement* svgElement = toSVGElement(node)->correspondingElement())
-            return svgElement;
-    }
     return m_currentTarget.get();
 }
 

@@ -1428,12 +1428,6 @@ Color RenderStyle::colorIncludingFallback(int colorProperty, bool visitedLink) c
     case CSSPropertyWebkitTextStrokeColor:
         result = visitedLink ? visitedLinkTextStrokeColor() : textStrokeColor();
         break;
-    case CSSPropertyFloodColor:
-        break;
-    case CSSPropertyLightingColor:
-        break;
-    case CSSPropertyStopColor:
-        break;
     case CSSPropertyWebkitTapHighlightColor:
         result = tapHighlightColor();
         break;

@@ -29,11 +29,6 @@
 
 namespace blink {
 
-static PassRefPtrWillBeRawPtr<CSSValue> adjustSVGPaintForCurrentColor(SVGPaintType paintType, const String& url, const Color& color, const Color& currentColor)
-{
-    return nullptr;
-}
-
 static inline String serializeAsFragmentIdentifier(const AtomicString& resource)
 {
     return "#" + resource;

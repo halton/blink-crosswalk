@@ -153,7 +153,7 @@ bool isExpandedShorthandForAll(CSSPropertyID propertyId)
     // directly. This causes ASSERT crash, because StyleBuilder assume that
     // all given properties are not expanded shorthands.
     // "marker" has the same issue.
-    if (propertyId == CSSPropertyMarker || propertyId == CSSPropertyFont)
+    if (propertyId == CSSPropertyFont)
         return true;
     return shorthandForProperty(propertyId).length();
 }

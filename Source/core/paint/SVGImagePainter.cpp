@@ -40,13 +40,6 @@ void SVGImagePainter::paint(PaintInfo& paintInfo)
         // SVGRenderingContext may taint the state - make sure we're always saving.
         stateSaver.saveIfNeeded();
 
-        SVGRenderingContext renderingContext(&m_renderSVGImage, childPaintInfo);
-        if (renderingContext.isRenderingPrepared()) {
-            if (m_renderSVGImage.style()->svgStyle().bufferedRendering() == BR_STATIC && renderingContext.bufferForeground(m_renderSVGImage.bufferedForeground()))
-                return;
-
-            paintForeground(m_renderSVGImage, childPaintInfo);
-        }
     }
 
     if (m_renderSVGImage.style()->outlineWidth())
@@ -63,9 +56,6 @@ void SVGImagePainter::paintForeground(RenderSVGImage& renderer, PaintInfo& paint
     imageElement->preserveAspectRatio()->currentValue()->transformRect(destRect, srcRect);
 
     InterpolationQuality interpolationQuality = InterpolationDefault;
-    if (renderer.style()->svgStyle().bufferedRendering() != BR_STATIC)
-        interpolationQuality = ImageQualityController::imageQualityController()->chooseInterpolationQuality(paintInfo.context, &renderer, image.get(), image.get(), LayoutSize(destRect.size()));
-
     InterpolationQuality previousInterpolationQuality = paintInfo.context->imageInterpolationQuality();
     paintInfo.context->setImageInterpolationQuality(interpolationQuality);
     paintInfo.context->drawImage(image.get(), destRect, srcRect, CompositeSourceOver);

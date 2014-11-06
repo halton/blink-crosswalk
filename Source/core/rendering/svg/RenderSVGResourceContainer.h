@@ -88,23 +88,9 @@ private:
     HashSet<RenderLayer*> m_clientLayers;
 };
 
-inline RenderSVGResourceContainer* getRenderSVGResourceContainerById(TreeScope& treeScope, const AtomicString& id)
-{
-    if (id.isEmpty())
-        return 0;
-
-    if (RenderSVGResourceContainer* renderResource = treeScope.document().accessSVGExtensions().resourceById(id))
-        return renderResource;
-
-    return 0;
-}
-
 template<typename Renderer>
 Renderer* getRenderSVGResourceById(TreeScope& treeScope, const AtomicString& id)
 {
-    if (RenderSVGResourceContainer* container = getRenderSVGResourceContainerById(treeScope, id))
-        return container->cast<Renderer>();
-
     return 0;
 }
 

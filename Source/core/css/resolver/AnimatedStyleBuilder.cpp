@@ -269,8 +269,6 @@ void AnimatedStyleBuilder::applyProperty(CSSPropertyID property, StyleResolverSt
     case CSSPropertyBackgroundSize:
         setOnFillLayers<CSSPropertyBackgroundSize>(style->accessBackgroundLayers(), value, state);
         return;
-    case CSSPropertyBaselineShift:
-        return;
     case CSSPropertyBorderBottomColor:
         style->setBorderBottomColor(toAnimatableColor(value)->color());
         style->setVisitedLinkBorderBottomColor(toAnimatableColor(value)->visitedLinkColor());
@@ -337,10 +335,6 @@ void AnimatedStyleBuilder::applyProperty(CSSPropertyID property, StyleResolverSt
         style->setColor(toAnimatableColor(value)->color());
         style->setVisitedLinkColor(toAnimatableColor(value)->visitedLinkColor());
         return;
-    case CSSPropertyFillOpacity:
-        return;
-    case CSSPropertyFill:
-        return;
     case CSSPropertyFlexGrow:
         style->setFlexGrow(clampTo<float>(toAnimatableDouble(value)->toDouble(), 0));
         return;
@@ -349,10 +343,6 @@ void AnimatedStyleBuilder::applyProperty(CSSPropertyID property, StyleResolverSt
         return;
     case CSSPropertyFlexBasis:
         style->setFlexBasis(animatableValueToLength(value, state, ValueRangeNonNegative));
-        return;
-    case CSSPropertyFloodColor:
-        return;
-    case CSSPropertyFloodOpacity:
         return;
     case CSSPropertyFontSize:
         style->setFontSize(clampTo<float>(toAnimatableDouble(value)->toDouble(), 0));
@@ -368,8 +358,6 @@ void AnimatedStyleBuilder::applyProperty(CSSPropertyID property, StyleResolverSt
         return;
     case CSSPropertyLeft:
         style->setLeft(animatableValueToLength(value, state));
-        return;
-    case CSSPropertyLightingColor:
         return;
     case CSSPropertyLineHeight:
         if (value->isLength())
@@ -441,22 +429,6 @@ void AnimatedStyleBuilder::applyProperty(CSSPropertyID property, StyleResolverSt
         return;
     case CSSPropertyRight:
         style->setRight(animatableValueToLength(value, state));
-        return;
-    case CSSPropertyStrokeWidth:
-        return;
-    case CSSPropertyStopColor:
-        return;
-    case CSSPropertyStopOpacity:
-        return;
-    case CSSPropertyStrokeDasharray:
-        return;
-    case CSSPropertyStrokeDashoffset:
-        return;
-    case CSSPropertyStrokeMiterlimit:
-        return;
-    case CSSPropertyStrokeOpacity:
-        return;
-    case CSSPropertyStroke:
         return;
     case CSSPropertyTextDecorationColor:
         style->setTextDecorationColor(toAnimatableColor(value)->color());
