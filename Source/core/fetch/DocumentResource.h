@@ -53,8 +53,10 @@ private:
     OwnPtr<TextResourceDecoder> m_decoder;
 };
 
+#if !defined(DISABLE_SVG)
 DEFINE_TYPE_CASTS(DocumentResource, Resource, resource, resource->type() == Resource::SVGDocument, resource.type() == Resource::SVGDocument); \
 inline DocumentResource* toDocumentResource(const ResourcePtr<Resource>& ptr) { return toDocumentResource(ptr.get()); }
+#endif
 
 class DocumentResourceClient : public ResourceClient {
 public:

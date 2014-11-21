@@ -116,8 +116,10 @@ static void resolveKeyframes(StyleResolver* resolver, const Element* animatingEl
                     timingFunction = parentStyle->animations()->timingFunctionList()[0];
                 else if (value->isInheritedValue() || value->isInitialValue())
                     timingFunction = CSSTimingData::initialTimingFunction();
+#if !defined(DISABLE_SVG)
                 else
                     timingFunction = CSSToStyleMap::mapAnimationTimingFunction(toCSSValueList(value)->item(0));
+#endif
                 keyframe->setEasing(timingFunction.release());
             } else if (CSSPropertyMetadata::isAnimatableProperty(property)) {
                 keyframe->setPropertyValue(property, CSSAnimatableValueFactory::create(property, *keyframeStyle).get());

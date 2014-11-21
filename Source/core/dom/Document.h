@@ -128,8 +128,10 @@ class Range;
 class RenderView;
 class RequestAnimationFrameCallback;
 class ResourceFetcher;
+#if !defined(DISABLE_SVG)
 class SVGDocumentExtensions;
 class SVGUseElement;
+#endif
 class ScriptRunner;
 class ScriptableDocumentParser;
 class ScriptedAnimationController;
@@ -183,7 +185,9 @@ enum DocumentClass {
     ImageDocumentClass = 1 << 2,
     PluginDocumentClass = 1 << 3,
     MediaDocumentClass = 1 << 4,
+#if !defined(DISABLE_SVG)
     SVGDocumentClass = 1 << 5,
+#endif
     XMLDocumentClass = 1 << 6,
 };
 
@@ -369,11 +373,15 @@ public:
     bool isXHTMLDocument() const { return m_documentClasses & XHTMLDocumentClass; }
     bool isXMLDocument() const { return m_documentClasses & XMLDocumentClass; }
     bool isImageDocument() const { return m_documentClasses & ImageDocumentClass; }
+#if !defined(DISABLE_SVG)
     bool isSVGDocument() const { return m_documentClasses & SVGDocumentClass; }
+#endif
     bool isPluginDocument() const { return m_documentClasses & PluginDocumentClass; }
     bool isMediaDocument() const { return m_documentClasses & MediaDocumentClass; }
 
+#if !defined(DISABLE_SVG)
     bool hasSVGRootNode() const;
+#endif
 
     bool isFrameSet() const;
 
@@ -421,6 +429,7 @@ public:
     void modifiedStyleSheet(StyleSheet*, StyleResolverUpdateMode = FullStyleUpdate);
     void changedSelectorWatch() { styleResolverChanged(); }
 
+#if !defined(DISABLE_SVG)
     void scheduleUseShadowTreeUpdate(SVGUseElement&);
     void unscheduleUseShadowTreeUpdate(SVGUseElement&);
 
@@ -428,6 +437,7 @@ public:
     // instead of the RenderObject so we can get rid of this hack.
     void scheduleSVGFilterLayerUpdateHack(Element&);
     void unscheduleSVGFilterLayerUpdateHack(Element&);
+#endif
 
     void evaluateMediaQueryList();
 
@@ -874,8 +884,10 @@ public:
 
     virtual void removeAllEventListeners() OVERRIDE FINAL;
 
+#if !defined(DISABLE_SVG)
     const SVGDocumentExtensions* svgExtensions();
     SVGDocumentExtensions& accessSVGExtensions();
+#endif
 
     void initSecurityContext();
     void initSecurityContext(const DocumentInit&);
@@ -1033,7 +1045,9 @@ public:
 
     virtual void trace(Visitor*) OVERRIDE;
 
+#if !defined(DISABLE_SVG)
     bool hasSVGFilterElementsRequiringLayerUpdate() const { return m_layerUpdateSVGFilterElements.size(); }
+#endif
     void didRecalculateStyleForElement() { ++m_styleRecalcElementCounter; }
 
     AtomicString convertLocalName(const AtomicString&);
@@ -1081,7 +1095,9 @@ private:
 
     bool dirtyElementsForLayerUpdate();
     void updateDistributionIfNeeded();
+#if !defined(DISABLE_SVG)
     void updateUseShadowTreesIfNeeded();
+#endif
     void evaluateMediaQueryListIfNeeded();
 
     void updateRenderTree(StyleRecalcChange);
@@ -1286,7 +1302,9 @@ private:
     unsigned m_nodeListCounts[numNodeListInvalidationTypes];
 #endif
 
+#if !defined(DISABLE_SVG)
     OwnPtrWillBeMember<SVGDocumentExtensions> m_svgExtensions;
+#endif
 
     Vector<AnnotatedRegionValue> m_annotatedRegions;
     bool m_hasAnnotatedRegions;
@@ -1363,8 +1381,10 @@ private:
     Timer<Document> m_didAssociateFormControlsTimer;
     WillBeHeapHashSet<RefPtrWillBeMember<Element> > m_associatedFormControls;
 
+#if !defined(DISABLE_SVG)
     WillBeHeapHashSet<RawPtrWillBeMember<SVGUseElement> > m_useElementsNeedingUpdate;
     WillBeHeapHashSet<RawPtrWillBeMember<Element> > m_layerUpdateSVGFilterElements;
+#endif
 
     bool m_hasViewportUnits;
 

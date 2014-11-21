@@ -34,7 +34,9 @@
 #include "core/html/HTMLLinkElement.h"
 #include "core/html/HTMLStyleElement.h"
 #include "core/html/imports/HTMLImport.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGStyleElement.h"
+#endif
 
 namespace blink {
 
@@ -113,8 +115,10 @@ StyleSheetCandidate::Type StyleSheetCandidate::typeOf(Node& node)
         return HTMLStyle;
     }
 
+#if !defined(DISABLE_SVG)
     if (isSVGStyleElement(node))
         return SVGStyle;
+#endif
 
     ASSERT_NOT_REACHED();
     return HTMLStyle;
@@ -127,8 +131,10 @@ StyleSheet* StyleSheetCandidate::sheet() const
         return toHTMLLinkElement(node()).sheet();
     case HTMLStyle:
         return toHTMLStyleElement(node()).sheet();
+#if !defined(DISABLE_SVG)
     case SVGStyle:
         return toSVGStyleElement(node()).sheet();
+#endif
     case Pi:
         return toProcessingInstruction(node()).sheet();
     }

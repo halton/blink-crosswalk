@@ -40,7 +40,9 @@
 #include "core/rendering/line/RenderTextInfo.h"
 #include "core/rendering/line/TrailingObjects.h"
 #include "core/rendering/line/WordMeasurement.h"
+#if !defined(DISABLE_SVG)
 #include "core/rendering/svg/RenderSVGInlineText.h"
+#endif
 
 namespace blink {
 
@@ -251,7 +253,11 @@ inline void BreakingContext::initializeForCurrentObject()
     m_autoWrap = RenderStyle::autoWrap(m_currWS);
     m_autoWrapWasEverTrueOnLine = m_autoWrapWasEverTrueOnLine || m_autoWrap;
 
+#if !defined(DISABLE_SVG)
     m_preservesNewline = m_current.object()->isSVGInlineText() ? false : RenderStyle::preserveNewline(m_currWS);
+#else
+    m_preservesNewline = RenderStyle::preserveNewline(m_currWS);
+#endif
 
     m_collapseWhiteSpace = RenderStyle::collapseWhiteSpace(m_currWS);
 }
@@ -534,7 +540,9 @@ inline bool BreakingContext::handleText(WordMeasurements& wordMeasurements, bool
 
     RenderText* renderText = toRenderText(m_current.object());
 
+#if !defined(DISABLE_SVG)
     bool isSVGText = renderText->isSVGInlineText();
+#endif
 
     // If we have left a no-wrap inline and entered an autowrap inline while ignoring spaces
     // then we need to mark the start of the autowrap inline as a potential linebreak now.
@@ -572,10 +580,12 @@ inline bool BreakingContext::handleText(WordMeasurements& wordMeasurements, bool
     bool breakAll = m_currentStyle->wordBreak() == BreakAllWordBreak && m_autoWrap;
     float hyphenWidth = 0;
 
+#if !defined(DISABLE_SVG)
     if (isSVGText) {
         breakWords = false;
         breakAll = false;
     }
+#endif
 
     if (renderText->isWordBreak()) {
         m_width.commit();
@@ -779,11 +789,13 @@ inline bool BreakingContext::handleText(WordMeasurements& wordMeasurements, bool
             m_lineMidpointState.stopIgnoringSpaces(InlineIterator(0, m_current.object(), m_current.offset()));
         }
 
+#if !defined(DISABLE_SVG)
         if (isSVGText && m_current.offset()) {
             // Force creation of new InlineBoxes for each absolute positioned character (those that start new text chunks).
             if (toRenderSVGInlineText(renderText)->characterStartsNewTextChunk(m_current.offset()))
                 m_lineMidpointState.ensureCharacterGetsLineBox(m_current);
         }
+#endif
 
         if (m_currentCharacterIsSpace && !previousCharacterIsSpace) {
             m_startOfIgnoredSpaces.setObject(m_current.object());

@@ -30,8 +30,10 @@
 #include "bindings/core/v8/ExceptionStatePlaceholder.h"
 #include "core/HTMLNames.h"
 #include "core/MathMLNames.h"
+#if !defined(DISABLE_SVG)
 #include "core/SVGNames.h"
 #include "core/XLinkNames.h"
+#endif
 #include "core/XMLNSNames.h"
 #include "core/XMLNames.h"
 #include "core/dom/DocumentFragment.h"
@@ -520,6 +522,7 @@ static void mapLoweredLocalNameToName(PrefixedNameToQualifiedNameMap* map, const
     }
 }
 
+#if !defined(DISABLE_SVG)
 static void adjustSVGTagNameCase(AtomicHTMLToken* token)
 {
     static PrefixedNameToQualifiedNameMap* caseMap = 0;
@@ -534,6 +537,7 @@ static void adjustSVGTagNameCase(AtomicHTMLToken* token)
         return;
     token->setName(casedName.localName());
 }
+#endif
 
 template<PassOwnPtr<const QualifiedName*[]> getAttrs(), unsigned length>
 static void adjustAttributes(AtomicHTMLToken* token)
@@ -553,10 +557,12 @@ static void adjustAttributes(AtomicHTMLToken* token)
     }
 }
 
+#if !defined(DISABLE_SVG)
 static void adjustSVGAttributes(AtomicHTMLToken* token)
 {
     adjustAttributes<SVGNames::getSVGAttrs, SVGNames::SVGAttrsCount>(token);
 }
+#endif
 
 static void adjustMathMLAttributes(AtomicHTMLToken* token)
 {
@@ -580,8 +586,10 @@ static void adjustForeignAttributes(AtomicHTMLToken* token)
     if (!map) {
         map = new PrefixedNameToQualifiedNameMap;
 
+#if !defined(DISABLE_SVG)
         OwnPtr<const QualifiedName*[]> attrs = XLinkNames::getXLinkAttrs();
         addNamesWithPrefix(map, xlinkAtom, attrs.get(), XLinkNames::XLinkAttrsCount);
+#endif
 
         OwnPtr<const QualifiedName*[]> xmlAttrs = XMLNames::getXMLAttrs();
         addNamesWithPrefix(map, xmlAtom, xmlAttrs.get(), XMLNames::XMLAttrsCount);
@@ -892,6 +900,7 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken* token)
         m_tree.insertForeignElement(token, MathMLNames::mathmlNamespaceURI);
         return;
     }
+#if !defined(DISABLE_SVG)
     if (token->name() == SVGNames::svgTag.localName()) {
         m_tree.reconstructTheActiveFormattingElements();
         adjustSVGAttributes(token);
@@ -899,6 +908,7 @@ void HTMLTreeBuilder::processStartTagForInBody(AtomicHTMLToken* token)
         m_tree.insertForeignElement(token, SVGNames::svgNamespaceURI);
         return;
     }
+#endif
     if (isCaptionColOrColgroupTag(token->name())
         || token->name() == frameTag
         || token->name() == headTag
@@ -2665,8 +2675,12 @@ bool HTMLTreeBuilder::shouldProcessTokenInForeignContent(AtomicHTMLToken* token)
             return false;
     }
     if (adjustedCurrentNode->hasTagName(MathMLNames::annotation_xmlTag)
+#if !defined(DISABLE_SVG)
         && token->type() == HTMLToken::StartTag
         && token->name() == SVGNames::svgTag)
+#else
+        && token->type() == HTMLToken::StartTag)
+#endif
         return false;
     if (HTMLElementStack::isHTMLIntegrationPoint(adjustedCurrentNode)) {
         if (token->type() == HTMLToken::StartTag)
@@ -2748,15 +2762,18 @@ void HTMLTreeBuilder::processTokenInForeignContent(AtomicHTMLToken* token)
         const AtomicString& currentNamespace = adjustedCurrentNode->namespaceURI();
         if (currentNamespace == MathMLNames::mathmlNamespaceURI)
             adjustMathMLAttributes(token);
+#if !defined(DISABLE_SVG)
         if (currentNamespace == SVGNames::svgNamespaceURI) {
             adjustSVGTagNameCase(token);
             adjustSVGAttributes(token);
         }
+#endif
         adjustForeignAttributes(token);
         m_tree.insertForeignElement(token, currentNamespace);
         break;
     }
     case HTMLToken::EndTag: {
+#if !defined(DISABLE_SVG)
         if (adjustedCurrentNode->namespaceURI() == SVGNames::svgNamespaceURI)
             adjustSVGTagNameCase(token);
 
@@ -2766,6 +2783,7 @@ void HTMLTreeBuilder::processTokenInForeignContent(AtomicHTMLToken* token)
             m_tree.openElements()->pop();
             return;
         }
+#endif
         if (!m_tree.currentStackItem()->isInHTMLNamespace()) {
             // FIXME: This code just wants an Element* iterator, instead of an ElementRecord*
             HTMLElementStack::ElementRecord* nodeRecord = m_tree.openElements()->topRecord();

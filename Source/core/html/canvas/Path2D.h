@@ -31,7 +31,9 @@
 #include "bindings/core/v8/ScriptWrappable.h"
 #include "core/html/canvas/CanvasPathMethods.h"
 #include "core/svg/SVGMatrixTearOff.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGPathUtilities.h"
+#endif
 #include "platform/heap/Handle.h"
 #include "platform/transforms/AffineTransform.h"
 #include "wtf/PassRefPtr.h"
@@ -78,7 +80,9 @@ private:
     Path2D(const String& pathData)
         : CanvasPathMethods()
     {
+#if !defined(DISABLE_SVG)
         buildPathFromString(pathData, m_path);
+#endif
     }
 };
 

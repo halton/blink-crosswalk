@@ -47,7 +47,9 @@
 #include "core/inspector/InspectorCSSAgent.h"
 #include "core/inspector/InspectorPageAgent.h"
 #include "core/inspector/InspectorResourceAgent.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGStyleElement.h"
+#endif
 #include "wtf/OwnPtr.h"
 #include "wtf/PassOwnPtr.h"
 #include "wtf/text/StringBuilder.h"
@@ -1670,7 +1672,11 @@ Element* InspectorStyleSheet::ownerStyleElement() const
         return 0;
     Element* ownerElement = toElement(ownerNode);
 
+#if !defined(DISABLE_SVG)
     if (!isHTMLStyleElement(ownerElement) && !isSVGStyleElement(ownerElement))
+#else
+    if (!isHTMLStyleElement(ownerElement))
+#endif
         return 0;
     return ownerElement;
 }

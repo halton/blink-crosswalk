@@ -32,10 +32,13 @@
 #include "core/animation/animatable/AnimatableStrokeDasharrayList.h"
 
 #include "bindings/core/v8/ExceptionStatePlaceholder.h"
+#if !defined(DISABLE_SVG)
 #include "core/animation/animatable/AnimatableSVGLength.h"
+#endif
 
 namespace blink {
 
+#if !defined(DISABLE_SVG)
 AnimatableStrokeDasharrayList::AnimatableStrokeDasharrayList(PassRefPtr<SVGLengthList> passLengths)
 {
     RefPtr<SVGLengthList> lengths = passLengths;
@@ -56,6 +59,11 @@ PassRefPtr<SVGLengthList> AnimatableStrokeDasharrayList::toSVGLengthList() const
     }
     return lengths.release();
 }
+#else
+AnimatableStrokeDasharrayList::AnimatableStrokeDasharrayList()
+{
+}
+#endif
 
 bool AnimatableStrokeDasharrayList::usesDefaultInterpolationWith(const AnimatableValue* value) const
 {
@@ -74,6 +82,7 @@ PassRefPtrWillBeRawPtr<AnimatableValue> AnimatableStrokeDasharrayList::interpola
     // rather than '0 0'.
     if (from.isEmpty() && to.isEmpty())
         return takeConstRef(this);
+#if !defined(DISABLE_SVG)
     if (from.isEmpty() || to.isEmpty()) {
         DEFINE_STATIC_REF_WILL_BE_PERSISTENT(AnimatableSVGLength, zeroPixels, (AnimatableSVGLength::create(SVGLength::create())));
         if (from.isEmpty()) {
@@ -85,6 +94,7 @@ PassRefPtrWillBeRawPtr<AnimatableValue> AnimatableStrokeDasharrayList::interpola
             to.append(zeroPixels);
         }
     }
+#endif
 
     WillBeHeapVector<RefPtrWillBeMember<AnimatableValue> > interpolatedValues;
     bool success = interpolateLists(from, to, fraction, interpolatedValues);

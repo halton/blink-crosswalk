@@ -53,7 +53,9 @@
 #include "core/css/CSSPropertyMetadata.h"
 #include "core/css/CSSPropertySourceData.h"
 #include "core/css/CSSReflectValue.h"
+#if !defined(DISABLE_SVG)
 #include "core/css/CSSSVGDocumentValue.h"
+#endif
 #include "core/css/CSSSelector.h"
 #include "core/css/CSSShadowValue.h"
 #include "core/css/CSSTimingFunctionValue.h"
@@ -1512,7 +1514,11 @@ bool CSSPropertyParser::parseValue(CSSPropertyID propId, bool important)
         break;
 
     default:
+#if !defined(DISABLE_SVG)
         return parseSVGValue(propId, important);
+#else
+        return false;
+#endif
     }
 
     if (validPrimitive) {
@@ -7218,7 +7224,9 @@ PassRefPtrWillBeRawPtr<CSSValueList> CSSPropertyParser::parseFilter()
         if (value->unit == CSSPrimitiveValue::CSS_URI) {
             RefPtrWillBeRawPtr<CSSFilterValue> referenceFilterValue = CSSFilterValue::create(CSSFilterValue::ReferenceFilterOperation);
             list->append(referenceFilterValue);
+#if !defined(DISABLE_SVG)
             referenceFilterValue->append(CSSSVGDocumentValue::create(value->string));
+#endif
         } else {
             const CSSParserString name = value->function->name;
             unsigned maximumArgumentCount = 1;
@@ -7838,6 +7846,7 @@ bool CSSPropertyParser::isSystemColor(int id)
     return (id >= CSSValueActiveborder && id <= CSSValueWindowtext) || id == CSSValueMenu;
 }
 
+#if !defined(DISABLE_SVG)
 bool CSSPropertyParser::parseSVGValue(CSSPropertyID propId, bool important)
 {
     CSSParserValue* value = m_valueList->current();
@@ -8123,6 +8132,7 @@ PassRefPtrWillBeRawPtr<CSSValue> CSSPropertyParser::parseSVGStrokeDasharray()
         return nullptr;
     return ret.release();
 }
+#endif  // !defined(DISABLE_SVG)
 
 // normal | [ fill || stroke || markers ]
 PassRefPtrWillBeRawPtr<CSSValue> CSSPropertyParser::parsePaintOrder() const

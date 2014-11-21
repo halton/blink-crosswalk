@@ -189,8 +189,10 @@ private:
     PassRefPtrWillBeRawPtr<CSSValueList> parseFontFaceSrc();
     PassRefPtrWillBeRawPtr<CSSValueList> parseFontFaceUnicodeRange();
 
+#if !defined(DISABLE_SVG)
     bool parseSVGValue(CSSPropertyID propId, bool important);
     PassRefPtrWillBeRawPtr<CSSValue> parseSVGStrokeDasharray();
+#endif
 
     PassRefPtrWillBeRawPtr<CSSValue> parsePaintOrder() const;
 

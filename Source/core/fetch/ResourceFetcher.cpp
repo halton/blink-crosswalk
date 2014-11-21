@@ -42,6 +42,7 @@
 #include "core/fetch/ResourceLoader.h"
 #include "core/fetch/ResourceLoaderSet.h"
 #include "core/fetch/ScriptResource.h"
+#include "core/frame/UseCounter.h"
 #include "core/html/HTMLElement.h"
 #include "core/html/HTMLFrameOwnerElement.h"
 #include "core/html/imports/HTMLImportsController.h"
@@ -57,10 +58,13 @@
 #include "core/frame/LocalDOMWindow.h"
 #include "core/frame/LocalFrame.h"
 #include "core/frame/csp/ContentSecurityPolicy.h"
+#include "core/page/Page.h"
 #include "core/timing/Performance.h"
 #include "core/timing/ResourceTimingInfo.h"
 #include "core/frame/Settings.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/graphics/SVGImageChromeClient.h"
+#endif
 #include "platform/Logging.h"
 #include "platform/RuntimeEnabledFeatures.h"
 #include "platform/TraceEvent.h"
@@ -92,8 +96,10 @@ static Resource* createResource(Resource::Type type, const ResourceRequest& requ
         return new CSSStyleSheetResource(request, charset);
     case Resource::Script:
         return new ScriptResource(request, charset);
+#if !defined(DISABLE_SVG)
     case Resource::SVGDocument:
         return new DocumentResource(request, Resource::SVGDocument);
+#endif
     case Resource::Font:
         return new FontResource(request);
     case Resource::MainResource:
@@ -149,8 +155,10 @@ static ResourceLoadPriority loadPriority(Resource::Type type, const FetchRequest
     case Resource::XSLStyleSheet:
         ASSERT(RuntimeEnabledFeatures::xsltEnabled());
         return ResourceLoadPriorityHigh;
+#if !defined(DISABLE_SVG)
     case Resource::SVGDocument:
         return ResourceLoadPriorityLow;
+#endif
     case Resource::LinkPrefetch:
         return ResourceLoadPriorityVeryLow;
     case Resource::LinkSubresource:
@@ -233,8 +241,10 @@ static WebURLRequest::RequestContext requestContextFromType(const ResourceFetche
         return WebURLRequest::RequestContextSubresource;
     case Resource::TextTrack:
         return WebURLRequest::RequestContextTrack;
+#if !defined(DISABLE_SVG)
     case Resource::SVGDocument:
         return WebURLRequest::RequestContextImage;
+#endif
     case Resource::Media: // TODO: Split this.
         return WebURLRequest::RequestContextVideo;
     }
@@ -382,12 +392,14 @@ ResourcePtr<XSLStyleSheetResource> ResourceFetcher::fetchXSLStyleSheet(FetchRequ
 }
 #endif
 
+#if !defined(DISABLE_SVG)
 ResourcePtr<DocumentResource> ResourceFetcher::fetchSVGDocument(FetchRequest& request)
 {
     ASSERT(request.resourceRequest().frameType() == WebURLRequest::FrameTypeNone);
     request.mutableResourceRequest().setRequestContext(WebURLRequest::RequestContextImage);
     return toDocumentResource(requestResource(Resource::SVGDocument, request));
 }
+#endif
 
 ResourcePtr<Resource> ResourceFetcher::fetchLinkResource(Resource::Type type, FetchRequest& request)
 {
@@ -485,11 +497,13 @@ bool ResourceFetcher::canRequest(Resource::Type type, const ResourceRequest& res
         break;
     case Resource::XSLStyleSheet:
         ASSERT(RuntimeEnabledFeatures::xsltEnabled());
+#if !defined(DISABLE_SVG)
     case Resource::SVGDocument:
         if (!securityOrigin->canRequest(url)) {
             printAccessDeniedMessage(url);
             return false;
         }
+#endif
         break;
     }
 
@@ -531,7 +545,9 @@ bool ResourceFetcher::canRequest(Resource::Type type, const ResourceRequest& res
         if (!shouldBypassMainWorldCSP && !csp->allowStyleFromSource(url, cspReporting))
             return false;
         break;
+#if !defined(DISABLE_SVG)
     case Resource::SVGDocument:
+#endif
     case Resource::Image:
         if (!shouldBypassMainWorldCSP && !csp->allowImageFromSource(url, cspReporting))
             return false;
@@ -558,12 +574,14 @@ bool ResourceFetcher::canRequest(Resource::Type type, const ResourceRequest& res
         break;
     }
 
+#if !defined(DISABLE_SVG)
     // SVG Images have unique security rules that prevent all subresource requests
     // except for data urls.
     if (type != Resource::MainResource) {
         if (frame() && frame()->chromeClient().isSVGImageChromeClient() && !url.protocolIsData())
             return false;
     }
+#endif
 
     // Measure the number of legacy URL schemes ('ftp://') and the number of embedded-credential
     // ('http://user:password@...') resources embedded as subresources. in the hopes that we can

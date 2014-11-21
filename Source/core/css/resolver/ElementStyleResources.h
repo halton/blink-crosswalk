@@ -35,13 +35,17 @@ class CSSCursorImageValue;
 class CSSImageValue;
 class CSSImageGeneratorValue;
 class CSSImageSetValue;
+#if !defined(DISABLE_SVG)
 class CSSSVGDocumentValue;
+#endif
 class CSSValue;
 class FilterOperation;
 class StyleImage;
 class TextLinkColors;
 
+#if !defined(DISABLE_SVG)
 typedef WillBeHeapHashMap<FilterOperation*, RefPtrWillBeMember<CSSSVGDocumentValue> > PendingSVGDocumentMap;
+#endif
 typedef WillBeHeapHashMap<CSSPropertyID, RefPtrWillBeMember<CSSValue> > PendingImagePropertyMap;
 
 // Holds information about resources, requested by stylesheets.
@@ -60,19 +64,27 @@ public:
     PassRefPtr<StyleImage> cursorOrPendingFromValue(CSSPropertyID, CSSCursorImageValue*);
 
     const PendingImagePropertyMap& pendingImageProperties() const { return m_pendingImageProperties; }
+#if !defined(DISABLE_SVG)
     const PendingSVGDocumentMap& pendingSVGDocuments() const { return m_pendingSVGDocuments; }
+#endif
 
     void clearPendingImageProperties();
+#if !defined(DISABLE_SVG)
     void clearPendingSVGDocuments();
+#endif
 
     float deviceScaleFactor() const { return m_deviceScaleFactor; }
     void setDeviceScaleFactor(float deviceScaleFactor) { m_deviceScaleFactor = deviceScaleFactor; }
 
+#if !defined(DISABLE_SVG)
     void addPendingSVGDocument(FilterOperation*, CSSSVGDocumentValue*);
+#endif
 
 private:
     PendingImagePropertyMap m_pendingImageProperties;
+#if !defined(DISABLE_SVG)
     PendingSVGDocumentMap m_pendingSVGDocuments;
+#endif
     float m_deviceScaleFactor;
 };
 

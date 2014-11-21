@@ -40,7 +40,9 @@
 #include "core/rendering/RenderSelectionInfo.h"
 #include "core/rendering/compositing/CompositedLayerMapping.h"
 #include "core/rendering/compositing/RenderLayerCompositor.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGDocumentExtensions.h"
+#endif
 #include "platform/TraceEvent.h"
 #include "platform/geometry/FloatQuad.h"
 #include "platform/geometry/TransformState.h"
@@ -202,8 +204,10 @@ void RenderView::layout()
     if (relayoutChildren) {
         layoutScope.setChildNeedsLayout(this);
         for (RenderObject* child = firstChild(); child; child = child->nextSibling()) {
+#if !defined(DISABLE_SVG)
             if (child->isSVGRoot())
                 continue;
+#endif
 
             if ((child->isBox() && toRenderBox(child)->hasRelativeLogicalHeight())
                     || child->style()->logicalHeight().isPercent()
@@ -212,8 +216,10 @@ void RenderView::layout()
                 layoutScope.setChildNeedsLayout(child);
         }
 
+#if !defined(DISABLE_SVG)
         if (document().svgExtensions())
             document().accessSVGExtensions().invalidateSVGRootsWithRelativeLengthDescendents(&layoutScope);
+#endif
     }
 
     ASSERT(!m_layoutState);

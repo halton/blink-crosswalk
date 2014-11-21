@@ -39,8 +39,10 @@
 #include "bindings/core/v8/WindowProxy.h"
 #include "core/HTMLElementFactory.h"
 #include "core/HTMLNames.h"
+#if !defined(DISABLE_SVG)
 #include "core/SVGElementFactory.h"
 #include "core/SVGNames.h"
+#endif
 #include "core/XMLNSNames.h"
 #include "core/XMLNames.h"
 #include "core/accessibility/AXObjectCache.h"
@@ -177,10 +179,12 @@
 #include "core/rendering/RenderWidget.h"
 #include "core/rendering/TextAutosizer.h"
 #include "core/rendering/compositing/RenderLayerCompositor.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGDocumentExtensions.h"
 #include "core/svg/SVGFontFaceElement.h"
 #include "core/svg/SVGTitleElement.h"
 #include "core/svg/SVGUseElement.h"
+#endif
 #include "core/workers/SharedWorkerRepositoryClient.h"
 #if !defined(DISABLE_XSLT)
 #include "core/xml/XSLTProcessor.h"
@@ -673,8 +677,10 @@ void Document::dispose()
         m_scriptedAnimationController->clearDocumentPointer();
     m_scriptedAnimationController.clear();
 
+#if !defined(DISABLE_SVG)
     if (svgExtensions())
         accessSVGExtensions().pauseAnimations();
+#endif
 
     m_lifecycle.advanceTo(DocumentLifecycle::Disposed);
     lifecycleNotifier().notifyDocumentWasDisposed();
@@ -1096,8 +1102,10 @@ PassRefPtrWillBeRawPtr<Element> Document::createElement(const QualifiedName& qNa
     // FIXME: Use registered namespaces and look up in a hash to find the right factory.
     if (qName.namespaceURI() == xhtmlNamespaceURI)
         e = HTMLElementFactory::createHTMLElement(qName.localName(), *this, 0, createdByParser);
+#if !defined(DISABLE_SVG)
     else if (qName.namespaceURI() == SVGNames::svgNamespaceURI)
         e = SVGElementFactory::createSVGElement(qName.localName(), *this, createdByParser);
+#endif
 
     if (e)
         m_sawElementsInKnownNamespaces = true;
@@ -1242,8 +1250,10 @@ String Document::suggestedMIMEType() const
     if (isXMLDocument()) {
         if (isXHTMLDocument())
             return "application/xhtml+xml";
+#if !defined(DISABLE_SVG)
         if (isSVGDocument())
             return "image/svg+xml";
+#endif
         return "application/xml";
     }
     if (xmlStandalone())
@@ -1389,8 +1399,10 @@ void Document::setTitleElement(Element* titleElement)
     if (m_titleElement && m_titleElement != titleElement) {
         if (isHTMLDocument() || isXHTMLDocument()) {
             m_titleElement = Traversal<HTMLTitleElement>::firstWithin(*this);
+#if !defined(DISABLE_SVG)
         } else if (isSVGDocument()) {
             m_titleElement = Traversal<SVGTitleElement>::firstWithin(*this);
+#endif
         }
     } else {
         m_titleElement = titleElement;
@@ -1398,8 +1410,10 @@ void Document::setTitleElement(Element* titleElement)
 
     if (isHTMLTitleElement(m_titleElement))
         updateTitle(toHTMLTitleElement(m_titleElement)->text());
+#if !defined(DISABLE_SVG)
     else if (isSVGTitleElement(m_titleElement))
         updateTitle(toSVGTitleElement(m_titleElement)->textContent());
+#endif
 }
 
 void Document::removeTitle(Element* titleElement)
@@ -1413,9 +1427,11 @@ void Document::removeTitle(Element* titleElement)
     if (isHTMLDocument() || isXHTMLDocument()) {
         if (HTMLTitleElement* title = Traversal<HTMLTitleElement>::firstWithin(*this))
             setTitleElement(title);
+#if !defined(DISABLE_SVG)
     } else if (isSVGDocument()) {
         if (SVGTitleElement* title = Traversal<SVGTitleElement>::firstWithin(*this))
             setTitleElement(title);
+#endif
     }
 
     if (!m_titleElement)
@@ -1570,10 +1586,12 @@ bool Document::needsFullRenderTreeUpdate() const
 {
     if (!isActive() || !view())
         return false;
+#if !defined(DISABLE_SVG)
     if (!m_useElementsNeedingUpdate.isEmpty())
         return true;
     if (!m_layerUpdateSVGFilterElements.isEmpty())
         return true;
+#endif
     if (needsStyleRecalc())
         return true;
     if (needsStyleInvalidation())
@@ -1798,7 +1816,9 @@ void Document::updateRenderTree(StyleRecalcChange change)
 
     DocumentAnimations::updateOutdatedAnimationPlayersIfNeeded(*this);
     evaluateMediaQueryListIfNeeded();
+#if !defined(DISABLE_SVG)
     updateUseShadowTreesIfNeeded();
+#endif
     updateDistributionIfNeeded();
     updateStyleInvalidationIfNeeded();
 
@@ -2061,15 +2081,18 @@ void Document::setIsViewSource(bool isViewSource)
 
 bool Document::dirtyElementsForLayerUpdate()
 {
+#if !defined(DISABLE_SVG)
     if (m_layerUpdateSVGFilterElements.isEmpty())
         return false;
 
     for (WillBeHeapHashSet<RawPtrWillBeMember<Element> >::iterator it = m_layerUpdateSVGFilterElements.begin(), end = m_layerUpdateSVGFilterElements.end(); it != end; ++it)
         (*it)->setNeedsStyleRecalc(LocalStyleChange);
     m_layerUpdateSVGFilterElements.clear();
+#endif
     return true;
 }
 
+#if !defined(DISABLE_SVG)
 void Document::scheduleSVGFilterLayerUpdateHack(Element& element)
 {
     if (element.styleChangeType() == NeedsReattachStyleChange)
@@ -2110,6 +2133,7 @@ void Document::updateUseShadowTreesIfNeeded()
     for (WillBeHeapVector<RawPtrWillBeMember<SVGUseElement> >::iterator it = elements.begin(), end = elements.end(); it != end; ++it)
         (*it)->buildPendingResource();
 }
+#endif  // !defined(DISABLE_SVG)
 
 StyleResolver* Document::styleResolver() const
 {
@@ -2169,8 +2193,10 @@ void Document::detach(const AttachContext& context)
         m_scriptedAnimationController->clearDocumentPointer();
     m_scriptedAnimationController.clear();
 
+#if !defined(DISABLE_SVG)
     if (svgExtensions())
         accessSVGExtensions().pauseAnimations();
+#endif
 
     // FIXME: This shouldn't be needed once LocalDOMWindow becomes ExecutionContext.
     if (m_domWindow)
@@ -2523,10 +2549,12 @@ void Document::implicitClose()
     // JS running below could remove the frame or destroy the RenderView so we call
     // those two functions repeatedly and don't save them on the stack.
 
+#if !defined(DISABLE_SVG)
     // To align the HTML load event and the SVGLoad event for the outermost <svg> element, fire it from
     // here, instead of doing it from SVGElement::finishedParsingChildren.
     if (svgExtensions())
         accessSVGExtensions().dispatchSVGLoadEventToOutermostSVGElements();
+#endif
 
     if (protectedWindow)
         protectedWindow->documentWasClosed();
@@ -2582,8 +2610,10 @@ void Document::implicitClose()
         }
     }
 
+#if !defined(DISABLE_SVG)
     if (svgExtensions())
         accessSVGExtensions().startAnimations();
+#endif
 }
 
 bool Document::dispatchBeforeUnloadEvent(Chrome& chrome, bool& didAllowNavigation)
@@ -4566,6 +4596,7 @@ PassRefPtrWillBeRawPtr<Attr> Document::createAttributeNS(const AtomicString& nam
     return Attr::create(*this, qName, emptyAtom);
 }
 
+#if !defined(DISABLE_SVG)
 const SVGDocumentExtensions* Document::svgExtensions()
 {
     return m_svgExtensions.get();
@@ -4582,6 +4613,7 @@ bool Document::hasSVGRootNode() const
 {
     return isSVGSVGElement(documentElement());
 }
+#endif
 
 PassRefPtrWillBeRawPtr<HTMLCollection> Document::images()
 {
@@ -5831,7 +5863,9 @@ void Document::trace(Visitor* visitor)
     visitor->trace(m_elementDataCache);
     visitor->trace(m_associatedFormControls);
     visitor->trace(m_useElementsNeedingUpdate);
+#if !defined(DISABLE_SVG)
     visitor->trace(m_layerUpdateSVGFilterElements);
+#endif
     visitor->trace(m_templateDocument);
     visitor->trace(m_templateDocumentHost);
     visitor->trace(m_visibilityObservers);

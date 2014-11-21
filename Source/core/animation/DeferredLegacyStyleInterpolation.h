@@ -14,7 +14,9 @@ class CSSBasicShape;
 class CSSImageValue;
 class CSSPrimitiveValue;
 class CSSShadowValue;
+#if !defined(DISABLE_SVG)
 class CSSSVGDocumentValue;
+#endif
 class CSSValueList;
 
 class DeferredLegacyStyleInterpolation : public StyleInterpolation {
@@ -32,7 +34,9 @@ public:
     static bool interpolationRequiresStyleResolve(const CSSPrimitiveValue&);
     static bool interpolationRequiresStyleResolve(const CSSImageValue&);
     static bool interpolationRequiresStyleResolve(const CSSShadowValue&);
+#if !defined(DISABLE_SVG)
     static bool interpolationRequiresStyleResolve(const CSSSVGDocumentValue&);
+#endif
     static bool interpolationRequiresStyleResolve(const CSSValueList&);
     static bool interpolationRequiresStyleResolve(const CSSBasicShape&);
 

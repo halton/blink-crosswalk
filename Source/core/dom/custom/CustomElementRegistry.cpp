@@ -33,7 +33,9 @@
 
 #include "bindings/core/v8/CustomElementConstructorBuilder.h"
 #include "core/HTMLNames.h"
+#if !defined(DISABLE_SVG)
 #include "core/SVGNames.h"
+#endif
 #include "core/dom/DocumentLifecycleObserver.h"
 #include "core/dom/custom/CustomElementException.h"
 #include "core/dom/custom/CustomElementRegistrationContext.h"
@@ -90,7 +92,11 @@ CustomElementDefinition* CustomElementRegistry::registerElement(Document* docume
     if (!constructorBuilder->validateOptions(type, tagName, exceptionState))
         return 0;
 
+#if !defined(DISABLE_SVG)
     ASSERT(tagName.namespaceURI() == HTMLNames::xhtmlNamespaceURI || tagName.namespaceURI() == SVGNames::svgNamespaceURI);
+#else
+    ASSERT(tagName.namespaceURI() == HTMLNames::xhtmlNamespaceURI);
+#endif
 
     ASSERT(!observer.registrationContextWentAway());
 

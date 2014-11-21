@@ -40,15 +40,18 @@
 #include "bindings/core/v8/V8HTMLElement.h"
 #include "bindings/core/v8/V8HiddenValue.h"
 #include "bindings/core/v8/V8PerContextData.h"
-#include "bindings/core/v8/V8SVGElement.h"
 #include "core/HTMLNames.h"
-#include "core/SVGNames.h"
 #include "core/dom/Document.h"
 #include "core/dom/custom/CustomElementDefinition.h"
 #include "core/dom/custom/CustomElementDescriptor.h"
 #include "core/dom/custom/CustomElementException.h"
 #include "core/dom/custom/CustomElementProcessingStack.h"
 #include "wtf/Assertions.h"
+
+#if !defined(DISABLE_SVG)
+#include "bindings/core/v8/V8SVGElement.h"
+#include "core/SVGNames.h"
+#endif
 
 namespace blink {
 
@@ -109,8 +112,10 @@ bool CustomElementConstructorBuilder::validateOptions(const AtomicString& type, 
     }
 
     AtomicString namespaceURI = HTMLNames::xhtmlNamespaceURI;
+#if !defined(DISABLE_SVG)
     if (hasValidPrototypeChainFor(&V8SVGElement::wrapperTypeInfo))
         namespaceURI = SVGNames::svgNamespaceURI;
+#endif
 
     ASSERT(!tryCatch.HasCaught());
 
@@ -130,11 +135,13 @@ bool CustomElementConstructorBuilder::validateOptions(const AtomicString& type, 
             return false;
         }
     } else {
+#if !defined(DISABLE_SVG)
         if (namespaceURI == SVGNames::svgNamespaceURI) {
             CustomElementException::throwException(CustomElementException::ExtendsIsInvalidName, type, exceptionState);
             tryCatch.ReThrow();
             return false;
         }
+#endif
         localName = type;
     }
 

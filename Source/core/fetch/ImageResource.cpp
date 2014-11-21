@@ -31,7 +31,9 @@
 #include "core/fetch/ResourceFetcher.h"
 #include "core/frame/FrameView.h"
 #include "core/rendering/RenderObject.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/graphics/SVGImage.h"
+#endif
 #include "platform/Logging.h"
 #include "platform/RuntimeEnabledFeatures.h"
 #include "platform/SharedBuffer.h"
@@ -108,8 +110,10 @@ void ImageResource::didRemoveClient(ResourceClient* c)
     ASSERT(c->resourceClientType() == ImageResourceClient::expectedType());
 
     m_pendingContainerSizeRequests.remove(static_cast<ImageResourceClient*>(c));
+#if !defined(DISABLE_SVG)
     if (m_svgImageCache)
         m_svgImageCache->removeClientFromCache(static_cast<ImageResourceClient*>(c));
+#endif
 
     Resource::didRemoveClient(c);
 }
@@ -205,11 +209,13 @@ blink::Image* ImageResource::imageForRenderer(const RenderObject* renderer)
     if (!m_image)
         return blink::Image::nullImage();
 
+#if !defined(DISABLE_SVG)
     if (m_image->isSVGImage()) {
         blink::Image* image = m_svgImageCache->imageForRenderer(renderer);
         if (image != blink::Image::nullImage())
             return image;
     }
+#endif
 
     return m_image.get();
 }
@@ -224,12 +230,16 @@ void ImageResource::setContainerSizeForRenderer(const ImageResourceClient* rende
         m_pendingContainerSizeRequests.set(renderer, SizeAndZoom(containerSize, containerZoom));
         return;
     }
+#if !defined(DISABLE_SVG)
     if (!m_image->isSVGImage()) {
         m_image->setContainerSize(containerSize);
         return;
     }
 
     m_svgImageCache->setContainerSizeForRenderer(renderer, containerSize, containerZoom);
+#else
+    m_image->setContainerSize(containerSize);
+#endif
 }
 
 bool ImageResource::usesImageContainerSize() const
@@ -267,8 +277,10 @@ LayoutSize ImageResource::imageSizeForRenderer(const RenderObject* renderer, flo
 
     if (m_image->isBitmapImage() && (renderer && renderer->shouldRespectImageOrientation() == RespectImageOrientation))
         imageSize = toBitmapImage(m_image.get())->sizeRespectingOrientation();
+#if !defined(DISABLE_SVG)
     else if (m_image->isSVGImage() && sizeType == NormalSize)
         imageSize = m_svgImageCache->imageSizeForRenderer(renderer);
+#endif
     else
         imageSize = m_image->size();
 
@@ -318,6 +330,7 @@ inline void ImageResource::createImage()
     if (m_image)
         return;
 
+#if !defined(DISABLE_SVG)
     if (m_response.mimeType() == "image/svg+xml") {
         RefPtr<SVGImage> svgImage = SVGImage::create(this);
         m_svgImageCache = SVGImageCache::create(svgImage.get());
@@ -325,6 +338,9 @@ inline void ImageResource::createImage()
     } else {
         m_image = BitmapImage::create(this);
     }
+#else
+    m_image = BitmapImage::create(this);
+#endif
 
     if (m_image) {
         // Send queued container size requests.

@@ -34,11 +34,13 @@
 #include "core/fetch/DocumentResourceReference.h"
 #include "core/rendering/FilterEffectRenderer.h"
 #include "core/rendering/RenderLayer.h"
+#if !defined(DISABLE_SVG)
 #include "core/rendering/svg/ReferenceFilterBuilder.h"
 #include "core/rendering/svg/RenderSVGResourceContainer.h"
 #include "core/svg/SVGFilterElement.h"
 #include "core/svg/SVGFilterPrimitiveStandardAttributes.h"
 #include "core/svg/graphics/filters/SVGFilter.h"
+#endif
 
 namespace blink {
 
@@ -104,17 +106,20 @@ void RenderLayerFilterInfo::setRenderer(PassRefPtr<FilterEffectRenderer> rendere
 void RenderLayerFilterInfo::notifyFinished(Resource*)
 {
     RenderObject* renderer = m_layer->renderer();
+#if !defined(DISABLE_SVG)
     // FIXME: This caller of scheduleSVGFilterLayerUpdateHack() is not correct. It's using the layer update
     // system to trigger a RenderLayer to go through the filter updating logic, but that might not
     // even happen if this element is style sharing and RenderObject::setStyle() returns early.
     // Filters need to find a better way to hook into the system.
     toElement(renderer->node())->scheduleSVGFilterLayerUpdateHack();
+#endif
     renderer->setShouldDoFullPaintInvalidation(true);
 }
 
 void RenderLayerFilterInfo::updateReferenceFilterClients(const FilterOperations& operations)
 {
     removeReferenceFilterClients();
+#if !defined(DISABLE_SVG)
     for (size_t i = 0; i < operations.size(); ++i) {
         RefPtr<FilterOperation> filterOperation = operations.operations().at(i);
         if (filterOperation->type() != FilterOperation::REFERENCE)
@@ -140,10 +145,12 @@ void RenderLayerFilterInfo::updateReferenceFilterClients(const FilterOperations&
             m_internalSVGReferences.append(filter);
         }
     }
+#endif // !defined(DISABLE_SVG)
 }
 
 void RenderLayerFilterInfo::removeReferenceFilterClients()
 {
+#if !defined(DISABLE_SVG)
     for (size_t i = 0; i < m_externalSVGReferences.size(); ++i)
         m_externalSVGReferences.at(i)->removeClient(this);
     m_externalSVGReferences.clear();
@@ -155,6 +162,7 @@ void RenderLayerFilterInfo::removeReferenceFilterClients()
             toSVGFilterElement(filter)->removeClient(m_layer->renderer()->node());
     }
     m_internalSVGReferences.clear();
+#endif
 }
 
 } // namespace blink

@@ -65,7 +65,10 @@ struct SameSizeAsRenderStyle : public RefCounted<SameSizeAsRenderStyle> {
     } noninherited_flags;
 };
 
+// FIXME(halton): reason for compiler error
+#if !defined(DISABLE_SVG)
 COMPILE_ASSERT(sizeof(RenderStyle) == sizeof(SameSizeAsRenderStyle), RenderStyle_should_stay_small);
+#endif
 
 inline RenderStyle* defaultStyle()
 {
@@ -105,7 +108,9 @@ ALWAYS_INLINE RenderStyle::RenderStyle()
     , rareNonInheritedData(defaultStyle()->rareNonInheritedData)
     , rareInheritedData(defaultStyle()->rareInheritedData)
     , inherited(defaultStyle()->inherited)
+#if !defined(DISABLE_SVG)
     , m_svgStyle(defaultStyle()->m_svgStyle)
+#endif
 {
     setBitDefaults(); // Would it be faster to copy this from the default style?
     COMPILE_ASSERT((sizeof(InheritedFlags) <= 8), InheritedFlags_does_not_grow);
@@ -132,7 +137,9 @@ ALWAYS_INLINE RenderStyle::RenderStyle(DefaultStyleTag)
     rareNonInheritedData.access()->m_gridItem.init();
     rareInheritedData.init();
     inherited.init();
+#if !defined(DISABLE_SVG)
     m_svgStyle.init();
+#endif
 }
 
 ALWAYS_INLINE RenderStyle::RenderStyle(const RenderStyle& o)
@@ -144,7 +151,9 @@ ALWAYS_INLINE RenderStyle::RenderStyle(const RenderStyle& o)
     , rareNonInheritedData(o.rareNonInheritedData)
     , rareInheritedData(o.rareInheritedData)
     , inherited(o.inherited)
+#if !defined(DISABLE_SVG)
     , m_svgStyle(o.m_svgStyle)
+#endif
     , inherited_flags(o.inherited_flags)
     , noninherited_flags(o.noninherited_flags)
 {
@@ -208,8 +217,10 @@ void RenderStyle::inheritFrom(const RenderStyle* inheritParent, IsAtShadowBounda
         rareInheritedData = inheritParent->rareInheritedData;
     inherited = inheritParent->inherited;
     inherited_flags = inheritParent->inherited_flags;
+#if !defined(DISABLE_SVG)
     if (m_svgStyle != inheritParent->m_svgStyle)
         m_svgStyle.access()->inheritFrom(inheritParent->m_svgStyle.get());
+#endif
 }
 
 void RenderStyle::copyNonInheritedFrom(const RenderStyle* other)
@@ -235,8 +246,10 @@ void RenderStyle::copyNonInheritedFrom(const RenderStyle* other)
     noninherited_flags.pageBreakInside = other->noninherited_flags.pageBreakInside;
     noninherited_flags.explicitInheritance = other->noninherited_flags.explicitInheritance;
     noninherited_flags.hasViewportUnits = other->noninherited_flags.hasViewportUnits;
+#if !defined(DISABLE_SVG)
     if (m_svgStyle != other->m_svgStyle)
         m_svgStyle.access()->copyNonInheritedFrom(other->m_svgStyle.get());
+#endif
     ASSERT(zoom() == initialZoom());
 }
 
@@ -251,8 +264,12 @@ bool RenderStyle::operator==(const RenderStyle& o) const
         && surround == o.surround
         && rareNonInheritedData == o.rareNonInheritedData
         && rareInheritedData == o.rareInheritedData
+#if !defined(DISABLE_SVG)
         && inherited == o.inherited
         && m_svgStyle == o.m_svgStyle;
+#else
+        && inherited == o.inherited;
+#endif
 }
 
 bool RenderStyle::isStyleAvailable() const
@@ -325,7 +342,9 @@ bool RenderStyle::inheritedNotEqual(const RenderStyle* other) const
 {
     return inherited_flags != other->inherited_flags
            || inherited != other->inherited
+#if !defined(DISABLE_SVG)
            || m_svgStyle->inheritedNotEqual(other->m_svgStyle.get())
+#endif
            || rareInheritedData != other->rareInheritedData;
 }
 
@@ -334,7 +353,9 @@ bool RenderStyle::inheritedDataShared(const RenderStyle* other) const
     // This is a fast check that only looks if the data structures are shared.
     return inherited_flags == other->inherited_flags
         && inherited.get() == other->inherited.get()
+#if !defined(DISABLE_SVG)
         && m_svgStyle.get() == other->m_svgStyle.get()
+#endif
         && rareInheritedData.get() == other->rareInheritedData.get();
 }
 
@@ -374,8 +395,10 @@ StyleDifference RenderStyle::visualInvalidationDiff(const RenderStyle& other) co
     // this function anyway.
 
     StyleDifference diff;
+#if !defined(DISABLE_SVG)
     if (m_svgStyle.get() != other.m_svgStyle.get())
         diff = m_svgStyle->diff(other.m_svgStyle.get());
+#endif
 
     if ((!diff.needsFullLayout() || !diff.needsPaintInvalidation()) && diffNeedsFullLayoutAndPaintInvalidation(other)) {
         diff.setNeedsFullLayout();
@@ -1442,6 +1465,7 @@ Color RenderStyle::colorIncludingFallback(int colorProperty, bool visitedLink) c
     case CSSPropertyWebkitTextStrokeColor:
         result = visitedLink ? visitedLinkTextStrokeColor() : textStrokeColor();
         break;
+#if !defined(DISABLE_SVG)
     case CSSPropertyFloodColor:
         result = floodColor();
         break;
@@ -1451,6 +1475,7 @@ Color RenderStyle::colorIncludingFallback(int colorProperty, bool visitedLink) c
     case CSSPropertyStopColor:
         result = stopColor();
         break;
+#endif
     case CSSPropertyWebkitTapHighlightColor:
         result = tapHighlightColor();
         break;

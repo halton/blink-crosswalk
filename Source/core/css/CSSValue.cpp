@@ -48,7 +48,9 @@
 #include "core/css/CSSLineBoxContainValue.h"
 #include "core/css/CSSPrimitiveValue.h"
 #include "core/css/CSSReflectValue.h"
+#if !defined(DISABLE_SVG)
 #include "core/css/CSSSVGDocumentValue.h"
+#endif
 #include "core/css/CSSShadowValue.h"
 #include "core/css/CSSTimingFunctionValue.h"
 #include "core/css/CSSTransformValue.h"
@@ -210,8 +212,10 @@ bool CSSValue::equals(const CSSValue& other) const
             return compareCSSValues<CSSImageSetValue>(*this, other);
         case CSSFilterClass:
             return compareCSSValues<CSSFilterValue>(*this, other);
+#if !defined(DISABLE_SVG)
         case CSSSVGDocumentClass:
             return compareCSSValues<CSSSVGDocumentValue>(*this, other);
+#endif
         default:
             ASSERT_NOT_REACHED();
             return false;
@@ -288,8 +292,10 @@ String CSSValue::cssText() const
         return toCSSImageSetValue(this)->customCSSText();
     case CSSFilterClass:
         return toCSSFilterValue(this)->customCSSText();
+#if !defined(DISABLE_SVG)
     case CSSSVGDocumentClass:
         return toCSSSVGDocumentValue(this)->customCSSText();
+#endif
     }
     ASSERT_NOT_REACHED();
     return String();
@@ -389,9 +395,11 @@ void CSSValue::destroy()
     case CSSFilterClass:
         delete toCSSFilterValue(this);
         return;
+#if !defined(DISABLE_SVG)
     case CSSSVGDocumentClass:
         delete toCSSSVGDocumentValue(this);
         return;
+#endif
     }
     ASSERT_NOT_REACHED();
 }
@@ -490,9 +498,11 @@ void CSSValue::finalizeGarbageCollectedObject()
     case CSSFilterClass:
         toCSSFilterValue(this)->~CSSFilterValue();
         return;
+#if !defined(DISABLE_SVG)
     case CSSSVGDocumentClass:
         toCSSSVGDocumentValue(this)->~CSSSVGDocumentValue();
         return;
+#endif
     }
     ASSERT_NOT_REACHED();
 }
@@ -591,9 +601,11 @@ void CSSValue::trace(Visitor* visitor)
     case CSSFilterClass:
         toCSSFilterValue(this)->traceAfterDispatch(visitor);
         return;
+#if !defined(DISABLE_SVG)
     case CSSSVGDocumentClass:
         toCSSSVGDocumentValue(this)->traceAfterDispatch(visitor);
         return;
+#endif
     }
     ASSERT_NOT_REACHED();
 }

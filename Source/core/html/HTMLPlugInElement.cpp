@@ -503,7 +503,9 @@ bool HTMLPlugInElement::loadPlugin(const KURL& url, const String& mimeType, cons
         m_persistedPluginWidget = widget;
     }
     document().setContainsPlugins();
+#if !defined(DISABLE_SVG)
     scheduleSVGFilterLayerUpdateHack();
+#endif
     // Make sure any input event handlers introduced by the plugin are taken into account.
     if (Page* page = document().frame()->page()) {
         if (ScrollingCoordinator* scrollingCoordinator = page->scrollingCoordinator())

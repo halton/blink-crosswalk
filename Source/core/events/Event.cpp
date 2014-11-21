@@ -26,7 +26,9 @@
 #include "core/dom/StaticNodeList.h"
 #include "core/events/EventTarget.h"
 #include "core/frame/UseCounter.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGElement.h"
+#endif
 #include "wtf/CurrentTime.h"
 
 namespace blink {
@@ -247,11 +249,13 @@ EventTarget* Event::currentTarget() const
 {
     if (!m_currentTarget)
         return 0;
+#if !defined(DISABLE_SVG)
     Node* node = m_currentTarget->toNode();
     if (node && node->isSVGElement()) {
         if (SVGElement* svgElement = toSVGElement(node)->correspondingElement())
             return svgElement;
     }
+#endif
     return m_currentTarget.get();
 }
 

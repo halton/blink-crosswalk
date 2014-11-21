@@ -24,7 +24,6 @@
 
 #include "bindings/core/v8/ExceptionState.h"
 #include "bindings/core/v8/ExceptionStatePlaceholder.h"
-#include "core/SVGNames.h"
 #include "core/css/resolver/StyleResolver.h"
 #include "core/dom/ExceptionCode.h"
 #include "core/dom/NodeRenderStyle.h"
@@ -35,10 +34,14 @@
 #include "core/events/ScopedEventQueue.h"
 #include "core/rendering/RenderCombineText.h"
 #include "core/rendering/RenderText.h"
-#include "core/rendering/svg/RenderSVGInlineText.h"
-#include "core/svg/SVGForeignObjectElement.h"
 #include "wtf/text/CString.h"
 #include "wtf/text/StringBuilder.h"
+
+#if !defined(DISABLE_SVG)
+#include "core/SVGNames.h"
+#include "core/rendering/svg/RenderSVGInlineText.h"
+#include "core/svg/SVGForeignObjectElement.h"
+#endif
 
 namespace blink {
 
@@ -284,17 +287,21 @@ bool Text::textRendererIsNeeded(const RenderStyle& style, const RenderObject& pa
     return true;
 }
 
+#if !defined(DISABLE_SVG)
 static bool isSVGText(Text* text)
 {
     Node* parentOrShadowHostNode = text->parentOrShadowHostNode();
     ASSERT(parentOrShadowHostNode);
     return parentOrShadowHostNode->isSVGElement() && !isSVGForeignObjectElement(*parentOrShadowHostNode);
 }
+#endif
 
 RenderText* Text::createTextRenderer(RenderStyle* style)
 {
+#if !defined(DISABLE_SVG)
     if (isSVGText(this))
         return new RenderSVGInlineText(this, dataImpl());
+#endif
 
     if (style->hasTextCombine())
         return new RenderCombineText(this, dataImpl());

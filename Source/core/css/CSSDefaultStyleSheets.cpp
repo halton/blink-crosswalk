@@ -88,7 +88,9 @@ CSSDefaultStyleSheets::CSSDefaultStyleSheets()
     , m_defaultStyleSheet(nullptr)
     , m_viewportStyleSheet(nullptr)
     , m_quirksStyleSheet(nullptr)
+#if !defined(DISABLE_SVG)
     , m_svgStyleSheet(nullptr)
+#endif
     , m_mathmlStyleSheet(nullptr)
     , m_mediaControlsStyleSheet(nullptr)
     , m_fullscreenStyleSheet(nullptr)
@@ -152,6 +154,7 @@ RuleSet* CSSDefaultStyleSheets::defaultXHTMLMobileProfileStyle()
 
 void CSSDefaultStyleSheets::ensureDefaultStyleSheetsForElement(Element* element, bool& changedDefaultStyle)
 {
+#if !defined(DISABLE_SVG)
     // FIXME: We should assert that the sheet only styles SVG elements.
     if (element->isSVGElement() && !m_svgStyleSheet) {
         m_svgStyleSheet = parseUASheet(svgCss, sizeof(svgCss));
@@ -159,6 +162,7 @@ void CSSDefaultStyleSheets::ensureDefaultStyleSheetsForElement(Element* element,
         m_defaultPrintStyle->addRulesFromSheet(svgStyleSheet(), printEval());
         changedDefaultStyle = true;
     }
+#endif
 
     // FIXME: We should assert that the sheet only styles MathML elements.
     if (element->namespaceURI() == MathMLNames::mathmlNamespaceURI
@@ -204,7 +208,9 @@ void CSSDefaultStyleSheets::trace(Visitor* visitor)
     visitor->trace(m_defaultStyleSheet);
     visitor->trace(m_viewportStyleSheet);
     visitor->trace(m_quirksStyleSheet);
+#if !defined(DISABLE_SVG)
     visitor->trace(m_svgStyleSheet);
+#endif
     visitor->trace(m_mathmlStyleSheet);
     visitor->trace(m_mediaControlsStyleSheet);
     visitor->trace(m_fullscreenStyleSheet);

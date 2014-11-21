@@ -26,7 +26,9 @@
 #include "core/CSSPropertyNames.h"
 #include "core/css/CSSCursorImageValue.h"
 #include "core/css/CSSImageValue.h"
+#if !defined(DISABLE_SVG)
 #include "core/css/CSSSVGDocumentValue.h"
+#endif
 #include "core/css/resolver/ElementStyleResources.h"
 #include "core/fetch/ResourceFetcher.h"
 #include "core/rendering/style/ContentData.h"
@@ -45,6 +47,7 @@ StyleResourceLoader::StyleResourceLoader(ResourceFetcher* fetcher)
 {
 }
 
+#if !defined(DISABLE_SVG)
 void StyleResourceLoader::loadPendingSVGDocuments(RenderStyle* renderStyle, ElementStyleResources& elementStyleResources)
 {
     if (!renderStyle->hasFilter() || elementStyleResources.pendingSVGDocuments().isEmpty())
@@ -70,6 +73,7 @@ void StyleResourceLoader::loadPendingSVGDocuments(RenderStyle* renderStyle, Elem
 
     elementStyleResources.clearPendingSVGDocuments();
 }
+#endif
 
 static PassRefPtr<StyleImage> doLoadPendingImage(ResourceFetcher* fetcher, StylePendingImage* pendingImage, float deviceScaleFactor, const ResourceLoaderOptions& options)
 {
@@ -204,8 +208,10 @@ void StyleResourceLoader::loadPendingResources(RenderStyle* renderStyle, Element
     // Start loading images referenced by this style.
     loadPendingImages(renderStyle, elementStyleResources);
 
+#if !defined(DISABLE_SVG)
     // Start loading the SVG Documents referenced by this style.
     loadPendingSVGDocuments(renderStyle, elementStyleResources);
+#endif
 }
 
 }

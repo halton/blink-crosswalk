@@ -70,8 +70,10 @@ bool CSSPropertyEquality::propertiesEqual(CSSPropertyID prop, const RenderStyle&
         return fillLayersEqual<CSSPropertyBackgroundPositionY>(a.backgroundLayers(), b.backgroundLayers());
     case CSSPropertyBackgroundSize:
         return fillLayersEqual<CSSPropertyBackgroundSize>(a.backgroundLayers(), b.backgroundLayers());
+#if !defined(DISABLE_SVG)
     case CSSPropertyBaselineShift:
         return dataEquivalent(a.baselineShiftValue(), b.baselineShiftValue());
+#endif
     case CSSPropertyBorderBottomColor:
         return a.borderBottomColor() == b.borderBottomColor()
             && a.visitedLinkBorderBottomColor() == b.visitedLinkBorderBottomColor();
@@ -116,6 +118,7 @@ bool CSSPropertyEquality::propertiesEqual(CSSPropertyID prop, const RenderStyle&
         return a.clip() == b.clip();
     case CSSPropertyColor:
         return a.color() == b.color() && a.visitedLinkColor() == b.visitedLinkColor();
+#if !defined(DISABLE_SVG)
     case CSSPropertyFill: {
         const SVGRenderStyle& aSVG = a.svgStyle();
         const SVGRenderStyle& bSVG = b.svgStyle();
@@ -126,16 +129,19 @@ bool CSSPropertyEquality::propertiesEqual(CSSPropertyID prop, const RenderStyle&
     }
     case CSSPropertyFillOpacity:
         return a.fillOpacity() == b.fillOpacity();
+#endif
     case CSSPropertyFlexBasis:
         return a.flexBasis() == b.flexBasis();
     case CSSPropertyFlexGrow:
         return a.flexGrow() == b.flexGrow();
     case CSSPropertyFlexShrink:
         return a.flexShrink() == b.flexShrink();
+#if !defined(DISABLE_SVG)
     case CSSPropertyFloodColor:
         return a.floodColor() == b.floodColor();
     case CSSPropertyFloodOpacity:
         return a.floodOpacity() == b.floodOpacity();
+#endif
     case CSSPropertyFontSize:
         // CSSPropertyFontSize: Must pass a specified size to setFontSize if Text Autosizing is enabled, but a computed size
         // if text zoom is enabled (if neither is enabled it's irrelevant as they're probably the same).
@@ -152,8 +158,10 @@ bool CSSPropertyEquality::propertiesEqual(CSSPropertyID prop, const RenderStyle&
         return a.left() == b.left();
     case CSSPropertyLetterSpacing:
         return a.letterSpacing() == b.letterSpacing();
+#if !defined(DISABLE_SVG)
     case CSSPropertyLightingColor:
         return a.lightingColor() == b.lightingColor();
+#endif
     case CSSPropertyLineHeight:
         return a.specifiedLineHeight() == b.specifiedLineHeight();
     case CSSPropertyListStyleImage:
@@ -203,6 +211,7 @@ bool CSSPropertyEquality::propertiesEqual(CSSPropertyID prop, const RenderStyle&
         return a.shapeMargin() == b.shapeMargin();
     case CSSPropertyShapeOutside:
         return dataEquivalent(a.shapeOutside(), b.shapeOutside());
+#if !defined(DISABLE_SVG)
     case CSSPropertyStopColor:
         return a.stopColor() == b.stopColor();
     case CSSPropertyStopOpacity:
@@ -225,6 +234,7 @@ bool CSSPropertyEquality::propertiesEqual(CSSPropertyID prop, const RenderStyle&
         return a.strokeOpacity() == b.strokeOpacity();
     case CSSPropertyStrokeWidth:
         return dataEquivalent(a.strokeWidth(), b.strokeWidth());
+#endif
     case CSSPropertyTextDecorationColor:
         return a.textDecorationColor() == b.textDecorationColor()
             && a.visitedLinkTextDecorationColor() == b.visitedLinkTextDecorationColor();

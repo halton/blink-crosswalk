@@ -45,7 +45,9 @@
 #include "core/accessibility/AXMenuListPopup.h"
 #include "core/accessibility/AXProgressIndicator.h"
 #include "core/accessibility/AXRenderObject.h"
+#if !defined(DISABLE_SVG)
 #include "core/accessibility/AXSVGRoot.h"
+#endif
 #include "core/accessibility/AXScrollView.h"
 #include "core/accessibility/AXScrollbar.h"
 #include "core/accessibility/AXSlider.h"
@@ -291,8 +293,10 @@ static PassRefPtr<AXObject> createFromRenderer(RenderObject* renderer)
     if (isHTMLOptionElement(node))
         return AXListBoxOption::create(renderer);
 
+#if !defined(DISABLE_SVG)
     if (renderer->isSVGRoot())
         return AXSVGRoot::create(renderer);
+#endif
 
     if (renderer->isBoxModelObject()) {
         RenderBoxModelObject* cssBox = toRenderBoxModelObject(renderer);

@@ -30,7 +30,9 @@
 #include "core/dom/VisitedLinkState.h"
 
 #include "core/HTMLNames.h"
+#if !defined(DISABLE_SVG)
 #include "core/XLinkNames.h"
+#endif
 #include "core/dom/ElementTraversal.h"
 #include "core/html/HTMLAnchorElement.h"
 #include "public/platform/Platform.h"
@@ -40,10 +42,15 @@ namespace blink {
 static inline const AtomicString& linkAttribute(const Element& element)
 {
     ASSERT(element.isLink());
+#if !defined(DISABLE_SVG)
     if (element.isHTMLElement())
         return element.fastGetAttribute(HTMLNames::hrefAttr);
     ASSERT(element.isSVGElement());
     return element.getAttribute(XLinkNames::hrefAttr);
+#else
+    ASSERT(element.isHTMLElement());
+    return element.fastGetAttribute(HTMLNames::hrefAttr);
+#endif
 }
 
 static inline LinkHash linkHashForElement(const Element& element, const AtomicString& attribute = AtomicString())

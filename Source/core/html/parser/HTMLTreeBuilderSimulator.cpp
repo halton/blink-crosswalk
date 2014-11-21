@@ -28,7 +28,9 @@
 
 #include "core/HTMLNames.h"
 #include "core/MathMLNames.h"
+#if !defined(DISABLE_SVG)
 #include "core/SVGNames.h"
+#endif
 #include "core/html/parser/HTMLParserIdioms.h"
 #include "core/html/parser/HTMLTokenizer.h"
 #include "core/html/parser/HTMLTreeBuilder.h"
@@ -88,11 +90,13 @@ static bool tokenExitsForeignContent(const CompactHTMLToken& token)
         || (threadSafeMatch(tagName, fontTag) && (token.getAttributeItem(colorAttr) || token.getAttributeItem(faceAttr) || token.getAttributeItem(sizeAttr)));
 }
 
+#if !defined(DISABLE_SVG)
 static bool tokenExitsSVG(const CompactHTMLToken& token)
 {
     // FIXME: It's very fragile that we special case foreignObject here to be case-insensitive.
     return equalIgnoringCaseNonNull(token.data().impl(), SVGNames::foreignObjectTag.localName().impl());
 }
+#endif
 
 static bool tokenExitsMath(const CompactHTMLToken& token)
 {
@@ -117,10 +121,15 @@ HTMLTreeBuilderSimulator::State HTMLTreeBuilderSimulator::stateFor(HTMLTreeBuild
     State namespaceStack;
     for (HTMLElementStack::ElementRecord* record = treeBuilder->openElements()->topRecord(); record; record = record->next()) {
         Namespace currentNamespace = HTML;
+#if !defined(DISABLE_SVG)
         if (record->namespaceURI() == SVGNames::svgNamespaceURI)
             currentNamespace = SVG;
         else if (record->namespaceURI() == MathMLNames::mathmlNamespaceURI)
             currentNamespace = MathML;
+#else
+        if (record->namespaceURI() == MathMLNames::mathmlNamespaceURI)
+            currentNamespace = MathML;
+#endif
 
         if (namespaceStack.isEmpty() || namespaceStack.last() != currentNamespace)
             namespaceStack.append(currentNamespace);
@@ -133,15 +142,22 @@ bool HTMLTreeBuilderSimulator::simulate(const CompactHTMLToken& token, HTMLToken
 {
     if (token.type() == HTMLToken::StartTag) {
         const String& tagName = token.data();
+#if !defined(DISABLE_SVG)
         if (threadSafeMatch(tagName, SVGNames::svgTag))
             m_namespaceStack.append(SVG);
+#endif
         if (threadSafeMatch(tagName, MathMLNames::mathTag))
             m_namespaceStack.append(MathML);
         if (inForeignContent() && tokenExitsForeignContent(token))
             m_namespaceStack.removeLast();
+#if !defined(DISABLE_SVG)
         if ((m_namespaceStack.last() == SVG && tokenExitsSVG(token))
             || (m_namespaceStack.last() == MathML && tokenExitsMath(token)))
             m_namespaceStack.append(HTML);
+#else
+        if (m_namespaceStack.last() == MathML && tokenExitsMath(token))
+            m_namespaceStack.append(HTML);
+#endif
         if (!inForeignContent()) {
             // FIXME: This is just a copy of Tokenizer::updateStateFor which uses threadSafeMatches.
             if (threadSafeMatch(tagName, textareaTag) || threadSafeMatch(tagName, titleTag))
@@ -162,9 +178,13 @@ bool HTMLTreeBuilderSimulator::simulate(const CompactHTMLToken& token, HTMLToken
 
     if (token.type() == HTMLToken::EndTag) {
         const String& tagName = token.data();
+#if !defined(DISABLE_SVG)
         if ((m_namespaceStack.last() == SVG && threadSafeMatch(tagName, SVGNames::svgTag))
             || (m_namespaceStack.last() == MathML && threadSafeMatch(tagName, MathMLNames::mathTag))
             || (m_namespaceStack.contains(SVG) && m_namespaceStack.last() == HTML && tokenExitsSVG(token))
+#else
+        if ((m_namespaceStack.last() == MathML && threadSafeMatch(tagName, MathMLNames::mathTag))
+#endif
             || (m_namespaceStack.contains(MathML) && m_namespaceStack.last() == HTML && tokenExitsMath(token)))
             m_namespaceStack.removeLast();
         if (threadSafeMatch(tagName, scriptTag)) {

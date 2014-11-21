@@ -47,7 +47,9 @@
 #include "core/html/parser/HTMLToken.h"
 #include "core/loader/FrameLoader.h"
 #include "core/loader/FrameLoaderClient.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGScriptElement.h"
+#endif
 #include "platform/NotImplemented.h"
 #include "platform/text/TextBreakIterator.h"
 #include <limits>
@@ -82,8 +84,12 @@ static bool hasImpliedEndTag(const HTMLStackItem* item)
 static bool shouldUseLengthLimit(const ContainerNode& node)
 {
     return !isHTMLScriptElement(node)
+#if !defined(DISABLE_SVG)
         && !isHTMLStyleElement(node)
         && !isSVGScriptElement(node);
+#else
+        && !isHTMLStyleElement(node);
+#endif
 }
 
 static unsigned textLengthLimitForContainer(const ContainerNode& node)

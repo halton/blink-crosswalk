@@ -65,7 +65,9 @@ public:
         Script,
         Font,
         Raw,
+#if !defined(DISABLE_SVG)
         SVGDocument,
+#endif
         XSLStyleSheet,
         LinkPrefetch,
         LinkSubresource,

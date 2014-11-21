@@ -225,7 +225,6 @@
         '<(blink_core_output_dir)/MathMLNames.cpp',
         '<(blink_core_output_dir)/SVGNames.cpp',
         '<(blink_core_output_dir)/UserAgentStyleSheetsData.cpp',
-        '<(blink_core_output_dir)/XLinkNames.cpp',
         '<(blink_core_output_dir)/XMLNSNames.cpp',
         '<(blink_core_output_dir)/XMLNames.cpp',
 
@@ -301,6 +300,13 @@
         ['disable_xslt==1', {
           'dependencies!': [
             '<(DEPTH)/third_party/libxslt/libxslt.gyp:libxslt',
+          ]
+        }],
+        ['disable_xslt==1', {
+          'sources!': [
+            '<(blink_core_output_dir)/SVGNames.cpp',
+            '<(blink_core_output_dir)/SVGElementFactory.cpp',
+            '<(blink_core_output_dir)/XLinkNames.cpp',
           ]
         }],
       ],
@@ -709,7 +715,6 @@
         'webcore_html',
         'webcore_remaining',
         'webcore_rendering',
-        'webcore_svg',
         # Exported.
         'webcore_generated',
         '../platform/blink_platform.gyp:blink_platform',
@@ -754,6 +759,11 @@
                '<!@(pkg-config --libs ipp|sed s/-L//)/libippcore_l.a',
             ]
           },
+        }],
+        ['disable_svg==0', {
+          'dependencies': [
+            'webcore_svg',
+          ],
         }],
       ],
     },

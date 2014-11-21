@@ -46,7 +46,9 @@ public:
     void loadPendingResources(RenderStyle*, ElementStyleResources&);
 
 private:
+#if !defined(DISABLE_SVG)
     void loadPendingSVGDocuments(RenderStyle*, ElementStyleResources&);
+#endif
 
     PassRefPtr<StyleImage> loadPendingImage(StylePendingImage*, float deviceScaleFactor);
     void loadPendingImages(RenderStyle*, ElementStyleResources&);

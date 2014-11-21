@@ -346,7 +346,9 @@ private:
 
     Timer<EventHandler> m_fakeMouseMoveEventTimer;
 
+#if !defined(DISABLE_SVG)
     bool m_svgPan;
+#endif
 
     RenderLayerScrollableArea* m_resizeScrollableArea;
 

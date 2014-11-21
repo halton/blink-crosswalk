@@ -42,8 +42,10 @@
 #include "core/MathMLNames.h"
 #include "core/MediaFeatureNames.h"
 #include "core/MediaTypeNames.h"
+#if !defined(DISABLE_SVG)
 #include "core/SVGNames.h"
 #include "core/XLinkNames.h"
+#endif
 #include "core/XMLNSNames.h"
 #include "core/XMLNames.h"
 #include "core/dom/Document.h"
@@ -75,8 +77,10 @@ void CoreInitializer::init()
     m_isInited = true;
 
     HTMLNames::init();
+#if !defined(DISABLE_SVG)
     SVGNames::init();
     XLinkNames::init();
+#endif
     MathMLNames::init();
     XMLNSNames::init();
     XMLNames::init();

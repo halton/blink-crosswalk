@@ -37,7 +37,9 @@
 #include "core/page/FrameTree.h"
 #include "core/rendering/RenderImage.h"
 #include "core/rendering/RenderTextFragment.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGElement.h"
+#endif
 #include "platform/scroll/Scrollbar.h"
 
 namespace blink {
@@ -296,7 +298,9 @@ KURL HitTestResult::absoluteImageURL() const
         || isHTMLImageElement(*m_innerNonSharedNode)
         || isHTMLInputElement(*m_innerNonSharedNode)
         || isHTMLObjectElement(*m_innerNonSharedNode)
+#if !defined(DISABLE_SVG)
         || isSVGImageElement(*m_innerNonSharedNode)
+#endif
        ) {
         urlString = toElement(*m_innerNonSharedNode).imageSourceURL();
     } else

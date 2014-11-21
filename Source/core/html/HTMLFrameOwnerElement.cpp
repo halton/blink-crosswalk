@@ -196,9 +196,11 @@ void HTMLFrameOwnerElement::dispatchLoad()
 
 Document* HTMLFrameOwnerElement::getSVGDocument(ExceptionState& exceptionState) const
 {
+#if !defined(DISABLE_SVG)
     Document* doc = contentDocument();
     if (doc && doc->isSVGDocument())
         return doc;
+#endif
     return 0;
 }
 

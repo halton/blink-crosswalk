@@ -35,7 +35,9 @@
 
 namespace blink {
 
+#if !defined(DISABLE_SVG)
 class AXSVGRoot;
+#endif
 class AXObjectCache;
 class Element;
 class LocalFrame;
@@ -210,18 +212,22 @@ private:
     bool renderObjectIsObservable(RenderObject*) const;
     RenderObject* renderParentObject() const;
     bool isDescendantOfElementType(const HTMLQualifiedName& tagName) const;
+#if !defined(DISABLE_SVG)
     bool isSVGImage() const;
     void detachRemoteSVGRoot();
     AXSVGRoot* remoteSVGRootElement() const;
     AXObject* remoteSVGElementHitTest(const IntPoint&) const;
     void offsetBoundingBoxForRemoteSVGElement(LayoutRect&) const;
+#endif
     void addHiddenChildren();
     void addTextFieldChildren();
     void addImageMapChildren();
     void addCanvasChildren();
     void addAttachmentChildren();
     void addPopupChildren();
+#if !defined(DISABLE_SVG)
     void addRemoteSVGChildren();
+#endif
     void addInlineTextBoxChildren();
 
     void ariaSelectedRows(AccessibilityChildrenVector&);

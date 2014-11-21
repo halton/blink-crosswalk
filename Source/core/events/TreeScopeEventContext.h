@@ -91,8 +91,12 @@ private:
 #if ENABLE(ASSERT)
 inline bool TreeScopeEventContext::isUnreachableNode(EventTarget& target)
 {
+#if !defined(DISABLE_SVG)
     // FIXME: Checks also for SVG elements.
     return target.toNode() && !target.toNode()->isSVGElement() && !target.toNode()->treeScope().isInclusiveOlderSiblingShadowRootOrAncestorTreeScopeOf(treeScope());
+#else
+    return target.toNode() && !target.toNode()->treeScope().isInclusiveOlderSiblingShadowRootOrAncestorTreeScopeOf(treeScope());
+#endif
 }
 #endif
 

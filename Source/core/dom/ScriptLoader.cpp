@@ -27,7 +27,6 @@
 #include "bindings/core/v8/ScriptController.h"
 #include "bindings/core/v8/ScriptSourceCode.h"
 #include "core/HTMLNames.h"
-#include "core/SVGNames.h"
 #include "core/dom/Document.h"
 #include "core/events/Event.h"
 #include "core/dom/IgnoreDestructiveWriteCountIncrementer.h"
@@ -45,12 +44,16 @@
 #include "core/frame/SubresourceIntegrity.h"
 #include "core/frame/csp/ContentSecurityPolicy.h"
 #include "core/inspector/ConsoleMessage.h"
-#include "core/svg/SVGScriptElement.h"
 #include "platform/MIMETypeRegistry.h"
 #include "platform/weborigin/SecurityOrigin.h"
 #include "wtf/StdLibExtras.h"
 #include "wtf/text/StringBuilder.h"
 #include "wtf/text/StringHash.h"
+
+#if !defined(DISABLE_SVG)
+#include "core/SVGNames.h"
+#include "core/svg/SVGScriptElement.h"
+#endif
 
 namespace blink {
 
@@ -289,11 +292,13 @@ bool isHTMLScriptLoader(Element* element)
     return isHTMLScriptElement(*element);
 }
 
+#if !defined(DISABLE_SVG)
 bool isSVGScriptLoader(Element* element)
 {
     ASSERT(element);
     return isSVGScriptElement(*element);
 }
+#endif
 
 void ScriptLoader::executeScript(const ScriptSourceCode& sourceCode, double* compilationFinishTime)
 {
@@ -439,8 +444,10 @@ ScriptLoaderClient* ScriptLoader::client() const
     if (isHTMLScriptLoader(m_element))
         return toHTMLScriptElement(m_element);
 
+#if !defined(DISABLE_SVG)
     if (isSVGScriptLoader(m_element))
         return toSVGScriptElement(m_element);
+#endif
 
     ASSERT_NOT_REACHED();
     return 0;
@@ -451,8 +458,10 @@ ScriptLoader* toScriptLoaderIfPossible(Element* element)
     if (isHTMLScriptLoader(element))
         return toHTMLScriptElement(element)->loader();
 
+#if !defined(DISABLE_SVG)
     if (isSVGScriptLoader(element))
         return toSVGScriptElement(element)->loader();
+#endif
 
     return 0;
 }

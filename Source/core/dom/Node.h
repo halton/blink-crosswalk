@@ -78,7 +78,9 @@ class RenderBox;
 class RenderBoxModelObject;
 class RenderObject;
 class RenderStyle;
+#if !defined(DISABLE_SVG)
 class SVGQualifiedName;
+#endif
 class ShadowRoot;
 template <typename NodeType> class StaticNodeTypeList;
 typedef StaticNodeTypeList<Node> StaticNodeList;
@@ -176,7 +178,9 @@ public:
     // DOM methods & attributes for Node
 
     bool hasTagName(const HTMLQualifiedName&) const;
+#if !defined(DISABLE_SVG)
     bool hasTagName(const SVGQualifiedName&) const;
+#endif
     virtual String nodeName() const = 0;
     virtual String nodeValue() const;
     virtual void setNodeValue(const String&);
@@ -228,7 +232,9 @@ public:
     bool isContainerNode() const { return getFlag(IsContainerFlag); }
     bool isTextNode() const { return getFlag(IsTextFlag); }
     bool isHTMLElement() const { return getFlag(IsHTMLFlag); }
+#if !defined(DISABLE_SVG)
     bool isSVGElement() const { return getFlag(IsSVGFlag); }
+#endif
 
     bool isPseudoElement() const { return pseudoId() != NOPSEUDO; }
     bool isBeforePseudoElement() const { return pseudoId() == BEFORE; }
@@ -264,7 +270,11 @@ public:
     // PseudoElements and VTTElements. It's possible we can just eliminate all the checks
     // since those elements will never have class names, inline style, or other things that
     // this apparently guards against.
+#if !defined(DISABLE_SVG)
     bool isStyledElement() const { return isHTMLElement() || isSVGElement(); }
+#else
+    bool isStyledElement() const { return isHTMLElement(); }
+#endif
 
     bool isDocumentNode() const;
     bool isTreeScope() const;
@@ -372,9 +382,11 @@ public:
 
     void recalcDistribution();
 
+#if !defined(DISABLE_SVG)
     bool svgFilterNeedsLayerUpdate() const { return getFlag(SVGFilterNeedsLayerUpdateFlag); }
     void setSVGFilterNeedsLayerUpdate() { setFlag(SVGFilterNeedsLayerUpdateFlag); }
     void clearSVGFilterNeedsLayerUpdate() { clearFlag(SVGFilterNeedsLayerUpdateFlag); }
+#endif
 
     void setIsLink(bool f);
 
@@ -672,7 +684,9 @@ private:
         IsContainerFlag = 1 << 2,
         IsElementFlag = 1 << 3,
         IsHTMLFlag = 1 << 4,
+#if !defined(DISABLE_SVG)
         IsSVGFlag = 1 << 5,
+#endif
         IsDocumentFragmentFlag = 1 << 6,
         IsInsertionPointFlag = 1 << 7,
 
@@ -691,8 +705,10 @@ private:
         // Set by the parser when the children are done parsing.
         IsFinishedParsingChildrenFlag = 1 << 12,
 
+#if !defined(DISABLE_SVG)
         // Flags related to recalcStyle.
         SVGFilterNeedsLayerUpdateFlag = 1 << 13,
+#endif
         HasCustomStyleCallbacksFlag = 1 << 14,
         ChildNeedsStyleInvalidationFlag = 1 << 15,
         NeedsStyleInvalidationFlag = 1 << 16,
@@ -732,7 +748,9 @@ protected:
         CreateShadowRoot = CreateContainer | IsDocumentFragmentFlag | IsInShadowTreeFlag,
         CreateDocumentFragment = CreateContainer | IsDocumentFragmentFlag,
         CreateHTMLElement = CreateElement | IsHTMLFlag,
+#if !defined(DISABLE_SVG)
         CreateSVGElement = CreateElement | IsSVGFlag,
+#endif
         CreateDocument = CreateContainer | InDocumentFlag,
         CreateInsertionPoint = CreateHTMLElement | IsInsertionPointFlag,
         CreateEditingText = CreateText | HasNameOrIsEditingTextFlag,

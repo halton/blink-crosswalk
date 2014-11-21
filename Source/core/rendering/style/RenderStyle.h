@@ -37,7 +37,9 @@
 #include "core/rendering/style/NinePieceImage.h"
 #include "core/rendering/style/OutlineValue.h"
 #include "core/rendering/style/RenderStyleConstants.h"
+#if !defined(DISABLE_SVG)
 #include "core/rendering/style/SVGRenderStyle.h"
+#endif
 #include "core/rendering/style/ShapeValue.h"
 #include "core/rendering/style/StyleBackgroundData.h"
 #include "core/rendering/style/StyleBoxData.h"
@@ -146,7 +148,9 @@ protected:
     // list of associated pseudo styles
     OwnPtr<PseudoStyleCache> m_cachedPseudoStyles;
 
+#if !defined(DISABLE_SVG)
     DataRef<SVGRenderStyle> m_svgStyle;
+#endif
 
 // !START SYNC!: Keep this in sync with the copy constructor in RenderStyle.cpp and implicitlyInherited() in StyleResolver.cpp
 
@@ -1414,6 +1418,7 @@ public:
     bool requiresAcceleratedCompositingForExternalReasons(bool b) { return rareNonInheritedData->m_requiresAcceleratedCompositingForExternalReasons; }
     void setRequiresAcceleratedCompositingForExternalReasons(bool b) { SET_VAR(rareNonInheritedData, m_requiresAcceleratedCompositingForExternalReasons, b); }
 
+#if !defined(DISABLE_SVG)
     const SVGRenderStyle& svgStyle() const { return *m_svgStyle.get(); }
     SVGRenderStyle& accessSVGStyle() { return *m_svgStyle.access(); }
 
@@ -1447,6 +1452,7 @@ public:
 
     SVGLength* baselineShiftValue() const { return svgStyle().baselineShiftValue(); }
     void setBaselineShiftValue(PassRefPtr<SVGLength> s) { accessSVGStyle().setBaselineShiftValue(s); }
+#endif
 
     void setShapeOutside(PassRefPtr<ShapeValue> value)
     {
@@ -1804,9 +1810,11 @@ private:
 
     Color colorIncludingFallback(int colorProperty, bool visitedLink) const;
 
+#if !defined(DISABLE_SVG)
     Color stopColor() const { return svgStyle().stopColor(); }
     Color floodColor() const { return svgStyle().floodColor(); }
     Color lightingColor() const { return svgStyle().lightingColor(); }
+#endif
 
     void appendContent(PassOwnPtr<ContentData>);
     void addAppliedTextDecoration(const AppliedTextDecoration&);

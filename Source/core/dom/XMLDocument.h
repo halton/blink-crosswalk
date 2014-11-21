@@ -44,10 +44,12 @@ public:
         return adoptRefWillBeNoop(new XMLDocument(initializer, XMLDocumentClass | XHTMLDocumentClass));
     }
 
+#if !defined(DISABLE_SVG)
     static PassRefPtrWillBeRawPtr<XMLDocument> createSVG(const DocumentInit& initializer = DocumentInit())
     {
         return adoptRefWillBeNoop(new XMLDocument(initializer, XMLDocumentClass | SVGDocumentClass));
     }
+#endif
 
 protected:
     XMLDocument(const DocumentInit&, DocumentClassFlags documentClasses);

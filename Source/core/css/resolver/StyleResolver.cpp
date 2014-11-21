@@ -79,9 +79,11 @@
 #include "core/inspector/InspectorInstrumentation.h"
 #include "core/rendering/RenderView.h"
 #include "core/rendering/style/KeyframeList.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGDocumentExtensions.h"
 #include "core/svg/SVGElement.h"
 #include "core/svg/SVGFontFaceElement.h"
+#endif
 #include "platform/RuntimeEnabledFeatures.h"
 #include "wtf/StdLibExtras.h"
 
@@ -496,8 +498,10 @@ void StyleResolver::matchAllRules(StyleResolverState& state, ElementRuleCollecto
         }
 
         // Now check SMIL animation override style.
+#if !defined(DISABLE_SVG)
         if (includeSMILProperties && state.element()->isSVGElement())
             collector.addElementStyleProperties(toSVGElement(state.element())->animatedSMILStyleProperties(), false /* isCacheable */);
+#endif
     }
 }
 
@@ -1429,6 +1433,7 @@ void StyleResolver::applyMatchedProperties(StyleResolverState& state, const Matc
     applyMatchedProperties<HighPriorityProperties>(state, matchResult, true, matchResult.ranges.firstAuthorRule, matchResult.ranges.lastAuthorRule, applyInheritedOnly);
     applyMatchedProperties<HighPriorityProperties>(state, matchResult, true, matchResult.ranges.firstUARule, matchResult.ranges.lastUARule, applyInheritedOnly);
 
+#if !defined(DISABLE_SVG)
     if (UNLIKELY(isSVGForeignObjectElement(element))) {
         // RenderSVGRoot handles zooming for the whole SVG subtree, so foreignObject content should not be scaled again.
         //
@@ -1439,6 +1444,7 @@ void StyleResolver::applyMatchedProperties(StyleResolverState& state, const Matc
         // need to find another way of handling the SVG zoom model.
         state.setEffectiveZoom(RenderStyle::initialZoom());
     }
+#endif
 
     if (cachedMatchedProperties && cachedMatchedProperties->renderStyle->effectiveZoom() != state.style()->effectiveZoom()) {
         state.fontBuilder().setFontDirty(true);

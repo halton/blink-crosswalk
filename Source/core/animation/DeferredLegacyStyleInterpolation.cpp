@@ -8,7 +8,9 @@
 #include "core/animation/LegacyStyleInterpolation.h"
 #include "core/css/CSSImageValue.h"
 #include "core/css/CSSPrimitiveValue.h"
+#if !defined(DISABLE_SVG)
 #include "core/css/CSSSVGDocumentValue.h"
+#endif
 #include "core/css/CSSShadowValue.h"
 #include "core/css/CSSValueList.h"
 #include "core/css/Pair.h"
@@ -42,8 +44,10 @@ bool DeferredLegacyStyleInterpolation::interpolationRequiresStyleResolve(const C
             return interpolationRequiresStyleResolve(toCSSImageValue(value));
         if (value.isShadowValue())
             return interpolationRequiresStyleResolve(toCSSShadowValue(value));
+#if !defined(DISABLE_SVG)
         if (value.isSVGDocumentValue())
             return interpolationRequiresStyleResolve(toCSSSVGDocumentValue(value));
+#endif
         // FIXME: consider other custom types.
         return true;
     case CSSValue::CSS_INITIAL:
@@ -121,10 +125,12 @@ bool DeferredLegacyStyleInterpolation::interpolationRequiresStyleResolve(const C
         || (shadowValue.color && interpolationRequiresStyleResolve(*shadowValue.color));
 }
 
+#if !defined(DISABLE_SVG)
 bool DeferredLegacyStyleInterpolation::interpolationRequiresStyleResolve(const CSSSVGDocumentValue& documentValue)
 {
     return true;
 }
+#endif
 
 bool DeferredLegacyStyleInterpolation::interpolationRequiresStyleResolve(const CSSValueList& valueList)
 {

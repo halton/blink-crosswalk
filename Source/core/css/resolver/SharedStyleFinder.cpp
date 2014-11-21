@@ -47,7 +47,9 @@
 #include "core/html/HTMLOptGroupElement.h"
 #include "core/html/HTMLOptionElement.h"
 #include "core/rendering/style/RenderStyle.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGElement.h"
+#endif
 #include "wtf/HashSet.h"
 #include "wtf/text/AtomicString.h"
 
@@ -109,8 +111,12 @@ bool SharedStyleFinder::classNamesAffectedByRules(const SpaceSplitString& classN
 
 static inline const AtomicString& typeAttributeValue(const Element& element)
 {
+#if !defined(DISABLE_SVG)
     // type is animatable in SVG so we need to go down the slow path here.
     return element.isSVGElement() ? element.getAttribute(typeAttr) : element.fastGetAttribute(typeAttr);
+#else
+    return element.fastGetAttribute(typeAttr);
+#endif
 }
 
 bool SharedStyleFinder::sharingCandidateHasIdenticalStyleAffectingAttributes(Element& candidate) const
@@ -134,12 +140,18 @@ bool SharedStyleFinder::sharingCandidateHasIdenticalStyleAffectingAttributes(Ele
             return false;
     } else if (candidate.hasClass()) {
         // SVG elements require a (slow!) getAttribute comparision because "class" is an animatable attribute for SVG.
+#if !defined(DISABLE_SVG)
         if (element().isSVGElement()) {
             if (element().getAttribute(classAttr) != candidate.getAttribute(classAttr))
                 return false;
         } else if (element().classNames() != candidate.classNames()) {
             return false;
         }
+#else
+        if (element().classNames() != candidate.classNames()) {
+            return false;
+        }
+#endif
     } else {
         return false;
     }
@@ -213,8 +225,10 @@ bool SharedStyleFinder::canShareStyleWithElement(Element& candidate) const
         return false;
     if (candidate.needsStyleRecalc())
         return false;
+#if !defined(DISABLE_SVG)
     if (candidate.isSVGElement() && toSVGElement(candidate).animatedSMILStyleProperties())
         return false;
+#endif
     if (candidate.isLink() != element().isLink())
         return false;
     if (candidate.shadowPseudoId() != element().shadowPseudoId())
@@ -257,8 +271,10 @@ bool SharedStyleFinder::canShareStyleWithElement(Element& candidate) const
             return false;
         if (parent->inlineStyle())
             return false;
+#if !defined(DISABLE_SVG)
         if (parent->isSVGElement() && toSVGElement(parent)->animatedSMILStyleProperties())
             return false;
+#endif
         if (parent->hasID() && m_features.hasSelectorForId(parent->idForStyleResolution()))
             return false;
         if (!parent->childrenSupportStyleSharing())

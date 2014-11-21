@@ -132,6 +132,19 @@
       'target_name': 'make_core_generated',
       'type': 'none',
       'hard_dependency': 1,
+      'variables': {
+        'conditions' : [
+          ['disable_svg==0', {
+            'css_properties_in%': 'css/CSSProperties.in',
+            'event_aliases_in%': 'events/EventAliases.in',
+            'style_builder_functions_cpp_tmpl%': '../build/scripts/templates/StyleBuilderFunctions.cpp.tmpl',
+          }, {
+            'css_properties_in%': 'css/CSSProperties_nosvg.in',
+            'event_aliases_in%': 'events/EventAliases_nosvg.in',
+            'style_builder_functions_cpp_tmpl%': '../build/scripts/templates/StyleBuilderFunctions.cpp_nosvg.tmpl',
+          }],
+        ],
+      },
       'dependencies': [
         'generated_testing_idls',
         'core_event_interfaces',
@@ -219,7 +232,7 @@
           'action': [
             'python',
             '../build/scripts/make_css_property_names.py',
-            'css/CSSProperties.in',
+            '<(css_properties_in)',
             '--output_dir',
             '<(blink_core_output_dir)',
             '--gperf', '<(gperf_exe)',
@@ -326,7 +339,7 @@
           'action': [
             'python',
             '../build/scripts/make_style_shorthands.py',
-            'css/CSSProperties.in',
+            '<(css_properties_in)',
             '--output_dir',
             '<(blink_core_output_dir)',
           ],
@@ -337,7 +350,7 @@
             '<@(css_properties_files)',
             '../build/scripts/make_style_builder.py',
             '../build/scripts/templates/StyleBuilder.cpp.tmpl',
-            '../build/scripts/templates/StyleBuilderFunctions.cpp.tmpl',
+            '<(style_builder_functions_cpp_tmpl)',
             '../build/scripts/templates/StyleBuilderFunctions.h.tmpl',
           ],
           'outputs': [
@@ -348,7 +361,7 @@
           'action': [
             'python',
             '../build/scripts/make_style_builder.py',
-            'css/CSSProperties.in',
+            '<(css_properties_in)',
             '--output_dir',
             '<(blink_core_output_dir)',
           ],
@@ -366,7 +379,7 @@
           'action': [
             'python',
             '../build/scripts/make_css_property_metadata.py',
-            'css/CSSProperties.in',
+            '<(css_properties_in)',
             '--output_dir',
             '<(blink_core_output_dir)',
           ],
@@ -437,50 +450,11 @@
           ],
         },
         {
-          'action_name': 'SVGNames',
-          'inputs': [
-            '<@(make_element_factory_files)',
-            'svg/SVGTagNames.in',
-            'svg/SVGAttributeNames.in',
-          ],
-          'outputs': [
-            '<(blink_core_output_dir)/SVGElementFactory.cpp',
-            '<(blink_core_output_dir)/SVGElementFactory.h',
-            '<(blink_core_output_dir)/SVGNames.cpp',
-            '<(blink_core_output_dir)/SVGNames.h',
-          ],
-          'action': [
-            'python',
-            '../build/scripts/make_element_factory.py',
-            'svg/SVGTagNames.in',
-            'svg/SVGAttributeNames.in',
-            '--output_dir',
-            '<(blink_core_output_dir)',
-          ],
-        },
-        {
-          'action_name': 'SVGElementTypeHelpers',
-          'inputs': [
-            '<@(make_element_type_helpers_files)',
-            'svg/SVGTagNames.in',
-          ],
-          'outputs': [
-            '<(blink_core_output_dir)/SVGElementTypeHelpers.h',
-          ],
-          'action': [
-            'python',
-            '../build/scripts/make_element_type_helpers.py',
-            'svg/SVGTagNames.in',
-            '--output_dir',
-            '<(blink_core_output_dir)',
-          ],
-        },
-        {
           'action_name': 'EventFactory',
           'inputs': [
             '<@(make_event_factory_files)',
             '<(blink_core_output_dir)/EventInterfaces.in',
-            'events/EventAliases.in',
+            '<(event_aliases_in)',
           ],
           'outputs': [
             '<(blink_core_output_dir)/Event.cpp',
@@ -490,7 +464,7 @@
             'python',
             '../build/scripts/make_event_factory.py',
             '<(blink_core_output_dir)/EventInterfaces.in',
-            'events/EventAliases.in',
+            '<(event_aliases_in)',
             '--output_dir',
             '<(blink_core_output_dir)',
           ],
@@ -670,24 +644,6 @@
           ],
         },
         {
-          'action_name': 'XLinkNames',
-          'inputs': [
-            '<@(make_qualified_names_files)',
-            'svg/xlinkattrs.in',
-          ],
-          'outputs': [
-            '<(blink_core_output_dir)/XLinkNames.cpp',
-            '<(blink_core_output_dir)/XLinkNames.h',
-          ],
-          'action': [
-            'python',
-            '../build/scripts/make_qualified_names.py',
-            'svg/xlinkattrs.in',
-            '--output_dir',
-            '<(blink_core_output_dir)',
-          ],
-        },
-        {
           'action_name': 'XMLNSNames',
           'inputs': [
             '<@(make_qualified_names_files)',
@@ -812,6 +768,69 @@
             '<(bison_exe)',
           ],
         },
+      ],
+      'conditions': [
+        ['disable_svg==0', {
+          'actions': [
+            {
+              'action_name': 'SVGNames',
+              'inputs': [
+                '<@(make_element_factory_files)',
+                'svg/SVGTagNames.in',
+                'svg/SVGAttributeNames.in',
+              ],
+              'outputs': [
+                '<(blink_core_output_dir)/SVGElementFactory.cpp',
+                '<(blink_core_output_dir)/SVGElementFactory.h',
+                '<(blink_core_output_dir)/SVGNames.cpp',
+                '<(blink_core_output_dir)/SVGNames.h',
+              ],
+              'action': [
+                'python',
+                '../build/scripts/make_element_factory.py',
+                'svg/SVGTagNames.in',
+                'svg/SVGAttributeNames.in',
+                '--output_dir',
+                '<(blink_core_output_dir)',
+              ],
+            },
+            {
+              'action_name': 'SVGElementTypeHelpers',
+              'inputs': [
+                '<@(make_element_type_helpers_files)',
+                'svg/SVGTagNames.in',
+              ],
+              'outputs': [
+                '<(blink_core_output_dir)/SVGElementTypeHelpers.h',
+              ],
+              'action': [
+                'python',
+                '../build/scripts/make_element_type_helpers.py',
+                'svg/SVGTagNames.in',
+                '--output_dir',
+                '<(blink_core_output_dir)',
+              ],
+            },
+            {
+              'action_name': 'XLinkNames',
+              'inputs': [
+                '<@(make_qualified_names_files)',
+                'svg/xlinkattrs.in',
+              ],
+              'outputs': [
+                '<(blink_core_output_dir)/XLinkNames.cpp',
+                '<(blink_core_output_dir)/XLinkNames.h',
+              ],
+              'action': [
+                'python',
+                '../build/scripts/make_qualified_names.py',
+                'svg/xlinkattrs.in',
+                '--output_dir',
+                '<(blink_core_output_dir)',
+              ],
+            },
+          ],
+        }],
       ],
     },
   ],

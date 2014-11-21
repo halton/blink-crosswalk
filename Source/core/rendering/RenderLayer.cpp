@@ -72,8 +72,10 @@
 #include "core/rendering/RenderView.h"
 #include "core/rendering/compositing/CompositedLayerMapping.h"
 #include "core/rendering/compositing/RenderLayerCompositor.h"
+#if !defined(DISABLE_SVG)
 #include "core/rendering/svg/ReferenceFilterBuilder.h"
 #include "core/rendering/svg/RenderSVGResourceClipper.h"
+#endif
 #include "platform/LengthFunctions.h"
 #include "platform/Partitions.h"
 #include "platform/RuntimeEnabledFeatures.h"
@@ -1725,8 +1727,10 @@ void RenderLayer::paintLayerContents(GraphicsContext* context, const LayerPainti
     // Apply clip-path to context.
     GraphicsContextStateSaver clipStateSaver(*context, false);
     RenderStyle* style = renderer()->style();
+#if !defined(DISABLE_SVG)
     RenderSVGResourceClipper* resourceClipper = 0;
     RenderSVGResourceClipper::ClipperState clipperState = RenderSVGResourceClipper::ClipperNotApplied;
+#endif
 
     // Clip-path, like border radius, must not be applied to the contents of a composited-scrolling container.
     // It must, however, still be applied to the mask layer, so that the compositor can properly mask the
@@ -1745,6 +1749,7 @@ void RenderLayer::paintLayerContents(GraphicsContext* context, const LayerPainti
 
                 context->clipPath(clipPath->path(rootRelativeBounds), clipPath->windRule());
             }
+#if !defined(DISABLE_SVG)
         } else if (style->clipPath()->type() == ClipPathOperation::REFERENCE) {
             ReferenceClipPathOperation* referenceClipPathOperation = toReferenceClipPathOperation(style->clipPath());
             Document& document = renderer()->document();
@@ -1766,6 +1771,7 @@ void RenderLayer::paintLayerContents(GraphicsContext* context, const LayerPainti
                     resourceClipper = 0;
                 }
             }
+#endif // !defined(DISABLE_SVG)
         }
     }
 
@@ -1913,8 +1919,10 @@ void RenderLayer::paintLayerContents(GraphicsContext* context, const LayerPainti
         m_usedTransparency = false;
     }
 
+#if !defined(DISABLE_SVG)
     if (resourceClipper)
         resourceClipper->postApplyStatefulResource(renderer(), context, clipperState);
+#endif
 }
 
 void RenderLayer::paintLayerByApplyingTransform(GraphicsContext* context, const LayerPaintingInfo& paintingInfo, PaintLayerFlags paintFlags, const LayoutPoint& translationOffset)
@@ -3481,6 +3489,7 @@ bool RenderLayer::attemptDirectCompositingUpdate(StyleDifference diff, const Ren
     // the reflection layers.
     if (renderer()->hasReflection())
         return false;
+#if !defined(DISABLE_SVG)
     // If we're unwinding a scheduleSVGFilterLayerUpdateHack(), then we can't
     // perform a direct compositing update because the filters code is going
     // to produce different output this time around. We can remove this code
@@ -3488,6 +3497,7 @@ bool RenderLayer::attemptDirectCompositingUpdate(StyleDifference diff, const Ren
     // scheduleSVGFilterLayerUpdateHack().
     if (renderer()->node() && renderer()->node()->svgFilterNeedsLayerUpdate())
         return false;
+#endif
     if (!m_compositedLayerMapping)
         return false;
 
@@ -3566,8 +3576,10 @@ FilterOperations RenderLayer::computeFilterOperations(const RenderStyle* style)
             RefPtr<ReferenceFilter> referenceFilter = ReferenceFilter::create();
             float zoom = style->effectiveZoom();
             referenceFilter->setAbsoluteTransform(AffineTransform().scale(zoom, zoom));
+#if !defined(DISABLE_SVG)
             referenceFilter->setLastEffect(ReferenceFilterBuilder::build(referenceFilter.get(), renderer(), referenceFilter->sourceGraphic(),
                 referenceOperation));
+#endif
             referenceOperation->setFilter(referenceFilter.release());
         }
     }
@@ -3618,11 +3630,13 @@ void RenderLayer::filterNeedsPaintInvalidation()
 {
     {
         DeprecatedScheduleStyleRecalcDuringLayout marker(renderer()->document().lifecycle());
+#if !defined(DISABLE_SVG)
         // It's possible for scheduleSVGFilterLayerUpdateHack to schedule a style recalc, which
         // is a problem because this function can be called while performing layout.
         // Presumably this represents an illegal data flow of layout or compositing
         // information into the style system.
         toElement(renderer()->node())->scheduleSVGFilterLayerUpdateHack();
+#endif
     }
 
     renderer()->setShouldDoFullPaintInvalidation(true);

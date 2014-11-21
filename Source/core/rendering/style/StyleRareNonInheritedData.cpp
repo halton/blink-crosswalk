@@ -28,7 +28,9 @@
 #include "core/rendering/style/ShadowList.h"
 #include "core/rendering/style/StyleFilterData.h"
 #include "core/rendering/style/StyleTransformData.h"
+#if !defined(DISABLE_SVG)
 #include "core/rendering/svg/ReferenceFilterBuilder.h"
+#endif
 
 namespace blink {
 
@@ -184,9 +186,11 @@ StyleRareNonInheritedData::StyleRareNonInheritedData(const StyleRareNonInherited
 
 StyleRareNonInheritedData::~StyleRareNonInheritedData()
 {
+#if !defined(DISABLE_SVG)
     const FilterOperations& filterOperations = m_filter->m_operations;
     for (unsigned i = 0; i < filterOperations.size(); ++i)
         ReferenceFilterBuilder::clearDocumentResourceReference(filterOperations.at(i));
+#endif
 }
 
 bool StyleRareNonInheritedData::operator==(const StyleRareNonInheritedData& o) const

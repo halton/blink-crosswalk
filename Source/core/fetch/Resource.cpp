@@ -968,8 +968,10 @@ const char* Resource::resourceTypeToString(Type type, const FetchInitiatorInfo& 
         return "Font";
     case Resource::Raw:
         return initatorTypeNameToString(initiatorInfo.name);
+#if !defined(DISABLE_SVG)
     case Resource::SVGDocument:
         return "SVG document";
+#endif
     case Resource::XSLStyleSheet:
         return "XSL stylesheet";
     case Resource::LinkPrefetch:
@@ -1003,8 +1005,10 @@ const char* ResourceTypeName(Resource::Type type)
         return "Font";
     case Resource::Raw:
         return "Raw";
+#if !defined(DISABLE_SVG)
     case Resource::SVGDocument:
         return "SVGDocument";
+#endif
     case Resource::XSLStyleSheet:
         return "XSLStyleSheet";
     case Resource::LinkPrefetch:

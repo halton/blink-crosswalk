@@ -69,8 +69,10 @@ private:
     RefPtr<FilterEffectRenderer> m_renderer;
 
     static RenderLayerFilterInfoMap* s_filterMap;
+#if !defined(DISABLE_SVG)
     WillBePersistentHeapVector<RefPtrWillBeMember<Element> > m_internalSVGReferences;
     Vector<ResourcePtr<DocumentResource> > m_externalSVGReferences;
+#endif
 };
 
 } // namespace blink

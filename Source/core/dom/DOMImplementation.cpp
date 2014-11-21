@@ -27,7 +27,9 @@
 
 #include "bindings/core/v8/ExceptionState.h"
 #include "core/HTMLNames.h"
+#if !defined(DISABLE_SVG)
 #include "core/SVGNames.h"
+#endif
 #include "core/css/CSSStyleSheet.h"
 #include "core/css/MediaList.h"
 #include "core/css/StyleSheetContents.h"
@@ -64,6 +66,7 @@ namespace blink {
 
 typedef HashSet<String, CaseFoldingHash> FeatureSet;
 
+#if !defined(DISABLE_SVG)
 static void addString(FeatureSet& set, const char* string)
 {
     set.add(string);
@@ -163,6 +166,7 @@ static bool isSupportedSVG11Feature(const String& feature, const String& version
     return feature.startsWith("http://www.w3.org/tr/svg11/feature#", false)
         && svgFeatures.contains(feature.right(feature.length() - 35));
 }
+#endif
 
 DOMImplementation::DOMImplementation(Document& document)
     : m_document(document)
@@ -171,12 +175,14 @@ DOMImplementation::DOMImplementation(Document& document)
 
 bool DOMImplementation::hasFeature(const String& feature, const String& version)
 {
+#if !defined(DISABLE_SVG)
     if (feature.startsWith("http://www.w3.org/TR/SVG", false)
     || feature.startsWith("org.w3c.dom.svg", false)
     || feature.startsWith("org.w3c.svg", false)) {
         // FIXME: SVG 2.0 support?
         return isSupportedSVG10Feature(feature, version) || isSupportedSVG11Feature(feature, version);
     }
+#endif
     return true;
 }
 
@@ -204,10 +210,12 @@ PassRefPtrWillBeRawPtr<XMLDocument> DOMImplementation::createDocument(const Atom
 {
     RefPtrWillBeRawPtr<XMLDocument> doc = nullptr;
     DocumentInit init = DocumentInit::fromContext(document().contextDocument());
-    if (namespaceURI == SVGNames::svgNamespaceURI) {
-        doc = XMLDocument::createSVG(init);
-    } else if (namespaceURI == HTMLNames::xhtmlNamespaceURI) {
+    if (namespaceURI == HTMLNames::xhtmlNamespaceURI) {
         doc = XMLDocument::createXHTML(init.withRegistrationContext(document().registrationContext()));
+#if !defined(DISABLE_SVG)
+    } else if (namespaceURI == SVGNames::svgNamespaceURI {
+        doc = XMLDocument::createSVG(init);
+#endif
     } else {
         doc = XMLDocument::create(init);
     }
@@ -377,8 +385,10 @@ PassRefPtrWillBeRawPtr<Document> DOMImplementation::createDocument(const String&
         return PluginDocument::create(init);
     if (isTextMIMEType(type))
         return TextDocument::create(init);
+#if !defined(DISABLE_SVG)
     if (type == "image/svg+xml")
         return XMLDocument::createSVG(init);
+#endif
     if (isXMLMIMEType(type))
         return XMLDocument::create(init);
 

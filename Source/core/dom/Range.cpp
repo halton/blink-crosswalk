@@ -44,7 +44,9 @@
 #include "core/html/HTMLElement.h"
 #include "core/rendering/RenderBoxModelObject.h"
 #include "core/rendering/RenderText.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGSVGElement.h"
+#endif
 #include "platform/geometry/FloatQuad.h"
 #include "wtf/RefCountedLeakCounter.h"
 #include "wtf/text/CString.h"
@@ -1022,14 +1024,20 @@ PassRefPtrWillBeRawPtr<DocumentFragment> Range::createContextualFragment(const S
             element = document.body();
             if (!element)
                 element = HTMLBodyElement::create(document);
+#if !defined(DISABLE_SVG)
         } else if (document.isSVGDocument()) {
             element = document.documentElement();
             if (!element)
                 element = SVGSVGElement::create(document);
+#endif
         }
     }
 
+#if !defined(DISABLE_SVG)
     if (!element || (!element->isHTMLElement() && !element->isSVGElement())) {
+#else
+    if (!element || !element->isHTMLElement()) {
+#endif
         exceptionState.throwDOMException(NotSupportedError, "The range's container must be an HTML or SVG Element, Document, or DocumentFragment.");
         return nullptr;
     }

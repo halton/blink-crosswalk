@@ -49,6 +49,7 @@
 #include "core/rendering/RenderView.h"
 #include "core/rendering/RenderWidget.h"
 #include "core/rendering/compositing/CompositedLayerMapping.h"
+#if !defined(DISABLE_SVG)
 #include "core/rendering/svg/RenderSVGContainer.h"
 #include "core/rendering/svg/RenderSVGGradientStop.h"
 #include "core/rendering/svg/RenderSVGImage.h"
@@ -57,6 +58,7 @@
 #include "core/rendering/svg/RenderSVGRoot.h"
 #include "core/rendering/svg/RenderSVGText.h"
 #include "core/rendering/svg/SVGRenderTreeAsText.h"
+#endif
 #include "wtf/HexNumber.h"
 #include "wtf/Vector.h"
 #include "wtf/unicode/CharacterNames.h"
@@ -430,6 +432,7 @@ static void writeTextRun(TextStream& ts, const RenderText& o, const InlineTextBo
 
 void write(TextStream& ts, const RenderObject& o, int indent, RenderAsTextBehavior behavior)
 {
+#if !defined(DISABLE_SVG)
     if (o.isSVGShape()) {
         write(ts, toRenderSVGShape(o), indent);
         return;
@@ -462,6 +465,7 @@ void write(TextStream& ts, const RenderObject& o, int indent, RenderAsTextBehavi
         writeSVGImage(ts, toRenderSVGImage(o), indent);
         return;
     }
+#endif  // !defined(DISABLE_SVG)
 
     writeIndent(ts, indent);
 

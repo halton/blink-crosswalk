@@ -28,7 +28,9 @@
 #include "core/editing/MarkupAccumulator.h"
 
 #include "core/HTMLNames.h"
+#if !defined(DISABLE_SVG)
 #include "core/XLinkNames.h"
+#endif
 #include "core/XMLNSNames.h"
 #include "core/XMLNames.h"
 #include "core/dom/CDATASection.h"
@@ -417,7 +419,9 @@ void MarkupAccumulator::appendCloseTag(StringBuilder& result, const Element& ele
 static inline bool attributeIsInSerializedNamespace(const Attribute& attribute)
 {
     return attribute.namespaceURI() == XMLNames::xmlNamespaceURI
+#if !defined(DISABLE_SVG)
         || attribute.namespaceURI() == XLinkNames::xlinkNamespaceURI
+#endif
         || attribute.namespaceURI() == XMLNSNames::xmlnsNamespaceURI;
 }
 
@@ -441,10 +445,12 @@ void MarkupAccumulator::appendAttribute(StringBuilder& result, const Element& el
             if (!attribute.prefix())
                 prefixedName.setPrefix(xmlAtom);
         } else {
+#if !defined(DISABLE_SVG)
             if (attribute.namespaceURI() == XLinkNames::xlinkNamespaceURI) {
                 if (!attribute.prefix())
                     prefixedName.setPrefix(xlinkAtom);
             }
+#endif
 
             if (namespaces && shouldAddNamespaceAttribute(attribute, element)) {
                 if (!prefixedName.prefix()) {

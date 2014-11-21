@@ -35,7 +35,9 @@
 #include "core/css/CSSShadowValue.h"
 #include "core/css/Pair.h"
 #include "core/css/Rect.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGURIReference.h"
+#endif
 
 namespace blink {
 
@@ -86,9 +88,11 @@ Color StyleBuilderConverter::convertColor(StyleResolverState& state, CSSValue* v
 
 AtomicString StyleBuilderConverter::convertFragmentIdentifier(StyleResolverState& state, CSSValue* value)
 {
+#if !defined(DISABLE_SVG)
     CSSPrimitiveValue* primitiveValue = toCSSPrimitiveValue(value);
     if (primitiveValue->isURI())
         return SVGURIReference::fragmentIdentifierFromIRIString(primitiveValue->getStringValue(), state.element()->treeScope());
+#endif
     return nullAtom;
 }
 
@@ -247,6 +251,7 @@ FontDescription::VariantLigatures StyleBuilderConverter::convertFontVariantLigat
     return FontDescription::VariantLigatures();
 }
 
+#if !defined(DISABLE_SVG)
 EGlyphOrientation StyleBuilderConverter::convertGlyphOrientation(StyleResolverState&, CSSValue* value)
 {
     if (!value->isPrimitiveValue())
@@ -266,6 +271,7 @@ EGlyphOrientation StyleBuilderConverter::convertGlyphOrientation(StyleResolverSt
         return GO_180DEG;
     return GO_270DEG;
 }
+#endif
 
 GridPosition StyleBuilderConverter::convertGridPosition(StyleResolverState&, CSSValue* value)
 {
@@ -468,6 +474,7 @@ float StyleBuilderConverter::convertNumberOrPercentage(StyleResolverState& state
     return primitiveValue->getFloatValue() / 100.0f;
 }
 
+#if !defined(DISABLE_SVG)
 EPaintOrder StyleBuilderConverter::convertPaintOrder(StyleResolverState&, CSSValue* cssPaintOrder)
 {
     if (cssPaintOrder->isValueList()) {
@@ -499,6 +506,7 @@ EPaintOrder StyleBuilderConverter::convertPaintOrder(StyleResolverState&, CSSVal
 
     return PO_NORMAL;
 }
+#endif
 
 PassRefPtr<QuotesData> StyleBuilderConverter::convertQuotes(StyleResolverState&, CSSValue* value)
 {
@@ -567,6 +575,7 @@ float StyleBuilderConverter::convertSpacing(StyleResolverState& state, CSSValue*
     return primitiveValue->computeLength<float>(state.cssToLengthConversionData());
 }
 
+#if !defined(DISABLE_SVG)
 PassRefPtr<SVGLengthList> StyleBuilderConverter::convertStrokeDasharray(StyleResolverState&, CSSValue* value)
 {
     if (!value->isValueList()) {
@@ -588,6 +597,7 @@ PassRefPtr<SVGLengthList> StyleBuilderConverter::convertStrokeDasharray(StyleRes
 
     return array.release();
 }
+#endif
 
 StyleColor StyleBuilderConverter::convertStyleColor(StyleResolverState& state, CSSValue* value, bool forVisitedLink)
 {
@@ -597,6 +607,7 @@ StyleColor StyleBuilderConverter::convertStyleColor(StyleResolverState& state, C
     return state.document().textLinkColors().colorFromPrimitiveValue(primitiveValue, Color(), forVisitedLink);
 }
 
+#if !defined(DISABLE_SVG)
 Color StyleBuilderConverter::convertSVGColor(StyleResolverState& state, CSSValue* value)
 {
     CSSPrimitiveValue* primitiveValue = toCSSPrimitiveValue(value);
@@ -610,6 +621,7 @@ PassRefPtr<SVGLength> StyleBuilderConverter::convertSVGLength(StyleResolverState
 {
     return SVGLength::fromCSSPrimitiveValue(toCSSPrimitiveValue(value));
 }
+#endif
 
 float StyleBuilderConverter::convertTextStrokeWidth(StyleResolverState& state, CSSValue* value)
 {

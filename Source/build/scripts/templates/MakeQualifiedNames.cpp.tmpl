@@ -21,17 +21,6 @@ DEFINE_GLOBAL({{namespace}}QualifiedName, {{tag|symbol}}Tag)
 {% endfor %}
 
 
-{% if namespace == 'SVG' %}
-PassOwnPtr<const {{namespace}}QualifiedName*[]> get{{namespace}}Tags()
-{
-    OwnPtr<const {{namespace}}QualifiedName*[]> tags = adoptArrayPtr(new const {{namespace}}QualifiedName*[{{namespace}}TagsCount]);
-    {% for tag in tags|sort %}
-    tags[{{loop.index0}}] = reinterpret_cast<const {{namespace}}QualifiedName*>(&{{tag|symbol}}Tag);
-    {% endfor %}
-    return tags.release();
-}
-{% endif %}
-
 {% endif %}
 // Attributes
 {% for attr in attrs|sort %}

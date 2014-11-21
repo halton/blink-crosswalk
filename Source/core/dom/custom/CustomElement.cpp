@@ -33,7 +33,9 @@
 
 #include "core/HTMLNames.h"
 #include "core/MathMLNames.h"
+#if !defined(DISABLE_SVG)
 #include "core/SVGNames.h"
+#endif
 #include "core/dom/Document.h"
 #include "core/dom/Element.h"
 #include "core/dom/custom/CustomElementMicrotaskRunQueue.h"

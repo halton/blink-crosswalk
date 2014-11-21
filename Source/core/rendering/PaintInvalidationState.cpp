@@ -8,7 +8,6 @@
 #include "core/rendering/RenderInline.h"
 #include "core/rendering/RenderLayer.h"
 #include "core/rendering/RenderView.h"
-#include "core/rendering/svg/RenderSVGModelObject.h"
 #include "platform/Partitions.h"
 
 namespace blink {

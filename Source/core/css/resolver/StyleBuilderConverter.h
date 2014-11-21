@@ -28,12 +28,15 @@
 #define StyleBuilderConverter_h
 
 #include "core/css/CSSValue.h"
+#include "core/css/CSSValueList.h"
 #include "core/css/resolver/StyleResolverState.h"
 #include "core/rendering/RenderView.h"
 #include "core/rendering/style/QuotesData.h"
 #include "core/rendering/style/ShadowList.h"
 #include "core/rendering/style/StyleReflection.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGLength.h"
+#endif
 #include "platform/LengthSize.h"
 #include "platform/fonts/FontDescription.h"
 
@@ -53,7 +56,9 @@ public:
     static FontDescription::Size convertFontSize(StyleResolverState&, CSSValue*);
     static FontWeight convertFontWeight(StyleResolverState&, CSSValue*);
     static FontDescription::VariantLigatures convertFontVariantLigatures(StyleResolverState&, CSSValue*);
+#if !defined(DISABLE_SVG)
     static EGlyphOrientation convertGlyphOrientation(StyleResolverState&, CSSValue*);
+#endif
     static GridPosition convertGridPosition(StyleResolverState&, CSSValue*);
     static GridTrackSize convertGridTrackSize(StyleResolverState&, CSSValue*);
     template <typename T> static T convertLineWidth(StyleResolverState&, CSSValue*);
@@ -66,14 +71,20 @@ public:
     static float convertNumberOrPercentage(StyleResolverState&, CSSValue*);
     static PassRefPtr<QuotesData> convertQuotes(StyleResolverState&, CSSValue*);
     static LengthSize convertRadius(StyleResolverState&, CSSValue*);
+#if !defined(DISABLE_SVG)
     static EPaintOrder convertPaintOrder(StyleResolverState&, CSSValue*);
+#endif
     static PassRefPtr<ShadowList> convertShadow(StyleResolverState&, CSSValue*);
     static float convertSpacing(StyleResolverState&, CSSValue*);
     template <CSSValueID IdForNone> static AtomicString convertString(StyleResolverState&, CSSValue*);
+#if !defined(DISABLE_SVG)
     static PassRefPtr<SVGLengthList> convertStrokeDasharray(StyleResolverState&, CSSValue*);
+#endif
     static StyleColor convertStyleColor(StyleResolverState&, CSSValue*, bool forVisitedLink = false);
+#if !defined(DISABLE_SVG)
     static Color convertSVGColor(StyleResolverState&, CSSValue*);
     static PassRefPtr<SVGLength> convertSVGLength(StyleResolverState&, CSSValue*);
+#endif
     static float convertTextStrokeWidth(StyleResolverState&, CSSValue*);
 
     static bool convertGridTrackList(CSSValue*, Vector<GridTrackSize>&, NamedGridLinesMap&, OrderedNamedGridLines&, StyleResolverState&);

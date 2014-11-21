@@ -180,7 +180,11 @@ PassRefPtrWillBeRawPtr<StylePropertySet> computePresentationAttributeStyle(Eleme
         style = cacheValue->value->value;
         cacheCleaner.didHitPresentationAttributeCache();
     } else {
+#if !defined(DISABLE_SVG)
         style = MutableStylePropertySet::create(element.isSVGElement() ? SVGAttributeMode : HTMLAttributeMode);
+#else
+        style = MutableStylePropertySet::create(HTMLAttributeMode);
+#endif
         AttributeCollection attributes = element.attributesWithoutUpdate();
         AttributeCollection::iterator end = attributes.end();
         for (AttributeCollection::iterator it = attributes.begin(); it != end; ++it)

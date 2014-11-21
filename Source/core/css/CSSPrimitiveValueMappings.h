@@ -37,7 +37,9 @@
 #include "core/css/CSSToLengthConversionData.h"
 #include "core/rendering/style/LineClampValue.h"
 #include "core/rendering/style/RenderStyleConstants.h"
+#if !defined(DISABLE_SVG)
 #include "core/rendering/style/SVGRenderStyleDefs.h"
+#endif
 #include "platform/Length.h"
 #include "platform/ThemeTypes.h"
 #include "platform/fonts/FontDescription.h"
@@ -3939,7 +3941,7 @@ template<> inline CSSPrimitiveValue::operator WindRule() const
     return RULE_NONZERO;
 }
 
-
+#if !defined(DISABLE_SVG)
 template<> inline CSSPrimitiveValue::CSSPrimitiveValue(EAlignmentBaseline e)
     : CSSValue(PrimitiveClass)
 {
@@ -4019,6 +4021,7 @@ template<> inline CSSPrimitiveValue::operator EAlignmentBaseline() const
     ASSERT_NOT_REACHED();
     return AB_AUTO;
 }
+#endif
 
 template<> inline CSSPrimitiveValue::CSSPrimitiveValue(EBorderCollapse e)
     : CSSValue(PrimitiveClass)
@@ -4176,6 +4179,7 @@ template<int supported> Length CSSPrimitiveValue::convertToLength(const CSSToLen
     return Length(0, Fixed);
 }
 
+#if !defined(DISABLE_SVG)
 template<> inline CSSPrimitiveValue::CSSPrimitiveValue(EBufferedRendering e)
     : CSSValue(PrimitiveClass)
 {
@@ -4584,6 +4588,7 @@ template<> inline CSSPrimitiveValue::operator EMaskType() const
     ASSERT_NOT_REACHED();
     return MT_LUMINANCE;
 }
+#endif // !defined(DISABLE_SVG)
 
 template<> inline CSSPrimitiveValue::operator TouchAction() const
 {

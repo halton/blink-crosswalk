@@ -33,7 +33,6 @@
 
 #include "bindings/core/v8/ExceptionState.h"
 #include "core/HTMLNames.h"
-#include "core/SVGNames.h"
 #include "core/dom/Document.h"
 #include "core/dom/Element.h"
 #include "core/dom/custom/CustomElement.h"
@@ -41,8 +40,12 @@
 #include "core/dom/custom/CustomElementScheduler.h"
 #include "core/html/HTMLElement.h"
 #include "core/html/HTMLUnknownElement.h"
-#include "core/svg/SVGUnknownElement.h"
 #include "wtf/RefPtr.h"
+
+#if !defined(DISABLE_SVG)
+#include "core/SVGNames.h"
+#include "core/svg/SVGUnknownElement.h"
+#endif
 
 namespace blink {
 
@@ -76,8 +79,10 @@ PassRefPtrWillBeRawPtr<Element> CustomElementRegistrationContext::createCustomTa
 
     if (HTMLNames::xhtmlNamespaceURI == tagName.namespaceURI()) {
         element = HTMLElement::create(tagName, document);
+#if !defined(DISABLE_SVG)
     } else if (SVGNames::svgNamespaceURI == tagName.namespaceURI()) {
         element = SVGUnknownElement::create(tagName, document);
+#endif
     } else {
         // XML elements are not custom elements, so return early.
         return Element::create(tagName, &document);
@@ -129,8 +134,10 @@ void CustomElementRegistrationContext::setIsAttributeAndTypeExtension(Element* e
 
 void CustomElementRegistrationContext::setTypeExtension(Element* element, const AtomicString& type)
 {
+#if !defined(DISABLE_SVG)
     if (!element->isHTMLElement() && !element->isSVGElement())
         return;
+#endif
 
     CustomElementRegistrationContext* context = element->document().registrationContext();
     if (!context)

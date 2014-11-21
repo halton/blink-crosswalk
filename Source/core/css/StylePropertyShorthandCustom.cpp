@@ -153,7 +153,11 @@ bool isExpandedShorthandForAll(CSSPropertyID propertyId)
     // directly. This causes ASSERT crash, because StyleBuilder assume that
     // all given properties are not expanded shorthands.
     // "marker" has the same issue.
+#if !defined(DISABLE_SVG)
     if (propertyId == CSSPropertyMarker || propertyId == CSSPropertyFont)
+#else
+    if (propertyId == CSSPropertyFont)
+#endif
         return true;
     return shorthandForProperty(propertyId).length();
 }

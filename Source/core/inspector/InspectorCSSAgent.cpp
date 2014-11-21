@@ -1234,7 +1234,11 @@ InspectorStyleSheet* InspectorCSSAgent::viaInspectorStyleSheet(Document* documen
         return 0;
     }
 
+#if !defined(DISABLE_SVG)
     if (!document->isHTMLDocument() && !document->isSVGDocument())
+#else
+    if (!document->isHTMLDocument())
+#endif
         return 0;
 
     RefPtrWillBeRawPtr<InspectorStyleSheet> inspectorStyleSheet = m_documentToViaInspectorStyleSheet.get(document);

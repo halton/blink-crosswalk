@@ -33,21 +33,29 @@
 
 #include "bindings/core/v8/ExceptionState.h"
 #include "core/dom/ExceptionCode.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGTransformTearOff.h"
+#endif
 
 namespace blink {
 
 SVGMatrixTearOff::SVGMatrixTearOff(const AffineTransform& staticValue)
     : m_staticValue(staticValue)
+#if !defined(DISABLE_SVG)
     , m_contextTransform(0)
+#endif
 {
 }
 
+#if !defined(DISABLE_SVG)
 SVGMatrixTearOff::SVGMatrixTearOff(SVGTransformTearOff* transform)
+#if !defined(DISABLE_SVG)
     : m_contextTransform(transform)
+#endif
 {
     ASSERT(transform);
 }
+#endif
 
 SVGMatrixTearOff::~SVGMatrixTearOff()
 {
@@ -55,23 +63,34 @@ SVGMatrixTearOff::~SVGMatrixTearOff()
 
 const AffineTransform& SVGMatrixTearOff::value() const
 {
+#if !defined(DISABLE_SVG)
     return m_contextTransform ? m_contextTransform->target()->matrix() : m_staticValue;
+#else
+    return m_staticValue;
+#endif
 }
 
 AffineTransform* SVGMatrixTearOff::mutableValue()
 {
+#if !defined(DISABLE_SVG)
     return m_contextTransform ? m_contextTransform->target()->mutableMatrix() : &m_staticValue;
+#else
+    return &m_staticValue;
+#endif
 }
 
 void SVGMatrixTearOff::commitChange()
 {
+#if !defined(DISABLE_SVG)
     if (!m_contextTransform)
         return;
 
     m_contextTransform->target()->onMatrixChange();
     m_contextTransform->commitChange();
+#endif
 }
 
+#if !defined(DISABLE_SVG)
 #define DEFINE_SETTER(ATTRIBUTE) \
     void SVGMatrixTearOff::set##ATTRIBUTE(double f, ExceptionState& exceptionState) \
     { \
@@ -82,6 +101,14 @@ void SVGMatrixTearOff::commitChange()
         mutableValue()->set##ATTRIBUTE(f); \
         commitChange(); \
     }
+#else
+#define DEFINE_SETTER(ATTRIBUTE) \
+    void SVGMatrixTearOff::set##ATTRIBUTE(double f, ExceptionState& exceptionState) \
+    { \
+        mutableValue()->set##ATTRIBUTE(f); \
+        commitChange(); \
+    }
+#endif
 
 DEFINE_SETTER(A);
 DEFINE_SETTER(B);

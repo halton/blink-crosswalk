@@ -28,8 +28,10 @@
 #include "core/html/parser/XSSAuditor.h"
 
 #include "core/HTMLNames.h"
+#if !defined(DISABLE_SVG)
 #include "core/SVGNames.h"
 #include "core/XLinkNames.h"
+#endif
 #include "core/dom/Document.h"
 #include "core/frame/LocalFrame.h"
 #include "core/frame/Settings.h"
@@ -138,7 +140,11 @@ static bool hasName(const HTMLToken& token, const QualifiedName& name)
 static bool findAttributeWithName(const HTMLToken& token, const QualifiedName& name, size_t& indexOfMatchingAttribute)
 {
     // Notice that we're careful not to ref the StringImpl here because we might be on a background thread.
+#if !defined(DISABLE_SVG)
     const String& attrName = name.namespaceURI() == XLinkNames::xlinkNamespaceURI ? "xlink:" + name.localName().string() : name.localName().string();
+#else
+    const String& attrName = name.localName().string();
+#endif
 
     for (size_t i = 0; i < token.attributes().size(); ++i) {
         if (equalIgnoringNullity(token.attributes().at(i).name, attrName)) {
@@ -251,7 +257,11 @@ static ReflectedXSSDisposition combineXSSProtectionHeaderAndCSP(ReflectedXSSDisp
 
 static bool isSemicolonSeparatedAttribute(const HTMLToken::Attribute& attribute)
 {
+#if !defined(DISABLE_SVG)
     return threadSafeMatch(attribute.name, SVGNames::valuesAttr);
+#else
+    return false;
+#endif
 }
 
 static String semicolonSeparatedValueContainingJavaScriptURL(const String& value)
@@ -486,7 +496,9 @@ bool XSSAuditor::filterScriptToken(const FilterTokenRequest& request)
     m_scriptTagFoundInRequest = isContainedInRequest(canonicalizedSnippetForTagName(request));
     if (m_scriptTagFoundInRequest) {
         didBlockScript |= eraseAttributeIfInjected(request, srcAttr, blankURL().string(), SrcLikeAttributeTruncation);
+#if !defined(DISABLE_SVG)
         didBlockScript |= eraseAttributeIfInjected(request, XLinkNames::hrefAttr, blankURL().string(), SrcLikeAttributeTruncation);
+#endif
     }
     return didBlockScript;
 }

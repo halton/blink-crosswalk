@@ -30,7 +30,6 @@
 #include "core/css/resolver/StyleAdjuster.h"
 
 #include "core/HTMLNames.h"
-#include "core/SVGNames.h"
 #include "core/dom/ContainerNode.h"
 #include "core/dom/Document.h"
 #include "core/dom/Element.h"
@@ -47,10 +46,14 @@
 #include "core/rendering/style/GridPosition.h"
 #include "core/rendering/style/RenderStyle.h"
 #include "core/rendering/style/RenderStyleConstants.h"
-#include "core/svg/SVGSVGElement.h"
 #include "platform/Length.h"
 #include "platform/transforms/TransformOperations.h"
 #include "wtf/Assertions.h"
+
+#if !defined(DISABLE_SVG)
+#include "core/SVGNames.h"
+#include "core/svg/SVGSVGElement.h"
+#endif
 
 namespace blink {
 
@@ -225,6 +228,7 @@ void StyleAdjuster::adjustRenderStyle(RenderStyle* style, RenderStyle* parentSty
         || style->hasFilter()))
         style->setTransformStyle3D(TransformStyle3DFlat);
 
+#if !defined(DISABLE_SVG)
     if (e && e->isSVGElement()) {
         // Only the root <svg> element in an SVG document fragment tree honors css position
         if (!(isSVGSVGElement(*e) && e->parentNode() && !e->parentNode()->isSVGElement()))
@@ -234,6 +238,7 @@ void StyleAdjuster::adjustRenderStyle(RenderStyle* style, RenderStyle* parentSty
         if ((isSVGForeignObjectElement(*e) || isSVGTextElement(*e)) && style->isDisplayInlineType())
             style->setDisplay(BLOCK);
     }
+#endif
 
     if (e && e->renderStyle() && e->renderStyle()->textAutosizingMultiplier() != 1) {
         // Preserve the text autosizing multiplier on style recalc.

@@ -44,8 +44,10 @@
 #include "core/animation/animatable/AnimatableLengthPoint3D.h"
 #include "core/animation/animatable/AnimatableLengthSize.h"
 #include "core/animation/animatable/AnimatableRepeatable.h"
+#if !defined(DISABLE_SVG)
 #include "core/animation/animatable/AnimatableSVGLength.h"
 #include "core/animation/animatable/AnimatableSVGPaint.h"
+#endif
 #include "core/animation/animatable/AnimatableShadow.h"
 #include "core/animation/animatable/AnimatableShapeValue.h"
 #include "core/animation/animatable/AnimatableStrokeDasharrayList.h"
@@ -283,8 +285,10 @@ PassRefPtrWillBeRawPtr<AnimatableValue> CSSAnimatableValueFactory::create(CSSPro
     case CSSPropertyBackgroundSize:
     case CSSPropertyWebkitBackgroundSize:
         return createFromFillLayers<CSSPropertyBackgroundSize>(style.backgroundLayers(), style);
+#if !defined(DISABLE_SVG)
     case CSSPropertyBaselineShift:
         return AnimatableSVGLength::create(style.baselineShiftValue());
+#endif
     case CSSPropertyBorderBottomColor:
         return createFromColor(property, style);
     case CSSPropertyBorderBottomLeftRadius:
@@ -328,6 +332,7 @@ PassRefPtrWillBeRawPtr<AnimatableValue> CSSAnimatableValueFactory::create(CSSPro
         return createFromLengthBox(style.clip(), style);
     case CSSPropertyColor:
         return createFromColor(property, style);
+#if !defined(DISABLE_SVG)
     case CSSPropertyFillOpacity:
         return createFromDouble(style.fillOpacity());
     case CSSPropertyFill:
@@ -335,16 +340,19 @@ PassRefPtrWillBeRawPtr<AnimatableValue> CSSAnimatableValueFactory::create(CSSPro
             style.svgStyle().fillPaintType(), style.svgStyle().visitedLinkFillPaintType(),
             style.svgStyle().fillPaintColor(), style.svgStyle().visitedLinkFillPaintColor(),
             style.svgStyle().fillPaintUri(), style.svgStyle().visitedLinkFillPaintUri());
+#endif
     case CSSPropertyFlexGrow:
         return createFromDouble(style.flexGrow(), AnimatableDouble::InterpolationIsNonContinuousWithZero);
     case CSSPropertyFlexShrink:
         return createFromDouble(style.flexShrink(), AnimatableDouble::InterpolationIsNonContinuousWithZero);
     case CSSPropertyFlexBasis:
         return createFromLength(style.flexBasis(), style);
+#if !defined(DISABLE_SVG)
     case CSSPropertyFloodColor:
         return createFromColor(property, style);
     case CSSPropertyFloodOpacity:
         return createFromDouble(style.floodOpacity());
+#endif
     case CSSPropertyFontSize:
         // Must pass a specified size to setFontSize if Text Autosizing is enabled, but a computed size
         // if text zoom is enabled (if neither is enabled it's irrelevant as they're probably the same).
@@ -357,8 +365,10 @@ PassRefPtrWillBeRawPtr<AnimatableValue> CSSAnimatableValueFactory::create(CSSPro
         return createFromFontWeight(style.fontWeight());
     case CSSPropertyHeight:
         return createFromLength(style.height(), style);
+#if !defined(DISABLE_SVG)
     case CSSPropertyLightingColor:
         return createFromColor(property, style);
+#endif
     case CSSPropertyListStyleImage:
         return createFromStyleImage(style.listStyleImage());
     case CSSPropertyLeft:
@@ -405,6 +415,7 @@ PassRefPtrWillBeRawPtr<AnimatableValue> CSSAnimatableValueFactory::create(CSSPro
         return createFromLength(style.paddingTop(), style);
     case CSSPropertyRight:
         return createFromLength(style.right(), style);
+#if !defined(DISABLE_SVG)
     case CSSPropertyStrokeWidth:
         return AnimatableSVGLength::create(style.strokeWidth());
     case CSSPropertyStopColor:
@@ -424,6 +435,7 @@ PassRefPtrWillBeRawPtr<AnimatableValue> CSSAnimatableValueFactory::create(CSSPro
             style.svgStyle().strokePaintType(), style.svgStyle().visitedLinkStrokePaintType(),
             style.svgStyle().strokePaintColor(), style.svgStyle().visitedLinkStrokePaintColor(),
             style.svgStyle().strokePaintUri(), style.svgStyle().visitedLinkStrokePaintUri());
+#endif // !defined(DISABLE_SVG)
     case CSSPropertyTextDecorationColor:
         return AnimatableColor::create(style.textDecorationColor().resolve(style.color()), style.visitedLinkTextDecorationColor().resolve(style.visitedLinkColor()));
     case CSSPropertyTextIndent:

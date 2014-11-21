@@ -50,7 +50,9 @@ public:
     StyleSheetContents* defaultStyleSheet() { return m_defaultStyleSheet.get(); }
     StyleSheetContents* viewportStyleSheet() { return m_viewportStyleSheet.get(); }
     StyleSheetContents* quirksStyleSheet() { return m_quirksStyleSheet.get(); }
+#if !defined(DISABLE_SVG)
     StyleSheetContents* svgStyleSheet() { return m_svgStyleSheet.get(); }
+#endif
     StyleSheetContents* mathmlStyleSheet() { return m_mathmlStyleSheet.get(); }
     StyleSheetContents* mediaControlsStyleSheet() { return m_mediaControlsStyleSheet.get(); }
     StyleSheetContents* fullscreenStyleSheet() { return m_fullscreenStyleSheet.get(); }
@@ -71,7 +73,9 @@ private:
     RefPtrWillBeMember<StyleSheetContents> m_defaultStyleSheet;
     RefPtrWillBeMember<StyleSheetContents> m_viewportStyleSheet;
     RefPtrWillBeMember<StyleSheetContents> m_quirksStyleSheet;
+#if !defined(DISABLE_SVG)
     RefPtrWillBeMember<StyleSheetContents> m_svgStyleSheet;
+#endif
     RefPtrWillBeMember<StyleSheetContents> m_mathmlStyleSheet;
     RefPtrWillBeMember<StyleSheetContents> m_mediaControlsStyleSheet;
     RefPtrWillBeMember<StyleSheetContents> m_fullscreenStyleSheet;

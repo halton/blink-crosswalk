@@ -38,7 +38,9 @@
 
 namespace blink {
 
+#if !defined(DISABLE_SVG)
 class SVGTransformTearOff;
+#endif
 
 // SVGMatrixTearOff wraps a AffineTransform for Javascript.
 // Its instance can either hold a static value, or this can be teared off from |SVGTransform.matrix|.
@@ -51,10 +53,12 @@ public:
         return adoptRef(new SVGMatrixTearOff(value));
     }
 
+#if !defined(DISABLE_SVG)
     static PassRefPtr<SVGMatrixTearOff> create(SVGTransformTearOff* target)
     {
         return adoptRef(new SVGMatrixTearOff(target));
     }
+#endif
 
     ~SVGMatrixTearOff();
 
@@ -84,21 +88,27 @@ public:
     PassRefPtr<SVGMatrixTearOff> inverse(ExceptionState&);
     PassRefPtr<SVGMatrixTearOff> rotateFromVector(double x, double y, ExceptionState&);
 
+#if !defined(DISABLE_SVG)
     SVGTransformTearOff* contextTransform() { return m_contextTransform; }
+#endif
 
     const AffineTransform& value() const;
 
 private:
     SVGMatrixTearOff(const AffineTransform&);
+#if !defined(DISABLE_SVG)
     SVGMatrixTearOff(SVGTransformTearOff*);
+#endif
 
     AffineTransform* mutableValue();
     void commitChange();
 
     AffineTransform m_staticValue;
 
+#if !defined(DISABLE_SVG)
     // FIXME: oilpan: This is raw-ptr to avoid reference cycles. Should be Member in oilpan.
     SVGTransformTearOff* m_contextTransform;
+#endif
 };
 
 } // namespace blink

@@ -34,7 +34,6 @@
 #include "core/accessibility/AXImageMapLink.h"
 #include "core/accessibility/AXInlineTextBox.h"
 #include "core/accessibility/AXObjectCache.h"
-#include "core/accessibility/AXSVGRoot.h"
 #include "core/accessibility/AXSpinButton.h"
 #include "core/accessibility/AXTable.h"
 #include "core/dom/ElementTraversal.h"
@@ -67,11 +66,15 @@
 #include "core/rendering/RenderTextFragment.h"
 #include "core/rendering/RenderView.h"
 #include "core/rendering/RenderWidget.h"
+#include "platform/text/PlatformLocale.h"
+#include "wtf/StdLibExtras.h"
+
+#if !defined(DISABLE_SVG)
+#include "core/accessibility/AXSVGRoot.h"
 #include "core/svg/SVGDocumentExtensions.h"
 #include "core/svg/SVGSVGElement.h"
 #include "core/svg/graphics/SVGImage.h"
-#include "platform/text/PlatformLocale.h"
-#include "wtf/StdLibExtras.h"
+#endif
 
 using blink::WebLocalizedString;
 
@@ -292,8 +295,10 @@ AccessibilityRole AXRenderObject::determineAccessibilityRole()
     if (cssBox && cssBox->isImage()) {
         if (isHTMLInputElement(node))
             return ariaHasPopup() ? PopUpButtonRole : ButtonRole;
+#if !defined(DISABLE_SVG)
         if (isSVGImage())
             return SVGRootRole;
+#endif
         return ImageRole;
     }
 
@@ -332,10 +337,12 @@ AccessibilityRole AXRenderObject::determineAccessibilityRole()
     if (headingLevel())
         return HeadingRole;
 
+#if !defined(DISABLE_SVG)
     if (m_renderer->isSVGImage())
         return ImageRole;
     if (m_renderer->isSVGRoot())
         return SVGRootRole;
+#endif
 
     if (node && node->hasTagName(ddTag))
         return DescriptionListDetailRole;
@@ -431,7 +438,9 @@ void AXRenderObject::detach()
 {
     AXNodeObject::detach();
 
+#if !defined(DISABLE_SVG)
     detachRemoteSVGRoot();
+#endif
 
 #if ENABLE(ASSERT)
     if (m_renderer)
@@ -1327,8 +1336,10 @@ AXObject* AXRenderObject::accessibilityHitTest(const IntPoint& point) const
 
 AXObject* AXRenderObject::elementAccessibilityHitTest(const IntPoint& point) const
 {
+#if !defined(DISABLE_SVG)
     if (isSVGImage())
         return remoteSVGElementHitTest(point);
+#endif
 
     return AXObject::elementAccessibilityHitTest(point);
 }
@@ -1453,7 +1464,9 @@ void AXRenderObject::addChildren()
     addImageMapChildren();
     addTextFieldChildren();
     addCanvasChildren();
+#if !defined(DISABLE_SVG)
     addRemoteSVGChildren();
+#endif
     addInlineTextBoxChildren();
 }
 
@@ -2023,6 +2036,7 @@ bool AXRenderObject::isDescendantOfElementType(const HTMLQualifiedName& tagName)
     return false;
 }
 
+#if !defined(DISABLE_SVG)
 bool AXRenderObject::isSVGImage() const
 {
     return remoteSVGRootElement();
@@ -2097,6 +2111,7 @@ void AXRenderObject::offsetBoundingBoxForRemoteSVGElement(LayoutRect& rect) cons
         }
     }
 }
+#endif
 
 // Hidden children are those that are not rendered or visible, but are specifically marked as aria-hidden=false,
 // meaning that they should be exposed to the AX hierarchy.
@@ -2228,6 +2243,7 @@ void AXRenderObject::addPopupChildren()
         m_children.append(axPopup);
 }
 
+#if !defined(DISABLE_SVG)
 void AXRenderObject::addRemoteSVGChildren()
 {
     AXSVGRoot* root = remoteSVGRootElement();
@@ -2245,6 +2261,7 @@ void AXRenderObject::addRemoteSVGChildren()
         m_children.append(root);
     }
 }
+#endif
 
 void AXRenderObject::ariaSelectedRows(AccessibilityChildrenVector& result)
 {
@@ -2328,13 +2345,19 @@ LayoutRect AXRenderObject::computeElementRect() const
 
     if (obj->isText())
         toRenderText(obj)->absoluteQuads(quads, 0, RenderText::ClipToEllipsis);
+#if !defined(DISALE_SVG)
     else if (isWebArea() || obj->isSVGRoot())
         obj->absoluteQuads(quads);
+#else
+    else if (isWebArea())
+        obj->absoluteQuads(quads);
+#endif
     else
         obj->absoluteFocusRingQuads(quads);
 
     LayoutRect result = boundingBoxForQuads(obj, quads);
 
+#if !defined(DISABLE_SVG)
     Document* document = this->document();
     if (document && document->isSVGDocument())
         offsetBoundingBoxForRemoteSVGElement(result);
@@ -2343,6 +2366,7 @@ LayoutRect AXRenderObject::computeElementRect() const
         IntPoint mainOrigin = axObjectCache()->rootObject()->documentFrameView()->contentsToScreen(IntRect()).location();
         result.moveBy(IntPoint(popupOrigin - mainOrigin));
     }
+#endif
 
     // The size of the web area should be the content size, not the clipped size.
     if (isWebArea() && obj->frame()->view())

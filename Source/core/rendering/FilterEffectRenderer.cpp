@@ -34,9 +34,11 @@
 #include "core/page/Page.h"
 #include "core/rendering/RenderLayer.h"
 #include "core/rendering/RenderView.h"
+#if !defined(DISABLE_SVG)
 #include "core/rendering/svg/ReferenceFilterBuilder.h"
 #include "core/svg/SVGElement.h"
 #include "core/svg/SVGFilterPrimitiveStandardAttributes.h"
+#endif
 #include "platform/FloatConversion.h"
 #include "platform/LengthFunctions.h"
 #include "platform/graphics/ColorSpace.h"
@@ -96,10 +98,12 @@ bool FilterEffectRenderer::build(RenderObject* renderer, const FilterOperations&
         RefPtr<FilterEffect> effect;
         FilterOperation* filterOperation = operations.operations().at(i).get();
         switch (filterOperation->type()) {
+#if !defined(DISABLE_SVG)
         case FilterOperation::REFERENCE: {
             effect = ReferenceFilterBuilder::build(this, renderer, previousEffect.get(), toReferenceFilterOperation(filterOperation));
             break;
         }
+#endif
         case FilterOperation::GRAYSCALE: {
             Vector<float> inputParameters;
             double oneMinusAmount = clampTo(1 - toBasicColorMatrixFilterOperation(filterOperation)->amount(), 0.0, 1.0);

@@ -43,7 +43,9 @@ public:
     enum Type {
         HTMLLink,
         HTMLStyle,
+#if !defined(DISABLE_SVG)
         SVGStyle,
+#endif
         Pi
     };
 

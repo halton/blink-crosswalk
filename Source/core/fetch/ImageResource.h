@@ -24,7 +24,9 @@
 #define ImageResource_h
 
 #include "core/fetch/ResourcePtr.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/graphics/SVGImageCache.h"
+#endif
 #include "platform/geometry/IntRect.h"
 #include "platform/geometry/IntSizeHash.h"
 #include "platform/geometry/LayoutSize.h"
@@ -131,7 +133,9 @@ private:
     float m_devicePixelRatioHeaderValue;
 
     RefPtr<blink::Image> m_image;
+#if !defined(DISABLE_SVG)
     OwnPtr<SVGImageCache> m_svgImageCache;
+#endif
     bool m_loadingMultipartContent;
     bool m_hasDevicePixelRatioHeaderValue;
 };

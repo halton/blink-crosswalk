@@ -93,7 +93,9 @@ public:
     ResourcePtr<FontResource> fetchFont(FetchRequest&);
     ResourcePtr<RawResource> fetchRawResource(FetchRequest&);
     ResourcePtr<RawResource> fetchMainResource(FetchRequest&, const SubstituteData&);
+#if !defined(DISABLE_SVG)
     ResourcePtr<DocumentResource> fetchSVGDocument(FetchRequest&);
+#endif
 #if !defined(DISABLE_XSLT)
     ResourcePtr<XSLStyleSheetResource> fetchXSLStyleSheet(FetchRequest&);
 #endif

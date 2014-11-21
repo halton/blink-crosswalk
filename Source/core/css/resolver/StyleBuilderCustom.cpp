@@ -68,7 +68,9 @@
 #include "core/rendering/style/QuotesData.h"
 #include "core/rendering/style/RenderStyle.h"
 #include "core/rendering/style/RenderStyleConstants.h"
+#if !defined(DISABLE_SVG)
 #include "core/rendering/style/SVGRenderStyle.h"
+#endif
 #include "core/rendering/style/StyleGeneratedImage.h"
 #include "platform/fonts/FontDescription.h"
 #include "wtf/MathExtras.h"
@@ -88,9 +90,11 @@ static inline bool isValidVisitedLinkProperty(CSSPropertyID id)
     case CSSPropertyBorderTopColor:
     case CSSPropertyBorderBottomColor:
     case CSSPropertyColor:
+#if !defined(DISABLE_SVG)
     case CSSPropertyFill:
-    case CSSPropertyOutlineColor:
     case CSSPropertyStroke:
+#endif
+    case CSSPropertyOutlineColor:
     case CSSPropertyTextDecorationColor:
     case CSSPropertyWebkitColumnRuleColor:
     case CSSPropertyWebkitTextEmphasisColor:
@@ -212,8 +216,10 @@ void StyleBuilderFunctions::applyValueCSSPropertyCursor(StyleResolverState& stat
             CSSValue* item = list->item(i);
             if (item->isCursorImageValue()) {
                 CSSCursorImageValue* image = toCSSCursorImageValue(item);
+#if !defined(DISABLE_SVG)
                 if (image->updateIfSVGCursorIsUsed(state.element())) // Elements with SVG cursors are not allowed to share style.
                     state.style()->setUnique();
+#endif
                 state.style()->addCursor(state.styleImage(CSSPropertyCursor, image), image->hotSpot());
             } else {
                 state.style()->setCursor(*toCSSPrimitiveValue(item));
@@ -247,6 +253,7 @@ void StyleBuilderFunctions::applyValueCSSPropertyFontFamily(StyleResolverState& 
     state.fontBuilder().setFontFamilyValue(value);
 }
 
+#if !defined(DISABLE_SVG)
 void StyleBuilderFunctions::applyValueCSSPropertyGlyphOrientationVertical(StyleResolverState& state, CSSValue* value)
 {
     if (value->isPrimitiveValue() && toCSSPrimitiveValue(value)->getValueID() == CSSValueAuto)
@@ -254,6 +261,7 @@ void StyleBuilderFunctions::applyValueCSSPropertyGlyphOrientationVertical(StyleR
     else
         state.style()->accessSVGStyle().setGlyphOrientationVertical(StyleBuilderConverter::convertGlyphOrientation(state, value));
 }
+#endif
 
 void StyleBuilderFunctions::applyInitialCSSPropertyGridTemplateAreas(StyleResolverState& state)
 {
@@ -1115,18 +1123,24 @@ void StyleBuilderFunctions::applyValueCSSPropertyWebkitTextOrientation(StyleReso
         state.setTextOrientation(*toCSSPrimitiveValue(value));
 }
 
+#if !defined(DISABLE_SVG)
 void StyleBuilderFunctions::applyInheritCSSPropertyBaselineShift(StyleResolverState& state)
 {
+#if !defined(DISABLE_SVG)
     const SVGRenderStyle& parentSvgStyle = state.parentStyle()->svgStyle();
     EBaselineShift baselineShift = parentSvgStyle.baselineShift();
     SVGRenderStyle& svgStyle = state.style()->accessSVGStyle();
     svgStyle.setBaselineShift(baselineShift);
     if (baselineShift == BS_LENGTH)
         svgStyle.setBaselineShiftValue(parentSvgStyle.baselineShiftValue());
+#endif
 }
 
 void StyleBuilderFunctions::applyValueCSSPropertyBaselineShift(StyleResolverState& state, CSSValue* value)
 {
+#if defined(DISABLE_SVG)
+    return;
+#else
     SVGRenderStyle& svgStyle = state.style()->accessSVGStyle();
     CSSPrimitiveValue* primitiveValue = toCSSPrimitiveValue(value);
     if (!primitiveValue->isValueID()) {
@@ -1147,7 +1161,9 @@ void StyleBuilderFunctions::applyValueCSSPropertyBaselineShift(StyleResolverStat
     default:
         ASSERT_NOT_REACHED();
     }
+#endif // defined(DISABLE_SVG)
 }
+#endif  // !defined(DISABLE_SVG)
 
 void StyleBuilderFunctions::applyValueCSSPropertyGridAutoFlow(StyleResolverState& state, CSSValue* value)
 {

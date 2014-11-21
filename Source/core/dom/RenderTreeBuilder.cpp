@@ -27,7 +27,6 @@
 #include "core/dom/RenderTreeBuilder.h"
 
 #include "core/HTMLNames.h"
-#include "core/SVGNames.h"
 #include "core/css/resolver/StyleResolver.h"
 #include "core/dom/Fullscreen.h"
 #include "core/dom/Node.h"
@@ -36,8 +35,12 @@
 #include "core/rendering/RenderObject.h"
 #include "core/rendering/RenderText.h"
 #include "core/rendering/RenderView.h"
-#include "core/svg/SVGElement.h"
 #include "platform/RuntimeEnabledFeatures.h"
+
+#if !defined(DISABLE_SVG)
+#include "core/SVGNames.h"
+#include "core/svg/SVGElement.h"
+#endif
 
 namespace blink {
 
@@ -78,6 +81,7 @@ bool RenderTreeBuilder::shouldCreateRenderer() const
 {
     if (!m_renderingParent)
         return false;
+#if !defined(DISABLE_SVG)
     if (m_node->isSVGElement()) {
         // SVG elements only render when inside <svg>, or if the element is an <svg> itself.
         if (!isSVGSVGElement(*m_node) && !m_renderingParent->isSVGElement())
@@ -85,6 +89,7 @@ bool RenderTreeBuilder::shouldCreateRenderer() const
         if (!toSVGElement(m_node)->isValid())
             return false;
     }
+#endif
     RenderObject* parentRenderer = this->parentRenderer();
     if (!parentRenderer)
         return false;

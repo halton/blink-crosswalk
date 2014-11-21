@@ -28,7 +28,9 @@
 namespace blink {
 
 class Element;
+#if !defined(DISABLE_SVG)
 class SVGElement;
+#endif
 
 class CSSCursorImageValue : public CSSValue {
 public:
@@ -50,11 +52,13 @@ public:
 
     String customCSSText() const;
 
+#if !defined(DISABLE_SVG)
     bool updateIfSVGCursorIsUsed(Element*);
+#endif
     StyleImage* cachedImage(ResourceFetcher*, float deviceScaleFactor);
     StyleImage* cachedOrPendingImage(float deviceScaleFactor);
 
-#if !ENABLE(OILPAN)
+#if !ENABLE(OILPAN) && !defined(DISABLE_SVG)
     void removeReferencedElement(SVGElement*);
 #endif
 
@@ -65,7 +69,9 @@ public:
 private:
     CSSCursorImageValue(PassRefPtrWillBeRawPtr<CSSValue> imageValue, bool hasHotSpot, const IntPoint& hotSpot);
 
+#if !defined(DISABLE_SVG)
     bool isSVGCursor() const;
+#endif
     String cachedImageURL();
     void clearImageResource();
 
@@ -76,7 +82,7 @@ private:
     RefPtr<StyleImage> m_image;
     bool m_accessedImage;
 
-#if !ENABLE(OILPAN)
+#if !ENABLE(OILPAN) && !defined(DISABLE_SVG)
     HashSet<SVGElement*> m_referencedElements;
 #endif
 };

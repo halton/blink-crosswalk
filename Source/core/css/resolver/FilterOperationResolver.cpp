@@ -33,8 +33,10 @@
 #include "core/css/CSSPrimitiveValueMappings.h"
 #include "core/css/CSSShadowValue.h"
 #include "core/css/resolver/TransformBuilder.h"
+#if !defined(DISABLE_SVG)
 #include "core/rendering/svg/ReferenceFilterBuilder.h"
 #include "core/svg/SVGURIReference.h"
+#endif
 
 namespace blink {
 
@@ -99,6 +101,7 @@ bool FilterOperationResolver::createFilterOperations(CSSValue* inValue, const CS
         if (operationType == FilterOperation::REFERENCE) {
             if (filterValue->length() != 1)
                 continue;
+#if !defined(DISABLE_SVG)
             CSSValue* argument = filterValue->item(0);
 
             if (!argument->isSVGDocumentValue())
@@ -116,6 +119,7 @@ bool FilterOperationResolver::createFilterOperations(CSSValue* inValue, const CS
             }
             operations.operations().append(operation);
             continue;
+#endif  // !defined(DISABLE_SVG)
         }
 
         // Check that all parameters are primitive values, with the

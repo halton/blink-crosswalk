@@ -38,7 +38,9 @@
 #include "core/html/parser/HTMLParserIdioms.h"
 #include "core/rendering/RenderImage.h"
 #include "core/rendering/RenderVideo.h"
+#if !defined(DISABLE_SVG)
 #include "core/rendering/svg/RenderSVGImage.h"
+#endif
 #include "platform/Logging.h"
 #include "platform/weborigin/SecurityOrigin.h"
 #include "public/platform/WebURLRequest.h"
@@ -416,8 +418,10 @@ RenderImageResource* ImageLoader::renderImageResource()
     if (renderer->isImage() && !static_cast<RenderImage*>(renderer)->isGeneratedContent())
         return toRenderImage(renderer)->imageResource();
 
+#if !defined(DISABLE_SVG)
     if (renderer->isSVGImage())
         return toRenderSVGImage(renderer)->imageResource();
+#endif
 
     if (renderer->isVideo())
         return toRenderVideo(renderer)->imageResource();

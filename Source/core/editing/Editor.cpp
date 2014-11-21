@@ -31,7 +31,6 @@
 #include "core/CSSPropertyNames.h"
 #include "core/EventNames.h"
 #include "core/HTMLNames.h"
-#include "core/XLinkNames.h"
 #include "core/accessibility/AXObjectCache.h"
 #include "core/clipboard/DataObject.h"
 #include "core/clipboard/DataTransfer.h"
@@ -80,10 +79,14 @@
 #include "core/page/Page.h"
 #include "core/rendering/HitTestResult.h"
 #include "core/rendering/RenderImage.h"
-#include "core/svg/SVGImageElement.h"
 #include "platform/KillRing.h"
 #include "platform/weborigin/KURL.h"
 #include "wtf/unicode/CharacterNames.h"
+
+#if !defined(DISABLE_SVG)
+#include "core/XLinkNames.h"
+#include "core/svg/SVGImageElement.h"
+#endif
 
 namespace blink {
 
@@ -458,8 +461,10 @@ static void writeImageNodeToPasteboard(Pasteboard* pasteboard, Node* node, const
     AtomicString urlString;
     if (isHTMLImageElement(*node) || isHTMLInputElement(*node))
         urlString = toHTMLElement(node)->getAttribute(srcAttr);
+#if !defined(DISABLE_SVG)
     else if (isSVGImageElement(*node))
         urlString = toSVGElement(node)->getAttribute(XLinkNames::hrefAttr);
+#endif
     else if (isHTMLEmbedElement(*node) || isHTMLObjectElement(*node) || isHTMLCanvasElement(*node))
         urlString = toHTMLElement(node)->imageSourceURL();
     KURL url = urlString.isEmpty() ? KURL() : node->document().completeURL(stripLeadingAndTrailingHTMLSpaces(urlString));

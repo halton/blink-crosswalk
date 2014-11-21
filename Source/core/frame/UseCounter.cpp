@@ -396,10 +396,13 @@ int UseCounter::mapCSSPropertyIdToCSSSampleIdForHistogram(int id)
 #if defined(ENABLE_DRAGGABLE_REGION) && ENABLE_DRAGGABLE_REGION
     case CSSPropertyWebkitAppRegion: return 354;
 #endif
+#if !defined(DISABLE_SVG)
     case CSSPropertyClipPath: return 355;
     case CSSPropertyClipRule: return 356;
     case CSSPropertyMask: return 357;
+#endif
     case CSSPropertyEnableBackground: return 358;
+#if !defined(DISABLE_SVG)
     case CSSPropertyFilter: return 359;
     case CSSPropertyFloodColor: return 360;
     case CSSPropertyFloodOpacity: return 361;
@@ -436,6 +439,7 @@ int UseCounter::mapCSSPropertyIdToCSSSampleIdForHistogram(int id)
     case CSSPropertyTextAnchor: return 392;
     case CSSPropertyVectorEffect: return 393;
     case CSSPropertyWritingMode: return 394;
+#endif  // !defined(DISABLE_SVG)
     // CSSPropertyWebkitSvgShadow has been removed, was return 395;
     // CSSPropertyWebkitCursorVisibility has been removed, was return 396;
     // CSSPropertyImageOrientation has been removed, was return 397;
@@ -459,7 +463,9 @@ int UseCounter::mapCSSPropertyIdToCSSSampleIdForHistogram(int id)
     case CSSPropertyWebkitFilter: return 413;
     case CSSPropertyWebkitBoxDecorationBreak: return 414;
     case CSSPropertyWebkitTapHighlightColor: return 415;
+#if !defined(DISABLE_SVG)
     case CSSPropertyBufferedRendering: return 416;
+#endif
     case CSSPropertyGridAutoRows: return 417;
     case CSSPropertyGridAutoColumns: return 418;
     case CSSPropertyBackgroundBlendMode: return 419;
@@ -477,7 +483,9 @@ int UseCounter::mapCSSPropertyIdToCSSSampleIdForHistogram(int id)
     case CSSPropertyAnimationPlayState: return 431;
     case CSSPropertyAnimationTimingFunction: return 432;
     case CSSPropertyObjectFit: return 433;
+#if !defined(DISABLE_SVG)
     case CSSPropertyPaintOrder: return 434;
+#endif
     case CSSPropertyMaskSourceType: return 435;
     case CSSPropertyIsolation: return 436;
     case CSSPropertyObjectPosition: return 437;

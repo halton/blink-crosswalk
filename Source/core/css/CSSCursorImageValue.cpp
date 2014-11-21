@@ -22,7 +22,6 @@
 #include "config.h"
 #include "core/css/CSSCursorImageValue.h"
 
-#include "core/SVGNames.h"
 #include "core/css/CSSImageSetValue.h"
 #include "core/fetch/ImageResource.h"
 #include "core/fetch/ResourceFetcher.h"
@@ -30,20 +29,26 @@
 #include "core/rendering/style/StyleFetchedImageSet.h"
 #include "core/rendering/style/StyleImage.h"
 #include "core/rendering/style/StylePendingImage.h"
-#include "core/svg/SVGCursorElement.h"
-#include "core/svg/SVGLengthContext.h"
-#include "core/svg/SVGURIReference.h"
 #include "wtf/MathExtras.h"
 #include "wtf/text/StringBuilder.h"
 #include "wtf/text/WTFString.h"
 
+#if !defined(DISABLE_SVG)
+#include "core/SVGNames.h"
+#include "core/svg/SVGCursorElement.h"
+#include "core/svg/SVGLengthContext.h"
+#include "core/svg/SVGURIReference.h"
+#endif
+
 namespace blink {
 
+#if !defined(DISABLE_SVG)
 static inline SVGCursorElement* resourceReferencedByCursorElement(const String& url, TreeScope& treeScope)
 {
     Element* element = SVGURIReference::targetElementFromIRIString(url, treeScope);
     return isSVGCursorElement(element) ? toSVGCursorElement(element) : 0;
 }
+#endif
 
 CSSCursorImageValue::CSSCursorImageValue(PassRefPtrWillBeRawPtr<CSSValue> imageValue, bool hasHotSpot, const IntPoint& hotSpot)
     : CSSValue(CursorImageClass)
@@ -57,7 +62,7 @@ CSSCursorImageValue::CSSCursorImageValue(PassRefPtrWillBeRawPtr<CSSValue> imageV
 CSSCursorImageValue::~CSSCursorImageValue()
 {
     // The below teardown is all handled by weak pointer processing in oilpan.
-#if !ENABLE(OILPAN)
+#if !ENABLE(OILPAN) && !defined(DISABLE_SVG)
     if (!isSVGCursor())
         return;
 
@@ -87,6 +92,7 @@ String CSSCursorImageValue::customCSSText() const
     return result.toString();
 }
 
+#if !defined(DISABLE_SVG)
 bool CSSCursorImageValue::updateIfSVGCursorIsUsed(Element* element)
 {
     if (!element || !element->isSVGElement())
@@ -110,7 +116,7 @@ bool CSSCursorImageValue::updateIfSVGCursorIsUsed(Element* element)
             clearImageResource();
 
         SVGElement* svgElement = toSVGElement(element);
-#if !ENABLE(OILPAN)
+#if !ENABLE(OILPAN) && !defined(DISABLE_SVG)
         m_referencedElements.add(svgElement);
 #endif
         svgElement->setCursorImageValue(this);
@@ -120,6 +126,7 @@ bool CSSCursorImageValue::updateIfSVGCursorIsUsed(Element* element)
 
     return false;
 }
+#endif
 
 StyleImage* CSSCursorImageValue::cachedImage(ResourceFetcher* loader, float deviceScaleFactor)
 {
@@ -132,6 +139,7 @@ StyleImage* CSSCursorImageValue::cachedImage(ResourceFetcher* loader, float devi
         // For SVG images we need to lazily substitute in the correct URL. Rather than attempt
         // to change the URL of the CSSImageValue (which would then change behavior like cssText),
         // we create an alternate CSSImageValue to use.
+#if !defined(DISABLE_SVG)
         if (isSVGCursor() && loader && loader->document()) {
             RefPtrWillBeRawPtr<CSSImageValue> imageValue = toCSSImageValue(m_imageValue.get());
             // FIXME: This will fail if the <cursor> element is in a shadow DOM (bug 59827)
@@ -143,6 +151,7 @@ StyleImage* CSSCursorImageValue::cachedImage(ResourceFetcher* loader, float devi
                 return cachedImage;
             }
         }
+#endif
 
         if (m_imageValue->isImageValue())
             m_image = toCSSImageValue(m_imageValue.get())->cachedImage(loader);
@@ -165,6 +174,7 @@ StyleImage* CSSCursorImageValue::cachedOrPendingImage(float deviceScaleFactor)
     return m_image.get();
 }
 
+#if !defined(DISABLE_SVG)
 bool CSSCursorImageValue::isSVGCursor() const
 {
     if (m_imageValue->isImageValue()) {
@@ -174,6 +184,7 @@ bool CSSCursorImageValue::isSVGCursor() const
     }
     return false;
 }
+#endif
 
 String CSSCursorImageValue::cachedImageURL()
 {
@@ -188,7 +199,7 @@ void CSSCursorImageValue::clearImageResource()
     m_accessedImage = false;
 }
 
-#if !ENABLE(OILPAN)
+#if !ENABLE(OILPAN) && !defined(DISABLE_SVG)
 void CSSCursorImageValue::removeReferencedElement(SVGElement* element)
 {
     m_referencedElements.remove(element);

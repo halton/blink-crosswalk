@@ -52,7 +52,9 @@
 #include "core/html/parser/TextResourceDecoder.h"
 #include "core/loader/FrameLoader.h"
 #include "core/loader/ImageLoader.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/graphics/SVGImage.h"
+#endif
 #include "core/xml/parser/SharedBufferReader.h"
 #include "core/xml/parser/XMLDocumentParserScope.h"
 #include "core/xml/parser/XMLParserInput.h"
@@ -114,8 +116,10 @@ static inline bool hasNoStyleInformation(Document* document)
     if (document->frame()->tree().parent())
         return false; // This document is not in a top frame
 
+#if !defined(DISABLE_SVG)
     if (SVGImage::isInSVGImage(document))
         return false;
+#endif
 
     return true;
 }
@@ -609,9 +613,11 @@ static bool shouldAllowExternalLoad(const KURL& url)
     if (urlString.startsWith("http://www.w3.org/TR/xhtml", false))
         return false;
 
+#if !defined(DISABLE_SVG)
     // Similarly, there isn't much point in requesting the SVG DTD.
     if (urlString.startsWith("http://www.w3.org/Graphics/SVG", false))
         return false;
+#endif
 
     // The libxml doesn't give us a lot of context for deciding whether to allow
     // this request. In the worst case, this load could be for an external
@@ -1414,7 +1420,9 @@ static void externalSubsetHandler(void* closure, const xmlChar*, const xmlChar* 
         || extId == "-//W3C//DTD XHTML 1.0 Frameset//EN"
         || extId == "-//W3C//DTD XHTML Basic 1.0//EN"
         || extId == "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN"
+#if !defined(DISABLE_SVG)
         || extId == "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN"
+#endif
         || extId == "-//WAPFORUM//DTD XHTML Mobile 1.0//EN"
         || extId == "-//WAPFORUM//DTD XHTML Mobile 1.1//EN"
         || extId == "-//WAPFORUM//DTD XHTML Mobile 1.2//EN") {

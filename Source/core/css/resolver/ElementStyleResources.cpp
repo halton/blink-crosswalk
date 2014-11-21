@@ -24,7 +24,9 @@
 #include "core/css/resolver/ElementStyleResources.h"
 
 #include "core/css/CSSGradientValue.h"
+#if !defined(DISABLE_SVG)
 #include "core/css/CSSSVGDocumentValue.h"
+#endif
 #include "core/rendering/style/StyleGeneratedImage.h"
 #include "core/rendering/style/StyleImage.h"
 #include "core/rendering/style/StylePendingImage.h"
@@ -99,6 +101,7 @@ void ElementStyleResources::clearPendingImageProperties()
     m_pendingImageProperties.clear();
 }
 
+#if !defined(DISABLE_SVG)
 void ElementStyleResources::clearPendingSVGDocuments()
 {
     m_pendingSVGDocuments.clear();
@@ -108,5 +111,6 @@ void ElementStyleResources::addPendingSVGDocument(FilterOperation* filterOperati
 {
     m_pendingSVGDocuments.set(filterOperation, cssSVGDocumentValue);
 }
+#endif  // !defined(DISABLE_SVG)
 
 }

@@ -102,7 +102,9 @@ public:
     bool isCalcValue() const {return m_classType == CalculationClass; }
     bool isFilterValue() const { return m_classType == CSSFilterClass; }
     bool isGridTemplateAreasValue() const { return m_classType == GridTemplateAreasClass; }
+#if !defined(DISABLE_SVG)
     bool isSVGDocumentValue() const { return m_classType == CSSSVGDocumentClass; }
+#endif
     bool isUnicodeRangeValue() const { return m_classType == UnicodeRangeClass; }
     bool isGridLineNamesValue() const { return m_classType == GridLineNamesClass; }
 
@@ -160,8 +162,10 @@ protected:
         CalculationClass,
         GridTemplateAreasClass,
 
+#if !defined(DISABLE_SVG)
         // SVG classes.
         CSSSVGDocumentClass,
+#endif
 
         // List class types must appear after ValueListClass.
         ValueListClass,

@@ -25,7 +25,6 @@
 #include "bindings/core/v8/V8Binding.h"
 #include "bindings/core/v8/V8PerIsolateData.h"
 #include "core/HTMLNames.h"
-#include "core/SVGNames.h"
 #include "core/css/CSSCharsetRule.h"
 #include "core/css/CSSImportRule.h"
 #include "core/css/CSSRuleList.h"
@@ -39,9 +38,13 @@
 #include "core/frame/UseCounter.h"
 #include "core/html/HTMLStyleElement.h"
 #include "core/inspector/InspectorInstrumentation.h"
-#include "core/svg/SVGStyleElement.h"
 #include "platform/weborigin/SecurityOrigin.h"
 #include "wtf/text/StringBuilder.h"
+
+#if !defined(DISABLE_SVG)
+#include "core/SVGNames.h"
+#include "core/svg/SVGStyleElement.h"
+#endif
 
 namespace blink {
 
@@ -86,7 +89,9 @@ static bool isAcceptableCSSStyleSheetParent(Node* parentNode)
         || parentNode->isDocumentNode()
         || isHTMLLinkElement(*parentNode)
         || isHTMLStyleElement(*parentNode)
+#if !defined(DISABLE_SVG)
         || isSVGStyleElement(*parentNode)
+#endif
         || parentNode->nodeType() == Node::PROCESSING_INSTRUCTION_NODE;
 }
 #endif

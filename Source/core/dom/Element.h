@@ -220,7 +220,9 @@ public:
 
     bool hasTagName(const QualifiedName& tagName) const { return m_tagName.matches(tagName); }
     bool hasTagName(const HTMLQualifiedName& tagName) const { return ContainerNode::hasTagName(tagName); }
+#if !defined(DISABLE_SVG)
     bool hasTagName(const SVGQualifiedName& tagName) const { return ContainerNode::hasTagName(tagName); }
+#endif
 
     // Should be called only by Document::createElementNS to fix up m_tagName immediately after construction.
     void setTagNameForCreateElementNS(const QualifiedName&);
@@ -241,7 +243,9 @@ public:
     PassRefPtrWillBeRawPtr<Element> cloneElementWithChildren();
     PassRefPtrWillBeRawPtr<Element> cloneElementWithoutChildren();
 
+#if !defined(DISABLE_SVG)
     void scheduleSVGFilterLayerUpdateHack();
+#endif
 
     void normalizeAttributes();
 
@@ -738,8 +742,10 @@ inline const AtomicString& Element::getClassAttribute() const
 {
     if (!hasClass())
         return nullAtom;
+#if !defined(DISABLE_SVG)
     if (isSVGElement())
         return getAttribute(HTMLNames::classAttr);
+#endif
     return fastGetAttribute(HTMLNames::classAttr);
 }
 

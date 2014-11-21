@@ -23,8 +23,10 @@
 
 #include "core/HTMLNames.h"
 #include "core/MathMLNames.h"
+#if !defined(DISABLE_SVG)
 #include "core/SVGNames.h"
 #include "core/XLinkNames.h"
+#endif
 #include "core/XMLNSNames.h"
 #include "core/XMLNames.h"
 #include "wtf/Assertions.h"
@@ -43,8 +45,10 @@ COMPILE_ASSERT(sizeof(QualifiedName::QualifiedNameImpl) == sizeof(SameSizeAsQual
 
 static const int staticQualifiedNamesCount = HTMLNames::HTMLTagsCount + HTMLNames::HTMLAttrsCount
     + MathMLNames::MathMLTagsCount + MathMLNames::MathMLAttrsCount
+#if !defined(DISABLE_SVG)
     + SVGNames::SVGTagsCount + SVGNames::SVGAttrsCount
     + XLinkNames::XLinkAttrsCount
+#endif
     + XMLNSNames::XMLNSAttrsCount
     + XMLNames::XMLAttrsCount;
 

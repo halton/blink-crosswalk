@@ -311,6 +311,7 @@ static void buildNodeHighlight(Node& node, const HighlightConfig& highlightConfi
 
     highlight->setDataFromConfig(highlightConfig);
 
+#if !defined(DISABLE_SVG)
     // RenderSVGRoot should be highlighted through the isBox() code path, all other SVG elements should just dump their absoluteQuads().
     if (renderer->node() && renderer->node()->isSVGElement() && !renderer->isSVGRoot()) {
         Vector<FloatQuad> quads;
@@ -319,6 +320,7 @@ static void buildNodeHighlight(Node& node, const HighlightConfig& highlightConfi
             highlight->appendQuad(quads[i], highlightConfig.content, highlightConfig.contentOutline);
         return;
     }
+#endif
 
     FloatQuad content, padding, border, margin;
     if (!buildNodeQuads(renderer, &content, &padding, &border, &margin))

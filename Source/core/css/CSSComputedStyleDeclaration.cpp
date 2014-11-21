@@ -331,6 +331,7 @@ static const CSSPropertyID staticComputableProperties[] = {
     CSSPropertyWebkitUserSelect,
     CSSPropertyWebkitWritingMode,
     CSSPropertyWebkitAppRegion,
+#if !defined(DISABLE_SVG)
     CSSPropertyBufferedRendering,
     CSSPropertyClipPath,
     CSSPropertyClipRule,
@@ -351,7 +352,9 @@ static const CSSPropertyID staticComputableProperties[] = {
     CSSPropertyMarkerMid,
     CSSPropertyMarkerStart,
     CSSPropertyMaskType,
+#endif
     CSSPropertyMaskSourceType,
+#if !defined(DISABLE_SVG)
     CSSPropertyShapeRendering,
     CSSPropertyStroke,
     CSSPropertyStrokeDasharray,
@@ -370,6 +373,7 @@ static const CSSPropertyID staticComputableProperties[] = {
     CSSPropertyGlyphOrientationVertical,
     CSSPropertyVectorEffect,
     CSSPropertyPaintOrder
+#endif
 };
 
 static const Vector<CSSPropertyID>& computableProperties()
@@ -2766,14 +2770,15 @@ PassRefPtrWillBeRawPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValu
         case CSSPropertyInternalMarqueeRepetition:
         case CSSPropertyInternalMarqueeSpeed:
         case CSSPropertyInternalMarqueeStyle:
+        case CSSPropertyEnableBackground:
             ASSERT_NOT_REACHED();
             return nullptr;
 
+#if !defined(DISABLE_SVG)
         case CSSPropertyBufferedRendering:
         case CSSPropertyClipPath:
         case CSSPropertyClipRule:
         case CSSPropertyMask:
-        case CSSPropertyEnableBackground:
         case CSSPropertyFilter:
         case CSSPropertyFloodColor:
         case CSSPropertyFloodOpacity:
@@ -2810,6 +2815,7 @@ PassRefPtrWillBeRawPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValu
         case CSSPropertyPaintOrder:
         case CSSPropertyWritingMode:
             return getSVGPropertyCSSValue(propertyID, DoNotUpdateLayout);
+#endif
 
         case CSSPropertyAll:
             return nullptr;

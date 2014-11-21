@@ -44,7 +44,9 @@
 #include "core/rendering/RenderLayer.h"
 #include "core/rendering/RenderView.h"
 #include "core/rendering/TextRunConstructor.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/graphics/SVGImage.h"
+#endif
 #include "platform/fonts/Font.h"
 #include "platform/fonts/FontCache.h"
 
@@ -461,9 +463,11 @@ RenderBox* RenderImage::embeddedContentBox() const
     if (!m_imageResource)
         return 0;
 
+#if !defined(DISABLE_SVG)
     ImageResource* cachedImage = m_imageResource->cachedImage();
     if (cachedImage && cachedImage->image() && cachedImage->image()->isSVGImage())
         return toSVGImage(cachedImage->image())->embeddedContentBox();
+#endif
 
     return 0;
 }

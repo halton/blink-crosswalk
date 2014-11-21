@@ -40,7 +40,9 @@
 #include "core/rendering/line/LineWidth.h"
 #include "core/rendering/line/RenderTextInfo.h"
 #include "core/rendering/line/WordMeasurement.h"
+#if !defined(DISABLE_SVG)
 #include "core/rendering/svg/SVGRootInlineBox.h"
+#endif
 #include "platform/fonts/Character.h"
 #include "platform/text/BidiResolver.h"
 #include "wtf/RefCountedLeakCounter.h"
@@ -686,17 +688,22 @@ RootInlineBox* RenderBlockFlow::createLineBoxesFromBidiRuns(unsigned bidiLevel, 
     lineBox->setBidiLevel(bidiLevel);
     lineBox->setEndsWithBreak(lineInfo.previousLineBrokeCleanly());
 
+#if !defined(DISABLE_SVG)
     bool isSVGRootInlineBox = lineBox->isSVGRootInlineBox();
+#endif
 
     GlyphOverflowAndFallbackFontsMap textBoxDataMap;
 
+#if !defined(DISABLE_SVG)
     // Now we position all of our text runs horizontally.
     if (!isSVGRootInlineBox)
         computeInlineDirectionPositionsForLine(lineBox, lineInfo, bidiRuns.firstRun(), trailingSpaceRun, end.atEnd(), textBoxDataMap, verticalPositionCache, wordMeasurements);
+#endif
 
     // Now position our text runs vertically.
     computeBlockDirectionPositionsForLine(lineBox, bidiRuns.firstRun(), textBoxDataMap, verticalPositionCache);
 
+#if !defined(DISABLE_SVG)
     // SVG text layout code computes vertical & horizontal positions on its own.
     // Note that we still need to execute computeVerticalPositionsForLine() as
     // it calls InlineTextBox::positionLineBox(), which tracks whether the box
@@ -706,6 +713,7 @@ RootInlineBox* RenderBlockFlow::createLineBoxesFromBidiRuns(unsigned bidiLevel, 
         ASSERT(isSVGText());
         toSVGRootInlineBox(lineBox)->computePerCharacterLayoutInformation();
     }
+#endif
 
     // Compute our overflow now.
     lineBox->computeOverflow(lineBox->lineTop(), lineBox->lineBottom(), textBoxDataMap);

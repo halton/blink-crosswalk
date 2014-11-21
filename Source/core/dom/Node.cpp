@@ -87,7 +87,9 @@
 #include "core/page/Page.h"
 #include "core/rendering/FlowThreadController.h"
 #include "core/rendering/RenderBox.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/graphics/SVGImage.h"
+#endif
 #include "platform/EventDispatchForbiddenScope.h"
 #include "platform/Partitions.h"
 #include "platform/TraceEvent.h"
@@ -672,7 +674,11 @@ void Node::recalcDistribution()
 
 void Node::setIsLink(bool isLink)
 {
+#if !defined(DISABLE_SVG)
     setFlag(isLink && !SVGImage::isInSVGImage(toElement(this)), IsLinkFlag);
+#else
+    setFlag(isLink, IsLinkFlag);
+#endif
 }
 
 void Node::setNeedsStyleInvalidation()
@@ -791,7 +797,9 @@ void Node::clearNeedsStyleRecalc()
 {
     m_nodeFlags &= ~StyleChangeMask;
 
+#if !defined(DISABLE_SVG)
     clearSVGFilterNeedsLayerUpdate();
+#endif
 
     if (isElementNode() && hasRareData())
         toElement(*this).setAnimationStyleChange(false);
@@ -2423,7 +2431,11 @@ void Node::setCustomElementState(CustomElementState newState)
         break;
     }
 
+#if !defined(DISABLE_SVG)
     ASSERT(isHTMLElement() || isSVGElement());
+#else
+    ASSERT(isHTMLElement());
+#endif
     setFlag(CustomElementFlag);
     setFlag(newState == Upgraded, CustomElementUpgradedFlag);
 

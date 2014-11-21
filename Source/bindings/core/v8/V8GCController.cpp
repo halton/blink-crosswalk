@@ -48,7 +48,9 @@
 #include "core/html/HTMLTemplateElement.h"
 #include "core/html/imports/HTMLImportsController.h"
 #include "core/inspector/InspectorTraceEvents.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGElement.h"
+#endif
 #include "platform/Partitions.h"
 #include "platform/TraceEvent.h"
 #include "wtf/Vector.h"
@@ -146,11 +148,13 @@ public:
             // See https://code.google.com/p/chromium/issues/detail?id=164882
             if (isHTMLImageElement(*node) && toHTMLImageElement(*node).hasPendingActivity())
                 return;
+#if !defined(DISABLE_SVG)
             // FIXME: Remove the special handling for SVG elements.
             // We currently can't collect SVG Elements from minor gc, as we have
             // strong references from SVG property tear-offs keeping context SVG element alive.
             if (node->isSVGElement())
                 return;
+#endif
 
             m_nodesInNewSpace.append(node);
             node->markV8CollectableDuringMinorGC();

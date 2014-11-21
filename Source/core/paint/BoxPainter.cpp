@@ -595,10 +595,12 @@ bool BoxPainter::isDocumentElementWithOpaqueBackground(RenderObject& obj)
             if (body) {
                 // Can't scroll a frameset document anyway.
                 isOpaque = body->hasTagName(HTMLNames::framesetTag);
+#if !defined(DISABLE_SVG)
             } else {
                 // FIXME: SVG specific behavior should be in the SVG code.
                 // SVG documents and XML documents with SVG root nodes are transparent.
                 isOpaque = !obj.document().hasSVGRootNode();
+#endif
             }
         }
     } else if (obj.view()->frameView()) {

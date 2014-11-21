@@ -33,8 +33,10 @@
 #include "bindings/core/v8/V8DOMWrapper.h"
 #include "bindings/core/v8/V8PerContextData.h"
 #include "core/CSSValueKeywords.h"
+#if !defined(DISABLE_SVG)
 #include "core/SVGNames.h"
 #include "core/XLinkNames.h"
+#endif
 #include "core/XMLNames.h"
 #include "core/accessibility/AXObjectCache.h"
 #include "core/animation/AnimationTimeline.h"
@@ -105,8 +107,10 @@
 #include "core/rendering/RenderLayer.h"
 #include "core/rendering/RenderView.h"
 #include "core/rendering/compositing/RenderLayerCompositor.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGDocumentExtensions.h"
 #include "core/svg/SVGElement.h"
+#endif
 #include "platform/EventDispatchForbiddenScope.h"
 #include "platform/RuntimeEnabledFeatures.h"
 #include "platform/UserGestureIndicator.h"
@@ -164,10 +168,12 @@ Element::~Element()
     // the Document the element has already been removed from the pending
     // resources. If the document is also dead, there is no need to remove
     // the element from the pending resources.
+#if !defined(DISABLE_SVG)
     if (hasPendingResources()) {
         document().accessSVGExtensions().removeElementFromPendingResources(this);
         ASSERT(!hasPendingResources());
     }
+#endif
 #endif
 }
 
@@ -380,10 +386,12 @@ void Element::synchronizeAllAttributes() const
         ASSERT(isStyledElement());
         synchronizeStyleAttributeInternal();
     }
+#if !defined(DISABLE_SVG)
     if (elementData()->m_animatedSVGAttributesAreDirty) {
         ASSERT(isSVGElement());
         toSVGElement(this)->synchronizeAnimatedSVGAttribute(anyQName());
     }
+#endif
 }
 
 inline void Element::synchronizeAttribute(const QualifiedName& name) const
@@ -395,12 +403,14 @@ inline void Element::synchronizeAttribute(const QualifiedName& name) const
         synchronizeStyleAttributeInternal();
         return;
     }
+#if !defined(DISABLE_SVG)
     if (UNLIKELY(elementData()->m_animatedSVGAttributesAreDirty)) {
         ASSERT(isSVGElement());
         // See comment in the AtomicString version of synchronizeAttribute()
         // also.
         toSVGElement(this)->synchronizeAnimatedSVGAttribute(name);
     }
+#endif
 }
 
 void Element::synchronizeAttribute(const AtomicString& localName) const
@@ -414,6 +424,7 @@ void Element::synchronizeAttribute(const AtomicString& localName) const
         synchronizeStyleAttributeInternal();
         return;
     }
+#if !defined(DISABLE_SVG)
     if (elementData()->m_animatedSVGAttributesAreDirty) {
         // We're not passing a namespace argument on purpose. SVGNames::*Attr are defined w/o namespaces as well.
 
@@ -428,6 +439,7 @@ void Element::synchronizeAttribute(const AtomicString& localName) const
         // true.
         toSVGElement(this)->synchronizeAnimatedSVGAttribute(QualifiedName(nullAtom, localName, nullAtom));
     }
+#endif
 }
 
 const AtomicString& Element::getAttribute(const QualifiedName& name) const
@@ -775,6 +787,7 @@ IntRect Element::boundsInRootViewSpace()
         return IntRect();
 
     Vector<FloatQuad> quads;
+#if !defined(DISABLE_SVG)
     if (isSVGElement() && renderer()) {
         // Get the bounding rectangle from the SVG model.
         SVGElement* svgElement = toSVGElement(this);
@@ -782,10 +795,13 @@ IntRect Element::boundsInRootViewSpace()
         if (svgElement->getBoundingBox(localRect))
             quads.append(renderer()->localToAbsoluteQuad(localRect));
     } else {
+#endif
         // Get the bounding rectangle from the box model.
         if (renderBoxModelObject())
             renderBoxModelObject()->absoluteQuads(quads);
+#if !defined(DISABLE_SVG)
     }
+#endif
 
     if (quads.isEmpty())
         return IntRect();
@@ -820,6 +836,7 @@ PassRefPtrWillBeRawPtr<ClientRect> Element::getBoundingClientRect()
     document().updateLayoutIgnorePendingStylesheets();
 
     Vector<FloatQuad> quads;
+#if !defined(DISABLE_SVG)
     if (isSVGElement() && renderer() && !renderer()->isSVGRoot()) {
         // Get the bounding rectangle from the SVG model.
         SVGElement* svgElement = toSVGElement(this);
@@ -827,10 +844,13 @@ PassRefPtrWillBeRawPtr<ClientRect> Element::getBoundingClientRect()
         if (svgElement->getBoundingBox(localRect))
             quads.append(renderer()->localToAbsoluteQuad(localRect));
     } else {
+#endif
         // Get the bounding rectangle from the box model.
         if (renderBoxModelObject())
             renderBoxModelObject()->absoluteQuads(quads);
+#if !defined(DISABLE_SVG)
     }
+#endif
 
     if (quads.isEmpty())
         return ClientRect::create();
@@ -1303,8 +1323,10 @@ void Element::removedFrom(ContainerNode* insertionPoint)
 
     ContainerNode::removedFrom(insertionPoint);
     if (wasInDocument) {
+#if !defined(DISABLE_SVG)
         if (hasPendingResources())
             document().accessSVGExtensions().removeElementFromPendingResources(this);
+#endif
 
         if (isUpgradedCustomElement())
             CustomElement::didDetach(this, insertionPoint->document());
@@ -1359,8 +1381,10 @@ void Element::detach(const AttachContext& context)
     HTMLFrameOwnerElement::UpdateSuspendScope suspendWidgetHierarchyUpdates;
     cancelFocusAppearanceUpdate();
     removeCallbackSelectors();
+#if !defined(DISABLE_SVG)
     if (svgFilterNeedsLayerUpdate())
         document().unscheduleSVGFilterLayerUpdateHack(*this);
+#endif
     if (hasRareData()) {
         ElementRareData* data = elementRareData();
         data->clearPseudoElements();
@@ -1544,7 +1568,11 @@ StyleRecalcChange Element::recalcOwnStyle(StyleRecalcChange change)
         updateCallbackSelectors(oldStyle.get(), newStyle.get());
 
     if (RenderObject* renderer = this->renderer()) {
+#if !defined(DISABLE_SVG)
         if (localChange != NoChange || pseudoStyleCacheIsInvalid(oldStyle.get(), newStyle.get()) || svgFilterNeedsLayerUpdate()) {
+#else
+        if (localChange != NoChange || pseudoStyleCacheIsInvalid(oldStyle.get(), newStyle.get())) {
+#endif
             renderer->setStyle(newStyle.get());
         } else {
             // Although no change occurred, we use the new style so that the cousin style sharing code won't get
@@ -2116,8 +2144,10 @@ bool Element::supportsSpatialNavigationFocus() const
         || hasEventListeners(EventTypeNames::keypress)
         || hasEventListeners(EventTypeNames::keyup))
         return true;
+#if !defined(DISABLE_SVG)
     if (!isSVGElement())
         return false;
+#endif
     return (hasEventListeners(EventTypeNames::focus)
         || hasEventListeners(EventTypeNames::blur)
         || hasEventListeners(EventTypeNames::focusin)
@@ -2572,8 +2602,10 @@ KURL Element::hrefURL() const
     // <link> implement URLUtils?
     if (isHTMLAnchorElement(*this) || isHTMLAreaElement(*this) || isHTMLLinkElement(*this))
         return getURLAttribute(hrefAttr);
+#if !defined(DISABLE_SVG)
     if (isSVGAElement(*this))
         return getURLAttribute(XLinkNames::hrefAttr);
+#endif
     return KURL();
 }
 
@@ -2702,8 +2734,10 @@ bool Element::fastAttributeLookupAllowed(const QualifiedName& name) const
     if (name == HTMLNames::styleAttr)
         return false;
 
+#if !defined(DISABLE_SVG)
     if (isSVGElement())
         return !toSVGElement(this)->isAnimatableAttribute(name);
+#endif
 
     return true;
 }
@@ -2867,10 +2901,12 @@ void Element::updateExtraNamedItemRegistration(const AtomicString& oldId, const 
         toHTMLDocument(document()).addExtraNamedItem(newId);
 }
 
+#if !defined(DISABLE_SVG)
 void Element::scheduleSVGFilterLayerUpdateHack()
 {
     document().scheduleSVGFilterLayerUpdateHack(*this);
 }
+#endif
 
 IntSize Element::savedLayerScrollOffset() const
 {
@@ -3192,8 +3228,10 @@ bool Element::supportsStyleSharing() const
     // If the element has inline style it is probably unique.
     if (inlineStyle())
         return false;
+#if !defined(DISABLE_SVG)
     if (isSVGElement() && toSVGElement(this)->animatedSMILStyleProperties())
         return false;
+#endif
     // Ids stop style sharing if they show up in the stylesheets.
     if (hasID() && document().ensureStyleResolver().hasRulesForId(idForStyleResolution()))
         return false;

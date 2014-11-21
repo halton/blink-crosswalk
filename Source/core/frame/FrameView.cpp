@@ -70,9 +70,11 @@
 #include "core/rendering/compositing/CompositedSelectionBound.h"
 #include "core/rendering/compositing/RenderLayerCompositor.h"
 #include "core/rendering/style/RenderStyle.h"
+#if !defined(DISABLE_SVG)
 #include "core/rendering/svg/RenderSVGRoot.h"
 #include "core/svg/SVGDocumentExtensions.h"
 #include "core/svg/SVGSVGElement.h"
+#endif
 #include "platform/RuntimeEnabledFeatures.h"
 #include "platform/ScriptForbiddenScope.h"
 #include "platform/TraceEvent.h"
@@ -472,6 +474,7 @@ void FrameView::applyOverflowToViewportAndSetRenderer(RenderObject* o, Scrollbar
     EOverflow overflowX = o->style()->overflowX();
     EOverflow overflowY = o->style()->overflowY();
 
+#if !defined(DISABLE_SVG)
     if (o->isSVGRoot()) {
         // Don't allow overflow to affect <img> and css backgrounds
         if (toRenderSVGRoot(o)->isEmbeddedThroughSVGImage())
@@ -484,6 +487,7 @@ void FrameView::applyOverflowToViewportAndSetRenderer(RenderObject* o, Scrollbar
             overflowY = OHIDDEN;
         }
     }
+#endif
 
     bool ignoreOverflowHidden = false;
     if (m_frame->settings()->ignoreMainFrameOverflowHiddenQuirk() && m_frame->isMainFrame())
@@ -665,9 +669,11 @@ inline void FrameView::forceLayoutParentViewIfNeeded()
     if (!contentBox)
         return;
 
+#if !defined(DISABLE_SVG)
     RenderSVGRoot* svgRoot = toRenderSVGRoot(contentBox);
     if (svgRoot->everHadLayout() && !svgRoot->needsLayout())
         return;
+#endif
 
     // If the embedded SVG document appears the first time, the ownerRenderer has already finished
     // layout without knowing about the existence of the embedded SVG document, because RenderReplaced
@@ -1030,9 +1036,11 @@ RenderBox* FrameView::embeddedContentBox() const
     if (!firstChild || !firstChild->isBox())
         return 0;
 
+#if !defined(DISABLE_SVG)
     // Curently only embedded SVG documents participate in the size-negotiation logic.
     if (firstChild->isSVGRoot())
         return toRenderBox(firstChild);
+#endif
 
     return 0;
 }
@@ -1345,6 +1353,7 @@ bool FrameView::scrollToAnchor(const String& name)
     // Setting to null will clear the current target.
     m_frame->document()->setCSSTarget(anchorNode);
 
+#if !defined(DISABLE_SVG)
     if (m_frame->document()->isSVGDocument()) {
         if (SVGSVGElement* svg = SVGDocumentExtensions::rootElement(*m_frame->document())) {
             svg->setupInitialView(name, anchorNode);
@@ -1352,6 +1361,7 @@ bool FrameView::scrollToAnchor(const String& name)
                 return true;
         }
     }
+#endif
 
     // Implement the rule that "" and "top" both mean top of page as in other browsers.
     if (!anchorNode && !(name.isEmpty() || equalIgnoringCase(name, "top")))
@@ -2598,16 +2608,20 @@ void FrameView::updateLayoutAndStyleIfNeededRecursive()
     // To avoid pushing an invalid tree for display, we have to check for this case and do another
     // style recalc. The extra style recalc needs to happen after our child <iframes> were updated.
     // FIXME: We shouldn't be triggering an extra style recalc in the first place.
+#if !defined(DISABLE_SVG)
     if (m_frame->document()->hasSVGFilterElementsRequiringLayerUpdate()) {
         m_frame->document()->updateRenderTreeIfNeeded();
 
         if (needsLayout())
             layout();
     }
+#endif
 
     // These asserts ensure that parent frames are clean, when child frames finished updating layout and style.
     ASSERT(!needsLayout());
+#if !defined(DISABLE_SVG)
     ASSERT(!m_frame->document()->hasSVGFilterElementsRequiringLayerUpdate());
+#endif
 #if ENABLE(ASSERT)
     m_frame->document()->renderView()->assertRendererLaidOut();
 #endif

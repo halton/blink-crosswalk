@@ -11,7 +11,9 @@
 #include "core/page/Chrome.h"
 #include "core/page/ChromeClient.h"
 #include "core/page/Page.h"
+#if !defined(DISABLE_SVG)
 #include "core/svg/SVGDocumentExtensions.h"
+#endif
 #include "platform/Logging.h"
 
 namespace blink {
@@ -48,7 +50,9 @@ void PageAnimator::serviceScriptedAnimations(double monotonicAnimationStartTime)
 
     for (size_t i = 0; i < documents.size(); ++i) {
         DocumentAnimations::updateAnimationTimingForAnimationFrame(*documents[i], monotonicAnimationStartTime);
+#if !defined(DISABLE_SVG)
         SVGDocumentExtensions::serviceOnAnimationFrame(*documents[i], monotonicAnimationStartTime);
+#endif
     }
 
     for (size_t i = 0; i < documents.size(); ++i)
