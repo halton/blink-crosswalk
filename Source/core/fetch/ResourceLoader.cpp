@@ -437,6 +437,7 @@ void ResourceLoader::didReceiveData(blink::WebURLLoader*, const char* data, int 
     m_host->didReceiveData(m_resource, data, length, encodedDataLength);
     if (m_state == Terminated)
         return;
+    fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
     m_resource->appendData(data, length);
 }
 

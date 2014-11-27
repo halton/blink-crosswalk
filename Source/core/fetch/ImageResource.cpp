@@ -363,6 +363,7 @@ inline void ImageResource::clearImage()
 
 void ImageResource::appendData(const char* data, int length)
 {
+    fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
     Resource::appendData(data, length);
     if (!m_loadingMultipartContent)
         updateImage(false);

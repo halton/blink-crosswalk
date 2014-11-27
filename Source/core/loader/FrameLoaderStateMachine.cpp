@@ -26,6 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdio.h>
 #include "config.h"
 #include "core/loader/FrameLoaderStateMachine.h"
 
@@ -46,6 +47,7 @@ bool FrameLoaderStateMachine::committedFirstRealDocumentLoad() const
 
 bool FrameLoaderStateMachine::creatingInitialEmptyDocument() const
 {
+    fprintf(stderr, "Halton: %s %d %d\n", __func__, __LINE__, m_state);
     return m_state == CreatingInitialEmptyDocument;
 }
 
@@ -62,6 +64,7 @@ bool FrameLoaderStateMachine::isDisplayingInitialEmptyDocument() const
 void FrameLoaderStateMachine::advanceTo(State state)
 {
     ASSERT(m_state < state);
+    fprintf(stderr, "Halton: %s %d %d\n", __func__, __LINE__, m_state);
     m_state = state;
 }
 

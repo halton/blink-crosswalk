@@ -344,8 +344,10 @@ static HistoryCommitType loadTypeToCommitType(FrameLoadType type)
 
 void FrameLoader::receivedFirstData()
 {
+    fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
     if (m_stateMachine.creatingInitialEmptyDocument())
         return;
+    fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
 
     HistoryCommitType historyCommitType = loadTypeToCommitType(m_loadType);
     if (historyCommitType == StandardCommit && (m_documentLoader->urlForHistory().isEmpty() || (opener() && !m_currentItem && m_documentLoader->originalRequest().url().isEmpty())))
@@ -361,6 +363,7 @@ void FrameLoader::receivedFirstData()
 
     InspectorInstrumentation::didCommitLoad(m_frame, m_documentLoader.get());
     m_frame->page()->didCommitLoad(m_frame);
+    fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
     dispatchDidClearDocumentOfWindowObject();
 }
 
@@ -899,6 +902,7 @@ void FrameLoader::notifyIfInitialDocumentAccessed()
 
 void FrameLoader::commitProvisionalLoad()
 {
+    fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
     ASSERT(client()->hasWebView());
     ASSERT(m_state == FrameStateProvisional);
     RefPtr<DocumentLoader> pdl = m_provisionalDocumentLoader;
@@ -976,6 +980,7 @@ static bool isDocumentDoneLoading(Document* document)
 
 bool FrameLoader::checkLoadCompleteForThisFrame()
 {
+    fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
     ASSERT(client()->hasWebView());
     RefPtrWillBeRawPtr<LocalFrame> protect(m_frame.get());
 
@@ -1035,6 +1040,7 @@ bool FrameLoader::checkLoadCompleteForThisFrame()
         if (m_frame->isMainFrame())
             m_frame->document()->viewportDescription().reportMobilePageStats(m_frame);
 
+        fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
         client()->dispatchDidFinishLoad();
     }
     m_loadType = FrameLoadTypeStandard;

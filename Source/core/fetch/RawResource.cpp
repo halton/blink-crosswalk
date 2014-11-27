@@ -40,12 +40,15 @@ RawResource::RawResource(const ResourceRequest& resourceRequest, Type type)
 
 void RawResource::appendData(const char* data, int length)
 {
+    fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
     Resource::appendData(data, length);
 
     ResourcePtr<RawResource> protect(this);
     ResourceClientWalker<RawResourceClient> w(m_clients);
-    while (RawResourceClient* c = w.next())
+    while (RawResourceClient* c = w.next()) {
+        fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
         c->dataReceived(this, data, length);
+    }
 }
 
 void RawResource::didAddClient(ResourceClient* c)
@@ -62,6 +65,7 @@ void RawResource::didAddClient(ResourceClient* c)
         RedirectPair redirect = redirectChain()[i];
         ResourceRequest request(redirect.m_request);
         client->redirectReceived(this, request, redirect.m_redirectResponse);
+    fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
         if (!hasClient(c))
             return;
     }
@@ -71,8 +75,10 @@ void RawResource::didAddClient(ResourceClient* c)
         client->responseReceived(this, m_response);
     if (!hasClient(c))
         return;
-    if (m_data)
+    if (m_data) {
+        fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
         client->dataReceived(this, m_data->data(), m_data->size());
+    }
     if (!hasClient(c))
         return;
     Resource::didAddClient(client);

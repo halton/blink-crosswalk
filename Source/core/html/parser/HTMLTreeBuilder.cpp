@@ -373,6 +373,7 @@ PassRefPtrWillBeRawPtr<Element> HTMLTreeBuilder::takeScriptToProcess(TextPositio
 
 void HTMLTreeBuilder::constructTree(AtomicHTMLToken* token)
 {
+    fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
     if (shouldProcessTokenInForeignContent(token))
         processTokenInForeignContent(token);
     else

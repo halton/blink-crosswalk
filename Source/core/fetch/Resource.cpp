@@ -464,8 +464,10 @@ void Resource::addClient(ResourceClient* client)
 
 void Resource::didAddClient(ResourceClient* c)
 {
-    if (!isLoading() && !stillNeedsLoad())
+    if (!isLoading() && !stillNeedsLoad()) {
+        fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
         c->notifyFinished(this);
+    }
 }
 
 static bool shouldSendCachedDataSynchronouslyForType(Resource::Type type)

@@ -219,6 +219,7 @@ void DocumentLoader::stopLoading()
 
 void DocumentLoader::commitIfReady()
 {
+    fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
     if (!m_committed) {
         m_committed = true;
         frameLoader()->commitProvisionalLoad();
@@ -250,6 +251,7 @@ void DocumentLoader::notifyFinished(Resource* resource)
 
 void DocumentLoader::finishedLoading(double finishTime)
 {
+    fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
     ASSERT(!mainResourceLoader() || !mainResourceLoader()->defersLoading() || InspectorInstrumentation::isDebuggerPaused(m_frame));
 
     RefPtr<DocumentLoader> protect(this);
@@ -538,6 +540,7 @@ void DocumentLoader::commitData(const char* bytes, size_t length)
 
 void DocumentLoader::dataReceived(Resource* resource, const char* data, int length)
 {
+    fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
     ASSERT(data);
     ASSERT(length);
     ASSERT_UNUSED(resource, resource == m_mainResource);
@@ -664,6 +667,7 @@ void DocumentLoader::prepareSubframeArchiveLoadIfNeeded()
 
 bool DocumentLoader::scheduleArchiveLoad(Resource* cachedResource, const ResourceRequest& request)
 {
+    fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
     if (!m_archive)
         return false;
 
@@ -673,12 +677,15 @@ bool DocumentLoader::scheduleArchiveLoad(Resource* cachedResource, const Resourc
         cachedResource->error(Resource::LoadError);
         return true;
     }
+    fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
 
     cachedResource->setLoading(true);
     cachedResource->responseReceived(archiveResource->response());
     SharedBuffer* data = archiveResource->data();
-    if (data)
+    if (data) {
+        fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
         cachedResource->appendData(data->data(), data->size());
+    }
     cachedResource->finish();
     return true;
 }

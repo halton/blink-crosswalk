@@ -57,6 +57,7 @@ void ScriptResource::didAddClient(ResourceClient* client)
 
 void ScriptResource::appendData(const char* data, int length)
 {
+    fprintf(stderr, "Halton: %s %d\n", __func__, __LINE__);
     Resource::appendData(data, length);
     ResourceClientWalker<ScriptResourceClient> walker(m_clients);
     while (ScriptResourceClient* client = walker.next())
