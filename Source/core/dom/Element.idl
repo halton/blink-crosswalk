@@ -19,7 +19,7 @@
  */
 
 [
-    SpecialWrapFor=(HTMLElement,SVGElement),
+    SpecialWrapFor=(HTMLElement),
 ] interface Element : Node {
 
     // DOM Level 1 Core

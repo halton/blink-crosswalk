@@ -309,7 +309,7 @@ bool HTMLElementStack::isHTMLIntegrationPoint(HTMLStackItem* item)
         || item->hasTagName(SVGNames::descTag)
         || item->hasTagName(SVGNames::titleTag);
 #else
-    return false;
+    return true;
 #endif
 }
 

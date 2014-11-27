@@ -51,7 +51,5 @@
     [Custom, NotEnumerable] getter Node (DOMString name);
     [Custom] setter Node (DOMString name, Node value);
 
-    [CheckSecurity=Node, RaisesException] Document getSVGDocument();
-
     [Reflect, RuntimeEnabled=SubresourceIntegrity] attribute DOMString integrity;
 };
